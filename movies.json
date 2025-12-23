@@ -30,6 +30,26 @@
   ]
 },
 {
+  "id": "Marjaavaan-2019",
+  "type": "Movie",
+  "layout_mode": "movie",
+  "title": "Marjaavaan",
+  "year": "2019",
+  "genre": "Action, Drama, Romance",
+  "rating": "3.7",
+  "poster": "https://image.tmdb.org/t/p/original/xILMQFZMQdJq3D7J6TuLrW6A3W5.jpg",
+  "backdrop": "https://image.tmdb.org/t/p/original/aKnxz5bTgKGIPwwoDNXmWB6TEZx.jpg",
+  "description": "Raghu and Zoya are enjoying their lives together until a gang leader with harmful intentions turns their world upside down.",
+  "trailer_embed": "",
+  "downloads": [
+    {
+      "quality": "[HINDI] 720p 10bit WEB-DL x265 HEVC",
+      "size": "1.2 GB",
+      "link": "https://cloudz.flixar.workers.dev/0:/Movies/2019/Marjaavaan%20(2019)%20%5BHIN%5D/%5B%40FlixArUniqx%5D.Marjaavaan.(2019).HINDI.720p.10bit.WEB-DL.x265.HEVC.E-Sub.mkv"
+    }
+  ]
+},
+{
   "id": "Home-Alone-1990",
   "type": "Movie",
   "layout_mode": "movie",
@@ -39,7 +59,8 @@
   "rating": "7.7",
   "poster": "https://image.tmdb.org/t/p/original/3tyD6OnLnjGN4JWRjKkbJccj4gY.jpg",
   "backdrop": "https://image.tmdb.org/t/p/original/vaVaNrscmsG8CUKYxiwZGFNqGJo.jpg",
-  "description": "An eight-year-old troublemaker, mistakenly left home alone, must defend his home against a pair of burglars on Christmas Eve.",
+  "description": "Eight-year-old Kevin McCallister makes the most of the situation after his family unwittingly leaves him behind when they go on Christmas vacation. When thieves try to break into his home, he puts up a fight like no other.",
+  "trailer_embed": "",
   "downloads": [
     {
       "quality": "1080p BluRay HDR x265",
