@@ -2,63 +2,93 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>StreamHub Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #111; color: #eee; font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0 15px; background: #222; border: 1px solid #444; color: white; box-sizing: border-box; }
-        button { padding: 12px 20px; cursor: pointer; background: #00d2ff; border: none; font-weight: bold; color: black; width: 100%; }
-        .row { display: flex; gap: 10px; }
-        .row > div { flex: 1; }
-        label { font-size: 0.9rem; color: #aaa; text-transform: uppercase; }
+        :root { --bg: #0f1014; --card: #1b1c22; --primary: #00d2ff; --text: #f5f5f5; }
+        body { margin: 0; font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        
+        .login-box { max-width: 400px; margin: 100px auto; background: var(--card); padding: 40px; border-radius: 8px; text-align: center; }
+        .admin-content { display: none; max-width: 800px; margin: 0 auto; }
+        
+        input, select, textarea { width: 100%; padding: 10px; margin: 10px 0; background: #23242a; border: 1px solid #333; color: white; border-radius: 4px; font-family: inherit; }
+        input:focus, textarea:focus { border-color: var(--primary); outline: none; }
+        
+        button { padding: 10px 20px; background: var(--primary); border: none; color: #000; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        h2 { color: var(--primary); border-bottom: 1px solid #333; padding-bottom: 10px; }
+        label { display: block; margin-top: 15px; font-size: 0.9rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
     </style>
 </head>
 <body>
-    <h2 style="color:#00d2ff">Add New Entry</h2>
-    
-    <div class="row">
-        <div><label>ID (Unique)</label><input type="text" id="id" placeholder="mv_001 or tv_001"></div>
-        <div><label>Type</label><select id="type"><option>Movie</option><option>TV Series</option></select></div>
+
+    <div class="login-box" id="login">
+        <h2>Admin Access</h2>
+        <input type="password" id="pass" placeholder="Enter Password">
+        <button onclick="checkPass()">Login</button>
     </div>
 
-    <label>Title</label>
-    <input type="text" id="title">
+    <div class="admin-content" id="panel">
+        <h2>Add New Entry</h2>
+        
+        <label>ID (Unique)</label>
+        <input type="text" id="id" placeholder="e.g. mv_050 or tv_020">
 
-    <div class="row">
-        <div><label>Year</label><input type="text" id="year"></div>
-        <div><label>Rating</label><input type="text" id="rating"></div>
+        <label>Type</label>
+        <select id="type"><option>Movie</option><option>TV Series</option></select>
+
+        <label>Title</label>
+        <input type="text" id="title">
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div><label>Year</label><input type="text" id="year"></div>
+            <div><label>Rating</label><input type="text" id="rating"></div>
+        </div>
+
+        <label>Genres (Comma Separated)</label>
+        <input type="text" id="genre" placeholder="Action, Drama, Sci-Fi">
+
+        <label>Poster URL</label>
+        <input type="text" id="poster">
+
+        <label>Backdrop URL</label>
+        <input type="text" id="backdrop">
+
+        <label>YouTube Embed Link</label>
+        <input type="text" id="trailer" placeholder="https://www.youtube.com/embed/...">
+
+        <label>Description</label>
+        <textarea id="desc" rows="3"></textarea>
+
+        <label style="color:var(--primary)">Downloads / Episodes JSON</label>
+        <p style="font-size:0.8rem; color:#666;">Paste the array code here.</p>
+        <textarea id="extra_json" rows="5" placeholder='[{"quality":"1080p","size":"1.2GB","link":"#"}]'></textarea>
+
+        <button onclick="generate()" style="width:100%; margin-top:20px;">GENERATE JSON CODE</button>
+        
+        <label>Result (Copy this to movies.json)</label>
+        <textarea id="output" rows="10" style="background:#000; color:#0f0; font-family:monospace;"></textarea>
     </div>
-
-    <label>Genre (Comma separated)</label>
-    <input type="text" id="genre">
-
-    <label>Poster URL</label>
-    <input type="text" id="poster">
-
-    <label>Backdrop URL</label>
-    <input type="text" id="backdrop">
-
-    <label>YouTube Embed URL</label>
-    <input type="text" id="trailer">
-
-    <label>Description</label>
-    <textarea id="desc" rows="3"></textarea>
-
-    <h3 style="color:#00d2ff; border-top:1px solid #333; padding-top:10px;">Downloads / Episodes (JSON)</h3>
-    <p style="font-size:0.8rem; color:#666;">Paste the array for downloads or seasons here.</p>
-    <textarea id="extra_json" rows="5" placeholder='[{"quality":"1080p","size":"1GB","link":"#"}]'></textarea>
-
-    <button onclick="generate()">GENERATE JSON CODE</button>
-    <br><br>
-    <textarea id="output" rows="10" style="background:#000; color:#0f0; border:1px solid #333;"></textarea>
 
     <script>
+        // CHANGE THIS PASSWORD
+        const PASS = "1234";
+
+        function checkPass() {
+            if(document.getElementById('pass').value === PASS) {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('panel').style.display = 'block';
+            } else {
+                alert("Wrong Password");
+            }
+        }
+
         function generate() {
             const type = document.getElementById('type').value;
-            const extra = document.getElementById('extra_json').value;
-            
             let obj = {
                 id: document.getElementById('id').value,
                 type: type,
+                layout_mode: type === 'Movie' ? 'movie' : 'series', // Auto-set layout
                 title: document.getElementById('title').value,
                 year: document.getElementById('year').value,
                 genre: document.getElementById('genre').value,
@@ -70,15 +100,15 @@
             };
 
             try {
-                const parsedExtra = JSON.parse(extra || "[]");
-                if(type === 'Movie') obj.downloads = parsedExtra;
-                else obj.seasons = parsedExtra;
+                const extra = JSON.parse(document.getElementById('extra_json').value || "[]");
+                if(type === 'Movie') obj.downloads = extra;
+                else obj.seasons = extra;
             } catch(e) {
-                alert("Invalid JSON in Downloads/Episodes box!");
+                alert("Invalid JSON format in Downloads box!");
                 return;
             }
 
-            document.getElementById('output').value = "," + JSON.stringify(obj, null, 2);
+            document.getElementById('output').value = ",\n" + JSON.stringify(obj, null, 2);
         }
     </script>
 </body>
