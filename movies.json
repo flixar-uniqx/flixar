@@ -1,0 +1,20 @@
+[
+  {
+    "id": "gd_001",
+    "title": "Big Buck Bunny",
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Big_buck_bunny_poster_big.jpg",
+    "backdrop": "https://peach.blender.org/wp-content/uploads/title_anouncement.jpg",
+    "gdrive_id": "YOUR_GOOGLE_DRIVE_FILE_ID_HERE",
+    "year": "2008",
+    "description": "A giant rabbit with a heart bigger than himself. When one sunny day three rodents rudely harass him, something snaps... and the bunny goes bad."
+  },
+  {
+    "id": "gd_002",
+    "title": "Sintel",
+    "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Sintel_poster.jpg/800px-Sintel_poster.jpg",
+    "backdrop": "https://durian.blender.org/wp-content/uploads/2010/09/sintel_original.jpg",
+    "gdrive_id": "ANOTHER_GOOGLE_DRIVE_FILE_ID",
+    "year": "2010",
+    "description": "A lonely young woman, Sintel, helps and befriends a dragon, whom she calls Scales. But when he is kidnapped by an adult dragon, Sintel decides to embark on a dangerous quest."
+  }
+]
