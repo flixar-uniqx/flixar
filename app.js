@@ -1,48 +1,57 @@
-// Environment Detection
-const isRoot = window.location.pathname.endsWith('index.html') 
-    ? window.location.pathname.split('/').length <= 2 
-    : window.location.pathname.replace(/\/$/, '').split('/').length <= 1;
+/* SAVE THIS AS app.js */
 
-// Link Helper
-const P = (path) => {
-    let base = isRoot ? path : `../${path}`;
-    // If running locally, ensure index.html is appended
-    if (window.location.protocol === 'file:' && !base.includes('.html') && !base.endsWith('/')) {
-        base += base.endsWith('/') ? 'index.html' : '/index.html';
+// 1. SMART PATH RESOLVER (Fixes broken links)
+function getRoot() {
+    const loc = window.location.pathname;
+    // If we are in a subfolder (e.g. /movie/index.html), go up one level
+    if (loc.includes('/movie/') || loc.includes('/series/') || loc.includes('/contact/') || loc.includes('/disclaimer/') || loc.includes('/terms/') || loc.includes('/admin/')) {
+        return '../';
     }
-    return base;
-};
+    return './'; // We are at root
+}
 
+const ROOT = getRoot();
+
+// 2. INITIALIZE
 document.addEventListener("DOMContentLoaded", () => {
+    // Wait for CONFIG to be loaded
+    if (typeof CONFIG === 'undefined') {
+        console.error("Config.js not loaded! Check script order.");
+        return;
+    }
+    
     applyConfig();
     injectNavbar();
     injectSidebar();
     injectFooter();
-    setupScroll();
 });
 
 function applyConfig() {
     document.documentElement.style.setProperty('--primary', CONFIG.colors.primary);
-    if(document.title === "Loading...") document.title = CONFIG.siteName;
 }
 
+// 3. INJECT NAVBAR (Search Bar Fixed)
 function injectNavbar() {
     const nav = document.createElement('nav');
     nav.className = 'nav';
     nav.innerHTML = `
-        <a href="${P('')}" class="logo">
+        <a href="${ROOT}index.html" class="logo">
             <img src="${CONFIG.logoUrl}" alt="Logo"> ${CONFIG.siteName}
         </a>
         <div class="nav-right">
-            <input type="text" class="search-box" placeholder="Search movies..." onchange="handleSearch(this.value)">
+            <div class="search-container">
+                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" class="search-box" placeholder="Search..." onchange="handleSearch(this.value)">
+            </div>
             <div class="menu-btn" onclick="toggleMenu()">
-                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </div>
         </div>
     `;
     document.body.prepend(nav);
 }
 
+// 4. INJECT SIDEBAR (Filters Fixed)
 function injectSidebar() {
     const sidebar = document.createElement('div');
     sidebar.innerHTML = `
@@ -51,38 +60,58 @@ function injectSidebar() {
             <div class="close-menu" onclick="toggleMenu()">✕</div>
             
             <div class="sidebar-heading">Menu</div>
-            <a href="${P('')}" class="sidebar-link">Home</a>
-            <a href="${P('contact')}" class="sidebar-link">Contact Us</a>
-            <a href="${P('terms')}" class="sidebar-link">Terms & Conditions</a>
-            <a href="${P('disclaimer')}" class="sidebar-link">Disclaimer</a>
+            <a href="${ROOT}index.html" class="sidebar-link">Home</a>
+            <a href="${ROOT}contact/index.html" class="sidebar-link">Contact Us</a>
+            <a href="${ROOT}terms/index.html" class="sidebar-link">Terms & Conditions</a>
+            <a href="${ROOT}disclaimer/index.html" class="sidebar-link">Disclaimer</a>
 
-            <div class="sidebar-heading">Browse</div>
-            <div id="side-filters">Loading...</div>
+            <div class="sidebar-heading">Browse Library</div>
+            <div id="side-filters" style="font-size:0.9rem; color:#666;">Loading...</div>
         </div>
     `;
     document.body.appendChild(sidebar);
     
-    // Load Filters
-    fetch(P('movies.json')).then(r=>r.json()).then(data => populateFilters(data));
+    // Fetch Filters
+    fetch(ROOT + 'movies.json?t=' + Date.now())
+        .then(r => {
+            if (!r.ok) throw new Error("JSON not found");
+            return r.json();
+        })
+        .then(data => populateSidebarFilters(data))
+        .catch(e => {
+            document.getElementById('side-filters').innerHTML = "Error loading menu.";
+            console.error(e);
+        });
 }
 
+// 5. INJECT FOOTER (Fixes Undefined)
 function injectFooter() {
     const footer = document.createElement('div');
     footer.className = 'footer';
     footer.innerHTML = `
         <div class="footer-links">
-            <a href="${P('')}" class="footer-link">Home</a>
-            <a href="${P('contact')}" class="footer-link">Contact</a>
-            <a href="${P('terms')}" class="footer-link">Terms</a>
-            <a href="${P('disclaimer')}" class="footer-link">Disclaimer</a>
+            <a href="${ROOT}index.html" class="footer-link">Home</a>
+            <a href="${ROOT}contact/index.html" class="footer-link">Contact</a>
+            <a href="${ROOT}terms/index.html" class="footer-link">Terms</a>
+            <a href="${ROOT}disclaimer/index.html" class="footer-link">Disclaimer</a>
         </div>
         <div class="footer-copy">${CONFIG.footerText}</div>
-        <div id="go-up" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</div>
+        <div class="footer-copy" style="margin-top:10px; color:#444;">${CONFIG.disclaimer}</div>
     `;
     document.body.appendChild(footer);
 }
 
-function populateFilters(data) {
+// 6. HELPER FUNCTIONS
+function toggleMenu() {
+    document.querySelector('.sidebar').classList.toggle('active');
+    document.querySelector('.sidebar-overlay').classList.toggle('active');
+}
+
+function handleSearch(q) {
+    if(q.trim()) window.location.href = `${ROOT}index.html?search=${encodeURIComponent(q)}`;
+}
+
+function populateSidebarFilters(data) {
     const types = new Set(), genres = new Set(), years = new Set();
     data.forEach(m => {
         if(m.type) types.add(m.type);
@@ -90,33 +119,26 @@ function populateFilters(data) {
         if(m.genre) m.genre.split(',').forEach(g => genres.add(g.trim()));
     });
 
-    const container = document.getElementById('side-filters');
+    const c = document.getElementById('side-filters');
     let html = '';
     
-    // Helper for filter links
-    const link = (k, v) => `<a href="${P('')}?${k}=${v}" class="sidebar-link">${v}</a>`;
+    // Filter Link Helper
+    const link = (k, v) => `<a href="${ROOT}index.html?${k}=${v}" class="sidebar-link" style="padding-left:10px; border:none; font-size:0.9rem;">${v}</a>`;
 
-    html += `<div style="margin-bottom:10px">${Array.from(types).map(t => link('type', t)).join('')}</div>`;
-    
-    html += `<div class="sidebar-heading">Genres</div>`;
-    html += Array.from(genres).sort().map(g => link('genre', g)).join('');
+    html += `<div style="margin-bottom:15px; border-bottom:1px solid #222; padding-bottom:10px;">
+        <strong style="color:#fff; display:block; margin-bottom:5px;">Type</strong>
+        ${Array.from(types).map(t => link('type', t)).join('')}
+    </div>`;
 
-    container.innerHTML = html;
-}
+    html += `<div style="margin-bottom:15px; border-bottom:1px solid #222; padding-bottom:10px;">
+        <strong style="color:#fff; display:block; margin-bottom:5px;">Years</strong>
+        ${Array.from(years).sort().reverse().slice(0, 5).map(y => link('year', y)).join('')}
+    </div>`;
 
-function toggleMenu() {
-    document.querySelector('.sidebar').classList.toggle('active');
-    document.querySelector('.sidebar-overlay').classList.toggle('active');
-}
+    html += `<div>
+        <strong style="color:#fff; display:block; margin-bottom:5px;">Genres</strong>
+        ${Array.from(genres).sort().map(g => link('genre', g)).join('')}
+    </div>`;
 
-function handleSearch(q) {
-    if(q) window.location.href = `${P('')}?search=${encodeURIComponent(q)}`;
-}
-
-function setupScroll() {
-    window.addEventListener('scroll', () => {
-        const up = document.getElementById('go-up');
-        if(window.scrollY > 300) up.classList.add('visible');
-        else up.classList.remove('visible');
-    });
+    c.innerHTML = html;
 }
