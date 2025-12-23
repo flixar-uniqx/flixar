@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JSON Generator</title>
+    <style>
+        body { background: #111; color: #fff; font-family: sans-serif; padding: 20px; }
+        input, select, textarea { width: 100%; padding: 8px; margin: 5px 0 15px; background: #222; border: 1px solid #444; color: white; }
+        button { padding: 10px 20px; cursor: pointer; background: #00d2ff; border: none; font-weight: bold; }
+        .row { display: flex; gap: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Add New Entry</h2>
+    <label>ID (Unique):</label> <input type="text" id="id">
+    <label>Type:</label> <select id="type"><option>Movie</option><option>TV Series</option></select>
+    <label>Title:</label> <input type="text" id="title">
+    <div class="row">
+        <div><label>Year:</label><input type="text" id="year"></div>
+        <div><label>Rating:</label><input type="text" id="rating"></div>
+    </div>
+    <label>Genre (comma separated):</label> <input type="text" id="genre">
+    <label>Poster URL:</label> <input type="text" id="poster">
+    <label>Backdrop URL:</label> <input type="text" id="backdrop">
+    <label>YouTube Embed URL:</label> <input type="text" id="trailer">
+    <label>Description:</label> <textarea id="desc" rows="4"></textarea>
+
+    <h3>Downloads (JSON Format)</h3>
+    <textarea id="dl_json" rows="4" placeholder='[{"quality":"1080p","size":"1GB","link":"url"}]'></textarea>
+
+    <button onclick="generate()">Generate JSON</button>
+    <br><br>
+    <textarea id="output" rows="10" style="background:#000; color:#0f0;"></textarea>
+
+    <script>
+        function generate() {
+            const obj = {
+                id: document.getElementById('id').value,
+                title: document.getElementById('title').value,
+                type: document.getElementById('type').value,
+                year: document.getElementById('year').value,
+                genre: document.getElementById('genre').value,
+                rating: document.getElementById('rating').value,
+                poster: document.getElementById('poster').value,
+                backdrop: document.getElementById('backdrop').value,
+                description: document.getElementById('desc').value,
+                trailer_embed: document.getElementById('trailer').value
+            };
+
+            // Parse downloads manually or use a builder logic
+            try {
+                if(obj.type === 'Movie') obj.downloads = JSON.parse(document.getElementById('dl_json').value);
+                else obj.seasons = JSON.parse(document.getElementById('dl_json').value);
+            } catch(e) { alert("Invalid Download JSON format"); return; }
+
+            document.getElementById('output').value = ",\n" + JSON.stringify(obj, null, 2);
+        }
+    </script>
+</body>
+</html>
