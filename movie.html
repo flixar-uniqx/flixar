@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #00d2ff; --bg-overlay: rgba(11, 12, 15, 0.93); }
+        body { margin: 0; font-family: 'Raleway', sans-serif; background-color: #0b0c0f; color: white; min-height: 100vh; }
+
+        /* Dynamic Background */
+        #bg-layer { position: fixed; inset: 0; z-index: -1; background-size: cover; background-position: center; filter: blur(20px); opacity: 0.4; }
+        #overlay { position: fixed; inset: 0; z-index: -1; background: var(--bg-overlay); }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        .nav-back { color: #aaa; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; margin-bottom: 30px; transition: 0.2s; }
+        .nav-back:hover { color: var(--primary); }
+
+        /* Trailer */
+        .trailer-box { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); background: #000; margin-bottom: 40px; }
+        .trailer-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        /* Info Grid */
+        .details-grid { display: grid; grid-template-columns: 250px 1fr; gap: 40px; align-items: start; }
+        .poster { width: 100%; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .header h1 { margin: 0 0 10px; font-size: 2.5rem; line-height: 1.1; }
+        .tagline { color: var(--primary); font-weight: 600; margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; }
+        .desc { line-height: 1.7; color: #ccc; margin-bottom: 30px; font-size: 1.05rem; }
+
+        /* Stats Row */
+        .stats { display: flex; gap: 30px; margin-bottom: 30px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; }
+        .stat-item { display: flex; flex-direction: column; }
+        .stat-label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-val { font-weight: 700; font-size: 1.1rem; margin-top: 3px; }
+
+        /* Download Table */
+        .dl-section h3 { border-left: 4px solid var(--primary); padding-left: 10px; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 8px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; }
+        th { background: rgba(255,255,255,0.05); color: #aaa; font-weight: 600; font-size: 0.9rem; }
+        tr:not(:last-child) { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .dl-btn { background: var(--primary); color: #000; text-decoration: none; padding: 6px 15px; border-radius: 4px; font-weight: 700; font-size: 0.85rem; transition: 0.2s; display: inline-block; }
+        .dl-btn:hover { background: white; }
+
+        @media(max-width: 768px) { .details-grid { grid-template-columns: 1fr; } .poster { max-width: 200px; margin: 0 auto; display: block; } .stats { flex-wrap: wrap; gap: 20px; } }
+    </style>
+</head>
+<body>
+
+    <div id="bg-layer"></div>
+    <div id="overlay"></div>
+
+    <div class="container">
+        <a href="index.html" class="nav-back">← Back to Library</a>
+
+        <div class="trailer-box">
+            <iframe id="trailer-frame" allowfullscreen></iframe>
+        </div>
+
+        <div class="details-grid">
+            <img id="poster" class="poster" src="" alt="Poster">
+            
+            <div class="content">
+                <div class="header">
+                    <h1 id="title">Loading...</h1>
+                    <div class="tagline">
+                        <span id="type"></span> • <span id="rating"></span>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-item"><span class="stat-label">Year</span><span class="stat-val" id="year"></span></div>
+                    <div class="stat-item"><span class="stat-label">Genre</span><span class="stat-val" id="genre"></span></div>
+                    <div class="stat-item"><span class="stat-label">Duration</span><span class="stat-val">N/A</span></div> </div>
+
+                <p id="desc" class="desc"></p>
+
+                <div class="dl-section">
+                    <h3>Download Links</h3>
+                    <table>
+                        <thead><tr><th>Quality</th><th>Size</th><th>Action</th></tr></thead>
+                        <tbody id="dl-table"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+
+        fetch('movies.json?t=' + Date.now())
+            .then(res => res.json())
+            .then(data => {
+                const movie = data.find(m => m.id === id);
+                if(movie) {
+                    // Background & Poster
+                    document.getElementById('bg-layer').style.backgroundImage = `url('${movie.backdrop || movie.poster}')`;
+                    document.getElementById('poster').src = movie.poster;
+
+                    // Text Info
+                    document.title = movie.title;
+                    document.getElementById('title').innerText = movie.title;
+                    document.getElementById('desc').innerText = movie.description;
+                    document.getElementById('type').innerText = movie.type;
+                    document.getElementById('rating').innerText = `★ ${movie.rating}`;
+                    document.getElementById('year').innerText = movie.year;
+                    document.getElementById('genre').innerText = movie.genre;
+
+                    // Trailer
+                    if(movie.trailer_embed) {
+                        document.getElementById('trailer-frame').src = movie.trailer_embed;
+                    } else {
+                        document.querySelector('.trailer-box').style.display = 'none';
+                    }
+
+                    // Download Table
+                    const table = document.getElementById('dl-table');
+                    if(movie.downloads && movie.downloads.length > 0) {
+                        movie.downloads.forEach(dl => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${dl.quality}</td>
+                                <td>${dl.size}</td>
+                                <td><a href="${dl.link}" class="dl-btn" target="_blank">Download</a></td>
+                            `;
+                            table.appendChild(row);
+                        });
+                    } else {
+                        table.innerHTML = '<tr><td colspan="3">No download links available.</td></tr>';
+                    }
+                } else {
+                    document.querySelector('.container').innerHTML = '<h1>Movie not found</h1><a href="index.html" style="color:white">Go Back</a>';
+                }
+            });
+    </script>
+</body>
+</html>
