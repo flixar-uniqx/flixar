@@ -6,45 +6,67 @@
     <title>Movie Details</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #00d2ff; --bg-overlay: rgba(11, 12, 15, 0.93); }
+        :root { --primary: #00d2ff; --bg-overlay: rgba(11, 12, 15, 0.95); --border: rgba(255,255,255,0.08); }
+        * { box-sizing: border-box; }
         body { margin: 0; font-family: 'Raleway', sans-serif; background-color: #0b0c0f; color: white; min-height: 100vh; }
 
         /* Dynamic Background */
-        #bg-layer { position: fixed; inset: 0; z-index: -1; background-size: cover; background-position: center; filter: blur(20px); opacity: 0.4; }
+        #bg-layer { position: fixed; inset: 0; z-index: -1; background-size: cover; background-position: center; filter: blur(30px); opacity: 0.3; transform: scale(1.1); }
         #overlay { position: fixed; inset: 0; z-index: -1; background: var(--bg-overlay); }
 
-        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
-        .nav-back { color: #aaa; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; margin-bottom: 30px; transition: 0.2s; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        .nav-back { color: #888; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; margin-bottom: 30px; transition: 0.2s; font-size: 0.9rem; }
         .nav-back:hover { color: var(--primary); }
 
-        /* Trailer */
-        .trailer-box { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); background: #000; margin-bottom: 40px; }
-        .trailer-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-
-        /* Info Grid */
-        .details-grid { display: grid; grid-template-columns: 250px 1fr; gap: 40px; align-items: start; }
-        .poster { width: 100%; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        /* Layout Grid */
+        .grid-layout { display: grid; grid-template-columns: 300px 1fr; gap: 50px; align-items: start; }
         
-        .header h1 { margin: 0 0 10px; font-size: 2.5rem; line-height: 1.1; }
-        .tagline { color: var(--primary); font-weight: 600; margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; }
-        .desc { line-height: 1.7; color: #ccc; margin-bottom: 30px; font-size: 1.05rem; }
+        /* Left Column */
+        .poster { width: 100%; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid var(--border); }
+        
+        /* Right Column */
+        .trailer-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: #000; margin-bottom: 30px; border: 1px solid var(--border); }
+        .trailer-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-        /* Stats Row */
-        .stats { display: flex; gap: 30px; margin-bottom: 30px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; }
-        .stat-item { display: flex; flex-direction: column; }
-        .stat-label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-val { font-weight: 700; font-size: 1.1rem; margin-top: 3px; }
+        .title { font-size: 2.8rem; margin: 0 0 10px; font-weight: 700; line-height: 1.1; }
+        .meta-row { display: flex; gap: 15px; color: var(--primary); font-weight: 600; font-size: 0.95rem; margin-bottom: 20px; align-items: center; }
+        .tag { background: rgba(0, 210, 255, 0.1); padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(0, 210, 255, 0.2); }
+        
+        .desc { line-height: 1.8; color: #ccc; font-size: 1.05rem; margin-bottom: 40px; }
 
-        /* Download Table */
-        .dl-section h3 { border-left: 4px solid var(--primary); padding-left: 10px; margin-bottom: 15px; }
-        table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 8px; overflow: hidden; }
-        th, td { padding: 15px; text-align: left; }
-        th { background: rgba(255,255,255,0.05); color: #aaa; font-weight: 600; font-size: 0.9rem; }
-        tr:not(:last-child) { border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .dl-btn { background: var(--primary); color: #000; text-decoration: none; padding: 6px 15px; border-radius: 4px; font-weight: 700; font-size: 0.85rem; transition: 0.2s; display: inline-block; }
-        .dl-btn:hover { background: white; }
+        /* --- DOWNLOAD SECTION --- */
+        .dl-header { font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; border-left: 4px solid var(--primary); padding-left: 15px; }
 
-        @media(max-width: 768px) { .details-grid { grid-template-columns: 1fr; } .poster { max-width: 200px; margin: 0 auto; display: block; } .stats { flex-wrap: wrap; gap: 20px; } }
+        /* MOVIE TABLE STYLE */
+        .movie-table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.02); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+        .movie-table th, .movie-table td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border); }
+        .movie-table th { background: rgba(255,255,255,0.05); color: #aaa; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* SERIES ACCORDION STYLE */
+        .accordion { display: flex; flex-direction: column; gap: 10px; }
+        .season-item { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: rgba(255,255,255,0.02); transition: 0.3s; }
+        .season-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1rem; background: rgba(255,255,255,0.03); user-select: none; transition: 0.2s; }
+        .season-header:hover { background: rgba(255,255,255,0.06); color: var(--primary); }
+        .season-header::after { content: '+'; font-size: 1.5rem; font-weight: 300; }
+        
+        .season-item.active .season-header { background: var(--primary); color: #000; }
+        .season-item.active .season-header::after { content: '-'; }
+
+        .season-body { display: none; padding: 0; background: #0e0f12; }
+        .season-item.active .season-body { display: block; animation: slideDown 0.3s ease; }
+
+        .episode-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; border-bottom: 1px solid var(--border); transition: 0.2s; }
+        .episode-row:hover { background: rgba(255,255,255,0.03); }
+        .episode-row:last-child { border-bottom: none; }
+        
+        .ep-title { font-weight: 600; font-size: 0.95rem; color: #ddd; }
+        .ep-meta { font-size: 0.85rem; color: #666; margin-left: 10px; }
+        
+        .btn-dl { background: #1a1b20; color: white; text-decoration: none; padding: 8px 18px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; border: 1px solid #333; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+        .btn-dl:hover { border-color: var(--primary); color: var(--primary); background: rgba(0, 210, 255, 0.05); }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @media(max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } .poster { max-width: 300px; margin: 0 auto 30px; display: block; } }
     </style>
 </head>
 <body>
@@ -55,35 +77,29 @@
     <div class="container">
         <a href="index.html" class="nav-back">← Back to Library</a>
 
-        <div class="trailer-box">
-            <iframe id="trailer-frame" allowfullscreen></iframe>
-        </div>
+        <div class="grid-layout">
+            <div>
+                <img id="poster" class="poster" src="" alt="Poster">
+            </div>
 
-        <div class="details-grid">
-            <img id="poster" class="poster" src="" alt="Poster">
-            
             <div class="content">
-                <div class="header">
-                    <h1 id="title">Loading...</h1>
-                    <div class="tagline">
-                        <span id="type"></span> • <span id="rating"></span>
-                    </div>
+                <div class="trailer-container">
+                    <iframe id="trailer-frame" allowfullscreen></iframe>
                 </div>
 
-                <div class="stats">
-                    <div class="stat-item"><span class="stat-label">Year</span><span class="stat-val" id="year"></span></div>
-                    <div class="stat-item"><span class="stat-label">Genre</span><span class="stat-val" id="genre"></span></div>
-                    <div class="stat-item"><span class="stat-label">Duration</span><span class="stat-val">N/A</span></div> </div>
+                <h1 id="title" class="title">Loading...</h1>
+                
+                <div class="meta-row">
+                    <span id="type" class="tag">Movie</span>
+                    <span>★ <span id="rating"></span></span>
+                    <span id="year"></span>
+                    <span id="genre" style="color:#ccc; font-weight:400"></span>
+                </div>
 
                 <p id="desc" class="desc"></p>
 
-                <div class="dl-section">
-                    <h3>Download Links</h3>
-                    <table>
-                        <thead><tr><th>Quality</th><th>Size</th><th>Action</th></tr></thead>
-                        <tbody id="dl-table"></tbody>
-                    </table>
-                </div>
+                <div class="dl-header">Downloads</div>
+                <div id="download-area"></div>
             </div>
         </div>
     </div>
@@ -96,46 +112,95 @@
             .then(res => res.json())
             .then(data => {
                 const movie = data.find(m => m.id === id);
+                
                 if(movie) {
-                    // Background & Poster
+                    // Populate Basic Info
+                    document.title = movie.title;
                     document.getElementById('bg-layer').style.backgroundImage = `url('${movie.backdrop || movie.poster}')`;
                     document.getElementById('poster').src = movie.poster;
-
-                    // Text Info
-                    document.title = movie.title;
                     document.getElementById('title').innerText = movie.title;
-                    document.getElementById('desc').innerText = movie.description;
                     document.getElementById('type').innerText = movie.type;
-                    document.getElementById('rating').innerText = `★ ${movie.rating}`;
+                    document.getElementById('rating').innerText = movie.rating;
                     document.getElementById('year').innerText = movie.year;
                     document.getElementById('genre').innerText = movie.genre;
+                    document.getElementById('desc').innerText = movie.description;
 
-                    // Trailer
+                    // Handle Trailer
                     if(movie.trailer_embed) {
                         document.getElementById('trailer-frame').src = movie.trailer_embed;
                     } else {
-                        document.querySelector('.trailer-box').style.display = 'none';
+                        document.querySelector('.trailer-container').style.display = 'none';
                     }
 
-                    // Download Table
-                    const table = document.getElementById('dl-table');
-                    if(movie.downloads && movie.downloads.length > 0) {
-                        movie.downloads.forEach(dl => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${dl.quality}</td>
-                                <td>${dl.size}</td>
-                                <td><a href="${dl.link}" class="dl-btn" target="_blank">Download</a></td>
+                    // --- LOGIC: DETECT LAYOUT MODE ---
+                    const dlArea = document.getElementById('download-area');
+
+                    if (movie.layout_mode === 'series' && movie.seasons) {
+                        // RENDER SERIES ACCORDION
+                        let html = '<div class="accordion">';
+                        
+                        movie.seasons.forEach((season, index) => {
+                            html += `
+                                <div class="season-item ${index === 0 ? '' : ''}"> 
+                                    <div class="season-header" onclick="toggleSeason(this)">${season.name}</div>
+                                    <div class="season-body">
                             `;
-                            table.appendChild(row);
+                            
+                            season.episodes.forEach(ep => {
+                                html += `
+                                    <div class="episode-row">
+                                        <div>
+                                            <span class="ep-title">${ep.title}</span>
+                                            <span class="ep-meta">${ep.quality} • ${ep.size}</span>
+                                        </div>
+                                        <a href="${ep.link}" class="btn-dl" target="_blank">Download</a>
+                                    </div>
+                                `;
+                            });
+
+                            html += `</div></div>`;
                         });
+                        html += '</div>';
+                        dlArea.innerHTML = html;
+
                     } else {
-                        table.innerHTML = '<tr><td colspan="3">No download links available.</td></tr>';
+                        // RENDER MOVIE TABLE (Default)
+                        let html = `
+                            <table class="movie-table">
+                                <thead><tr><th>Quality</th><th>Size</th><th>Link</th></tr></thead>
+                                <tbody>
+                        `;
+                        
+                        if(movie.downloads && movie.downloads.length > 0) {
+                            movie.downloads.forEach(dl => {
+                                html += `
+                                    <tr>
+                                        <td style="font-weight:600; color:#ddd">${dl.quality}</td>
+                                        <td style="color:#888">${dl.size}</td>
+                                        <td><a href="${dl.link}" class="btn-dl" target="_blank">Download File</a></td>
+                                    </tr>
+                                `;
+                            });
+                        } else {
+                            html += '<tr><td colspan="3">No links available</td></tr>';
+                        }
+                        
+                        html += '</tbody></table>';
+                        dlArea.innerHTML = html;
                     }
+
                 } else {
-                    document.querySelector('.container').innerHTML = '<h1>Movie not found</h1><a href="index.html" style="color:white">Go Back</a>';
+                    document.querySelector('.container').innerHTML = '<h1>Movie not found</h1>';
                 }
             });
+
+        // Function to toggle Series Accordion
+        function toggleSeason(header) {
+            const item = header.parentElement;
+            // Optional: Close others when opening one? 
+            // document.querySelectorAll('.season-item').forEach(i => { if(i !== item) i.classList.remove('active'); });
+            item.classList.toggle('active');
+        }
     </script>
 </body>
 </html>
