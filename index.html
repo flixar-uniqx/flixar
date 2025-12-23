@@ -3,75 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movies Hub</title>
+    <title>StreamHub</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0f1014; --card: #1b1c22; --primary: #00d2ff; --text: #f5f5f5; --sub: #888; --nav-bg: rgba(22, 23, 27, 0.95); }
+        :root { --bg: #0f1014; --card: #1b1c22; --primary: #00d2ff; --text: #f5f5f5; --nav-bg: rgba(22, 23, 27, 0.98); }
         * { box-sizing: border-box; }
         body { margin: 0; font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); opacity: 0; animation: fadeIn 0.5s forwards; }
-
         @keyframes fadeIn { to { opacity: 1; } }
+        a { text-decoration: none; color: inherit; }
 
         /* Navbar */
-        .nav { padding: 15px 4%; background: var(--nav-bg); border-bottom: 1px solid #2a2b30; position: sticky; top: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; backdrop-filter: blur(10px); }
-        .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.2rem; color: var(--text); text-decoration: none; text-transform: uppercase; letter-spacing: 1px; }
-        .logo img { height: 28px; }
-
-        /* Search & Menu Btn */
+        .nav { padding: 12px 4%; background: var(--nav-bg); border-bottom: 1px solid #2a2b30; position: sticky; top: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; backdrop-filter: blur(10px); }
+        .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
+        .logo img { height: 24px; }
         .nav-right { display: flex; gap: 15px; align-items: center; }
-        .search-box { background: #23242a; border: 1px solid #333; color: white; padding: 6px 12px; border-radius: 20px; font-family: inherit; font-size: 0.85rem; outline: none; width: 150px; transition: 0.3s; }
+        .search-box { background: #23242a; border: 1px solid #333; color: white; padding: 6px 15px; border-radius: 20px; font-family: inherit; font-size: 0.85rem; outline: none; width: 140px; transition: 0.3s; }
         .search-box:focus { border-color: var(--primary); width: 200px; }
-        .menu-btn { cursor: pointer; font-size: 1.5rem; color: var(--text); }
+        .menu-btn { cursor: pointer; font-size: 1.4rem; }
 
-        /* Sidebar Overlay */
-        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: none; opacity: 0; transition: opacity 0.3s; }
-        .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: #16171b; z-index: 2001; transition: 0.3s; padding: 25px; overflow-y: auto; border-left: 1px solid #333; box-shadow: -10px 0 30px rgba(0,0,0,0.8); }
+        /* Sidebar */
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: none; }
+        .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: #16171b; z-index: 2001; transition: 0.3s; padding: 25px; border-left: 1px solid #333; overflow-y: auto; }
         .sidebar.active { right: 0; }
-        .sidebar-overlay.active { display: block; opacity: 1; }
-        
-        .sidebar h3 { color: var(--primary); font-size: 0.9rem; text-transform: uppercase; margin: 20px 0 10px; letter-spacing: 1px; }
-        .filter-group { display: flex; flex-wrap: wrap; gap: 8px; }
-        .filter-tag { background: #23242a; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; border: 1px solid #333; transition: 0.2s; }
-        .filter-tag:hover, .filter-tag.active { border-color: var(--primary); color: var(--primary); background: rgba(0,210,255,0.05); }
+        .sidebar-overlay.active { display: block; }
         .close-menu { font-size: 1.5rem; cursor: pointer; position: absolute; top: 15px; right: 20px; }
+        .filter-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .filter-tag { background: #23242a; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; border: 1px solid #333; }
+        .filter-tag:hover { border-color: var(--primary); color: var(--primary); }
+        .sidebar h3 { color: var(--primary); font-size: 0.9rem; text-transform: uppercase; margin: 15px 0 10px; }
 
         /* Content */
         .container { padding: 20px 4%; min-height: 80vh; }
-        .section-header { margin: 40px 0 15px; font-size: 1.1rem; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .section-header { margin: 30px 0 15px; font-size: 1.1rem; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 12px; }
 
-        /* Grid */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-        .card { background: var(--card); border-radius: 8px; overflow: hidden; transition: 0.3s; cursor: pointer; position: relative; }
+        /* 3-Column Mobile Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 15px; }
+        .card { background: var(--card); border-radius: 6px; overflow: hidden; transition: 0.3s; cursor: pointer; position: relative; }
         .card:hover { transform: translateY(-5px); z-index: 10; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
         .poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
-        .card-info { padding: 10px; }
-        .card-title { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card-meta { display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.75rem; color: var(--sub); }
-        .badge { background: var(--primary); color: #000; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 0.65rem; }
+        .card-info { padding: 8px; }
+        .card-title { font-weight: 600; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
+        .card-meta { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--sub); opacity: 0.8; }
+        .badge { background: var(--primary); color: #000; padding: 1px 4px; border-radius: 2px; font-weight: bold; font-size: 0.6rem; }
 
         /* Footer */
-        .footer { background: #08080a; padding: 40px 20px; margin-top: 60px; border-top: 1px solid #222; text-align: center; font-size: 0.85rem; color: #666; }
-        .footer a { color: #888; text-decoration: none; margin: 0 10px; transition: 0.2s; }
-        .footer a:hover { color: var(--primary); }
+        .footer { background: #08080a; padding: 30px 20px; margin-top: 50px; border-top: 1px solid #222; text-align: center; font-size: 0.8rem; color: #666; }
+        .footer a { margin: 0 10px; transition: 0.2s; } .footer a:hover { color: var(--primary); }
 
-        /* Mobile Optimization */
-        @media(max-width: 600px) {
-            .grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; } /* Smaller tiles */
-            .search-box { width: 120px; }
-            .search-box:focus { width: 100%; position: absolute; left: 15px; right: 15px; top: 60px; width: auto; }
-            .card-title { font-size: 0.8rem; }
-            .nav { padding: 12px 15px; }
-            .section-header { font-size: 1rem; margin-top: 30px; }
-        }
+        @media(min-width: 768px) { .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; } }
     </style>
 </head>
 <body>
 
     <nav class="nav">
-        <a href="index.html" class="logo">
-            <img src="https://cdn-icons-png.flaticon.com/512/2503/2503508.png" alt="Icon"> 
-            StreamHub
-        </a>
+        <a href="index.html" class="logo"><img src="https://cdn-icons-png.flaticon.com/512/2503/2503508.png"> StreamHub</a>
         <div class="nav-right">
             <input type="text" id="search" class="search-box" placeholder="Search..." oninput="globalSearch()">
             <div class="menu-btn" onclick="toggleMenu()">☰</div>
@@ -81,147 +66,105 @@
     <div class="sidebar-overlay" onclick="toggleMenu()"></div>
     <div class="sidebar">
         <div class="close-menu" onclick="toggleMenu()">✕</div>
-        <h2>Filter Library</h2>
-        
-        <h3>Content Type</h3>
+        <h3>Filters</h3>
         <div class="filter-group" id="filter-type"></div>
-
-        <h3>Genre</h3>
         <div class="filter-group" id="filter-genre"></div>
-
-        <h3>Year</h3>
         <div class="filter-group" id="filter-year"></div>
-
-        <div style="margin-top:30px; border-top:1px solid #333; padding-top:20px;">
-            <a href="index.html" style="color:white; text-decoration:none; display:block; padding:8px 0;">Home</a>
-            <a href="contact.html" style="color:white; text-decoration:none; display:block; padding:8px 0;">Contact Us</a>
-            <a href="disclaimer.html" style="color:white; text-decoration:none; display:block; padding:8px 0;">Disclaimer</a>
-        </div>
+        <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+        <a href="index.html" style="display:block; padding:8px 0;">Home</a>
+        <a href="contact/" style="display:block; padding:8px 0;">Contact Us</a>
+        <a href="disclaimer/" style="display:block; padding:8px 0;">Disclaimer</a>
     </div>
 
-    <div class="container" id="main-container">
-        </div>
+    <div class="container" id="main-container"></div>
 
     <div class="footer">
-        <div style="margin-bottom:15px;">
-            <a href="index.html">Home</a> • 
-            <a href="contact.html">Contact</a> • 
-            <a href="disclaimer.html">Disclaimer</a>
-        </div>
-        &copy; 2025 StreamHub. All Rights Reserved. <br>
-        We do not host any files on our servers.
+        <a href="index.html">Home</a> • <a href="contact/">Contact</a> • <a href="disclaimer/">Disclaimer</a><br><br>
+        &copy; 2025 StreamHub.
     </div>
 
     <script>
         let allMovies = [];
         
-        // Fetch Data
-        fetch('movies.json?t=' + Date.now())
-            .then(res => res.json())
-            .then(data => {
-                allMovies = data;
-                populateFilters(data);
-                renderHomepage(data);
-            });
+        fetch('movies.json?t=' + Date.now()).then(res => res.json()).then(data => {
+            allMovies = data;
+            populateFilters(data);
+            
+            // Check URL Params for filtering (e.g., ?genre=Action)
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('genre')) filterBy('genre', params.get('genre'));
+            else if (params.has('year')) filterBy('year', params.get('year'));
+            else if (params.has('type')) filterBy('type', params.get('type'));
+            else renderHomepage(data);
+        });
 
         function populateFilters(data) {
-            const types = new Set();
-            const genres = new Set();
-            const years = new Set();
-
+            const types = new Set(), genres = new Set(), years = new Set();
             data.forEach(m => {
                 if(m.type) types.add(m.type);
                 if(m.year) years.add(m.year);
                 if(m.genre) m.genre.split(',').forEach(g => genres.add(g.trim()));
             });
-
-            createFilterTags('filter-type', types, 'type');
-            createFilterTags('filter-genre', genres, 'genre');
-            createFilterTags('filter-year', Array.from(years).sort().reverse(), 'year');
+            createTags('filter-type', types, 'type');
+            createTags('filter-genre', genres, 'genre');
+            createTags('filter-year', Array.from(years).sort().reverse(), 'year');
         }
 
-        function createFilterTags(id, set, key) {
-            const container = document.getElementById(id);
-            container.innerHTML = `<div class="filter-tag" onclick="resetFilter('${key}')">All</div>`;
+        function createTags(id, set, key) {
+            const el = document.getElementById(id);
+            el.innerHTML = `<div class="filter-tag" onclick="window.location.href='index.html'">All</div>`;
             set.forEach(val => {
-                const tag = document.createElement('div');
-                tag.className = 'filter-tag';
-                tag.innerText = val;
-                tag.onclick = () => filterBy(key, val);
-                container.appendChild(tag);
+                el.innerHTML += `<div class="filter-tag" onclick="filterBy('${key}', '${val}')">${val}</div>`;
             });
         }
 
-        // Render Categorized Sections
         function renderHomepage(data) {
-            const container = document.getElementById('main-container');
-            container.innerHTML = '';
-
-            // 1. Latest Uploads (First 4)
-            addSection(container, "Latest Uploads", data.slice(0, 4));
-
-            // 2. Movies
+            const c = document.getElementById('main-container');
+            c.innerHTML = '';
+            // Latest (Mixed)
+            addSection(c, "Latest Uploads", data.slice(0, 6));
+            // Categorized Rows
             const movies = data.filter(m => m.type === 'Movie');
-            if(movies.length) addSection(container, "Movies", movies);
-
-            // 3. TV Series
+            if(movies.length) addSection(c, "Movies", movies);
             const series = data.filter(m => m.type === 'TV Series');
-            if(series.length) addSection(container, "TV Series", series);
-
-            // 4. By Genre (Example: Action)
-            const action = data.filter(m => m.genre && m.genre.includes('Action'));
-            if(action.length) addSection(container, "Action Movies", action);
+            if(series.length) addSection(c, "TV Series", series);
         }
 
         function addSection(container, title, list) {
             const section = document.createElement('div');
             section.innerHTML = `<div class="section-header">${title}</div>`;
-            
             const grid = document.createElement('div');
             grid.className = 'grid';
-            
             list.forEach(m => {
+                // Determine destination based on type
+                const folder = m.type === 'TV Series' ? 'series' : 'movie';
                 grid.innerHTML += `
-                    <div class="card" onclick="window.location.href='movie.html?id=${m.id}'">
+                    <div class="card" onclick="window.location.href='${folder}/?id=${m.id}'">
                         <img src="${m.poster}" class="poster" loading="lazy">
                         <div class="card-info">
                             <div class="card-title">${m.title}</div>
-                            <div class="card-meta">
-                                <span>${m.year}</span>
-                                <span class="badge">${m.type}</span>
-                            </div>
+                            <div class="card-meta"><span>${m.year}</span><span class="badge">${m.type}</span></div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
             section.appendChild(grid);
             container.appendChild(section);
         }
 
-        // Search & Filter Logic
         function globalSearch() {
             const q = document.getElementById('search').value.toLowerCase();
             const filtered = allMovies.filter(m => m.title.toLowerCase().includes(q));
-            
-            const container = document.getElementById('main-container');
-            container.innerHTML = '';
-            addSection(container, `Search Results for "${q}"`, filtered);
+            document.getElementById('main-container').innerHTML = '';
+            addSection(document.getElementById('main-container'), `Search: "${q}"`, filtered);
         }
 
         function filterBy(key, val) {
-            toggleMenu(); // Close menu
-            const filtered = allMovies.filter(m => {
-                if(key === 'genre') return m.genre.includes(val);
-                return m[key] === val;
-            });
-            const container = document.getElementById('main-container');
-            container.innerHTML = '';
-            addSection(container, `${val} Results`, filtered);
+            const filtered = allMovies.filter(m => key === 'genre' ? m.genre.includes(val) : m[key] === val);
+            document.getElementById('main-container').innerHTML = '';
+            addSection(document.getElementById('main-container'), `${val}`, filtered);
+            if(document.querySelector('.sidebar.active')) toggleMenu();
         }
 
-        function resetFilter() { renderHomepage(allMovies); toggleMenu(); }
-
-        // Sidebar Toggles
         function toggleMenu() {
             document.querySelector('.sidebar').classList.toggle('active');
             document.querySelector('.sidebar-overlay').classList.toggle('active');
