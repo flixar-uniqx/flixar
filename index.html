@@ -3,89 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLIXᐃR</title>
+    <title>FLIXAR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #141414; --card: #1f1f1f; --primary: #e50914; --text: #fff; --sub: #b3b3b3; }
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); }
+        :root { --bg: #0f1014; --card: #1b1c22; --primary: #00d2ff; --text: #f5f5f5; --sub: #888; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); }
         
         /* Navbar */
-        .nav { padding: 20px 4%; display: flex; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); position: fixed; width: 100%; top: 0; z-index: 50; }
-        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
+        .nav { padding: 15px 4%; background: #16171b; border-bottom: 1px solid #2a2b30; position: sticky; top: 0; z-index: 100; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px; }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.4rem; color: var(--text); text-decoration: none; }
+        .logo img { height: 35px; }
 
-        /* Hero */
-        .hero { height: 70vh; background-size: cover; background-position: center; position: relative; display: flex; align-items: flex-end; }
-        .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 10%, transparent 90%); }
-        .hero-content { position: relative; z-index: 2; padding: 0 4% 100px; max-width: 600px; }
-        .hero-title { font-size: 3rem; margin: 0 0 10px; text-shadow: 2px 2px 4px black; }
-        .hero-desc { color: #ddd; margin-bottom: 20px; font-size: 1.1rem; line-height: 1.5; text-shadow: 1px 1px 2px black; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        .btn { padding: 10px 25px; border-radius: 4px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; text-decoration: none; display: inline-block; }
-        .btn-play { background: var(--text); color: black; }
-        .btn-play:hover { background: #ccc; }
-
+        .filters { display: flex; gap: 10px; flex-wrap: wrap; }
+        select, input { background: #23242a; border: 1px solid #333; color: white; padding: 8px 12px; border-radius: 4px; font-family: inherit; font-size: 0.9rem; outline: none; }
+        select:focus, input:focus { border-color: var(--primary); }
+        
         /* Grid */
-        .section-title { padding: 0 4%; margin-top: -50px; position: relative; z-index: 10; font-size: 1.2rem; font-weight: 500; color: #e5e5e5; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; padding: 20px 4%; }
-        .card { position: relative; aspect-ratio: 2/3; border-radius: 4px; overflow: hidden; cursor: pointer; transition: transform 0.3s ease; }
-        .card img { width: 100%; height: 100%; object-fit: cover; }
-        .card:hover { transform: scale(1.05); z-index: 20; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .card-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, black, transparent); padding: 10px; opacity: 0; transition: opacity 0.3s; }
-        .card:hover .card-overlay { opacity: 1; }
-        .card-title { font-size: 0.9rem; font-weight: bold; }
-        .card-meta { font-size: 0.75rem; color: #46d369; margin-top: 5px; }
+        .container { padding: 30px 4%; min-height: 80vh; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; margin-top: 20px; }
+        .card { background: var(--card); border-radius: 8px; overflow: hidden; transition: 0.3s; cursor: pointer; border: 1px solid transparent; }
+        .card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        .info { padding: 12px; }
+        .title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .meta { display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.8rem; color: var(--sub); }
+        .badge { background: var(--primary); color: #000; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: bold; }
 
-        @media(max-width: 768px) { .hero-title { font-size: 2rem; } .grid { grid-template-columns: repeat(3, 1fr); } }
+        /* Footer */
+        .footer { text-align: center; padding: 40px; background: #0a0a0c; border-top: 1px solid #222; margin-top: 50px; font-size: 0.9rem; color: var(--sub); }
+
+        @media(max-width: 600px) { .nav { flex-direction: column; align-items: stretch; } .filters { justify-content: space-between; } select, input { width: 100%; } }
     </style>
 </head>
 <body>
 
     <nav class="nav">
-        <div class="logo">MOVIES HUB</div>
+        <a href="index.html" class="logo">
+            <img src="https://cdn-icons-png.flaticon.com/512/2503/2503508.png" alt="Icon"> MOVIES HUB
+        </a>
+        
+        <div class="filters">
+            <input type="text" id="search" placeholder="Search title..." oninput="applyFilters()">
+            <select id="filter-type" onchange="applyFilters()">
+                <option value="All">All Types</option>
+            </select>
+            <select id="filter-genre" onchange="applyFilters()">
+                <option value="All">All Genres</option>
+            </select>
+            <select id="filter-year" onchange="applyFilters()">
+                <option value="All">All Years</option>
+            </select>
+        </div>
     </nav>
 
-    <div id="hero" class="hero">
-        <div class="hero-content">
-            <h1 id="hero-title" class="hero-title">Loading...</h1>
-            <p id="hero-desc" class="hero-desc"></p>
-            <a id="hero-btn" href="#" class="btn btn-play">▶ Play</a>
-        </div>
+    <div class="container">
+        <div id="grid" class="grid"></div>
+        <div id="no-result" style="display:none; text-align:center; margin-top:50px; color:#666;">No results found.</div>
     </div>
 
-    <h2 class="section-title">Latest Added</h2>
-    <div id="grid" class="grid"></div>
+    <div class="footer">
+        &copy; 2025 Movies Hub. All Rights Reserved. <br> 
+        Designed for speed and simplicity.
+    </div>
 
     <script>
-        // Force refresh to avoid caching issues
-        const DB_URL = 'movies.json?t=' + new Date().getTime();
-
-        fetch(DB_URL)
+        let allMovies = [];
+        
+        // 1. Fetch & Initialize
+        fetch('movies.json?t=' + Date.now())
             .then(res => res.json())
             .then(data => {
-                // 1. Setup Hero (First movie in list)
-                if(data.length > 0) {
-                    const feat = data[0];
-                    const hero = document.getElementById('hero');
-                    hero.style.backgroundImage = `url('${feat.backdrop || feat.poster}')`;
-                    document.getElementById('hero-title').innerText = feat.title;
-                    document.getElementById('hero-desc').innerText = feat.description;
-                    document.getElementById('hero-btn').href = `watch.html?id=${feat.id}`;
-                }
-
-                // 2. Setup Grid
-                const grid = document.getElementById('grid');
-                data.forEach(movie => {
-                    const div = document.createElement('div');
-                    div.className = 'card';
-                    div.onclick = () => window.location.href = `watch.html?id=${movie.id}`;
-                    div.innerHTML = `
-                        <img src="${movie.poster}" alt="${movie.title}" loading="lazy">
-                        <div class="card-overlay">
-                            <div class="card-title">${movie.title}</div>
-                            <div class="card-meta">${movie.year} • ${movie.rating} ★</div>
-                        </div>
-                    `;
-                    grid.appendChild(div);
-                });
+                allMovies = data;
+                populateDropdowns(data);
+                renderMovies(data);
             });
+
+        // 2. Populate Filters Dynamically
+        function populateDropdowns(data) {
+            const types = new Set();
+            const years = new Set();
+            const genres = new Set();
+
+            data.forEach(m => {
+                if(m.type) types.add(m.type);
+                if(m.year) years.add(m.year);
+                if(m.genre) m.genre.split(',').forEach(g => genres.add(g.trim()));
+            });
+
+            fillSelect('filter-type', Array.from(types).sort());
+            fillSelect('filter-year', Array.from(years).sort().reverse());
+            fillSelect('filter-genre', Array.from(genres).sort());
+        }
+
+        function fillSelect(id, list) {
+            const el = document.getElementById(id);
+            list.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item;
+                opt.innerText = item;
+                el.appendChild(opt);
+            });
+        }
+
+        // 3. Render Grid
+        function renderMovies(list) {
+            const grid = document.getElementById('grid');
+            const noRes = document.getElementById('no-result');
+            grid.innerHTML = '';
+
+            if(list.length === 0) {
+                noRes.style.display = 'block';
+                return;
+            } else {
+                noRes.style.display = 'none';
+            }
+
+            list.forEach(m => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => window.location.href = `movie.html?id=${m.id}`;
+                card.innerHTML = `
+                    <img src="${m.poster}" class="poster" loading="lazy">
+                    <div class="info">
+                        <div class="title" title="${m.title}">${m.title}</div>
+                        <div class="meta">
+                            <span>${m.year}</span>
+                            <span class="badge">${m.type}</span>
+                            <span>★ ${m.rating}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // 4. Filtering Logic
+        function applyFilters() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const type = document.getElementById('filter-type').value;
+            const genre = document.getElementById('filter-genre').value;
+            const year = document.getElementById('filter-year').value;
+
+            const filtered = allMovies.filter(m => {
+                const matchSearch = m.title.toLowerCase().includes(search);
+                const matchType = type === 'All' || m.type === type;
+                const matchYear = year === 'All' || m.year === year;
+                const matchGenre = genre === 'All' || m.genre.includes(genre);
+                return matchSearch && matchType && matchYear && matchGenre;
+            });
+
+            renderMovies(filtered);
+        }
     </script>
 </body>
 </html>
