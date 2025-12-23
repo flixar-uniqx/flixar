@@ -11,29 +11,39 @@
 
     <script src="config.js"></script>
     <script src="app.js"></script>
-    
     <script>
-        fetch('movies.json?t=' + Date.now()).then(r => r.json()).then(data => {
-            const params = new URLSearchParams(window.location.search);
-            const container = document.getElementById('content');
-            container.innerHTML = '';
+        fetch('movies.json?t=' + Date.now())
+            .then(r => r.json())
+            .then(data => {
+                const params = new URLSearchParams(window.location.search);
+                const container = document.getElementById('content');
+                container.innerHTML = '';
 
-            if(params.has('search')) {
-                const q = params.get('search').toLowerCase();
-                renderSection(container, `Search: "${q}"`, data.filter(m => m.title.toLowerCase().includes(q)));
-            } else if(params.has('genre')) {
-                renderSection(container, `Genre: ${params.get('genre')}`, data.filter(m => m.genre.includes(params.get('genre'))));
-            } else if(params.has('year')) {
-                renderSection(container, `Year: ${params.get('year')}`, data.filter(m => m.year === params.get('year')));
-            } else if(params.has('type')) {
-                renderSection(container, params.get('type'), data.filter(m => m.type === params.get('type')));
-            } else {
-                // Default Home Layout
-                renderSection(container, "Latest Uploads", data.slice(0, CONFIG.latestCount));
-                renderSection(container, "Movies", data.filter(m => m.type === "Movie"));
-                renderSection(container, "TV Series", data.filter(m => m.type === "TV Series"));
-            }
-        });
+                // Filter Logic
+                if(params.has('search')) {
+                    const q = params.get('search').toLowerCase();
+                    const list = data.filter(m => m.title.toLowerCase().includes(q));
+                    renderSection(container, `Results for "${q}"`, list);
+                } 
+                else if(params.has('genre')) {
+                    renderSection(container, `Genre: ${params.get('genre')}`, data.filter(m => m.genre.includes(params.get('genre'))));
+                } 
+                else if(params.has('year')) {
+                    renderSection(container, `Year: ${params.get('year')}`, data.filter(m => m.year === params.get('year')));
+                } 
+                else if(params.has('type')) {
+                    renderSection(container, params.get('type'), data.filter(m => m.type === params.get('type')));
+                } 
+                else {
+                    // Homepage
+                    renderSection(container, "Latest Uploads", data.slice(0, CONFIG.latestCount));
+                    renderSection(container, "Movies", data.filter(m => m.type === "Movie"));
+                    renderSection(container, "TV Series", data.filter(m => m.type === "TV Series"));
+                }
+            })
+            .catch(e => {
+                document.getElementById('content').innerHTML = "<h2 style='text-align:center; margin-top:50px;'>Failed to load library. Check movies.json</h2>";
+            });
 
         function renderSection(container, title, list) {
             if(list.length === 0) return;
@@ -43,10 +53,12 @@
             grid.className = 'grid';
             
             list.forEach(m => {
-                // AUTO-DETECT FOLDER NAME
                 const folder = m.type === 'TV Series' ? 'series' : 'movie';
+                // Detect path style
+                const link = isLocal ? `${folder}/index.html?id=${m.id}` : `${folder}/?id=${m.id}`;
+                
                 grid.innerHTML += `
-                    <div class="card" onclick="window.location.href='${folder}/index.html?id=${m.id}'">
+                    <div class="card" onclick="window.location.href='${link}'">
                         <img src="${m.poster}" class="poster" loading="lazy">
                         <div class="card-info">
                             <div class="card-title">${m.title}</div>
