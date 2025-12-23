@@ -171,8 +171,12 @@ function setupScroll() {
     });
 }
 
+/* REPLACE THE populateSidebarFilters FUNCTION IN app.js */
+
 function populateSidebarFilters(data) {
     const types = new Set(), genres = new Set(), years = new Set();
+    
+    // Sort and collect data
     data.forEach(m => {
         if(m.type) types.add(m.type);
         if(m.year) years.add(m.year);
@@ -181,20 +185,29 @@ function populateSidebarFilters(data) {
 
     const c = document.getElementById('side-filters');
     const homeLink = isLocal ? `${ROOT}index.html` : ROOT;
-    const link = (k, v) => `<a href="${homeLink}?${k}=${v}" class="sidebar-link" style="padding-left:15px; font-weight:400;">${v}</a>`;
-
-    // Added Icons SVG
-    const iconType = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>`;
-    const iconGenre = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>`;
-
-    let html = `<div style="margin-bottom:15px">
-        <strong style="color:#fff; display:flex; align-items:center; gap:8px; margin-bottom:5px;">${iconType} Type</strong>
-        ${Array.from(types).map(t => link('type', t)).join('')}
-    </div>`;
     
-    html += `<div>
-        <strong style="color:#fff; display:flex; align-items:center; gap:8px; margin-bottom:5px;">${iconGenre} Genre</strong>
-        ${Array.from(genres).sort().slice(0, 10).map(g => link('genre', g)).join('')}
-    </div>`;
+    // Helper to create a Chip
+    const createChip = (k, v) => `<a href="${homeLink}?${k}=${encodeURIComponent(v)}" class="chip">${v}</a>`;
+
+    let html = '';
+
+    // 1. Content Type (Movies/Series)
+    html += `<h3>Content Type</h3>`;
+    html += `<div class="chip-container">`;
+    Array.from(types).sort().forEach(t => { html += createChip('type', t); });
+    html += `</div>`;
+
+    // 2. Years (Sorted Newest First)
+    html += `<h3>Release Year</h3>`;
+    html += `<div class="chip-container">`;
+    Array.from(years).sort().reverse().slice(0, 12).forEach(y => { html += createChip('year', y); });
+    html += `</div>`;
+
+    // 3. Genres (Sorted Alphabetically)
+    html += `<h3>Genres</h3>`;
+    html += `<div class="chip-container">`;
+    Array.from(genres).sort().forEach(g => { html += createChip('genre', g); });
+    html += `</div>`;
+
     c.innerHTML = html;
 }
