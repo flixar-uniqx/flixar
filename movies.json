@@ -30,22 +30,27 @@
   ]
 },
 {
-  "id": "Marjaavaan-2019",
+  "id": "Dude-2025",
   "type": "Movie",
   "layout_mode": "movie",
-  "title": "Marjaavaan",
-  "year": "2019",
-  "genre": "Action, Drama, Romance",
-  "rating": "3.7",
-  "poster": "https://image.tmdb.org/t/p/original/xILMQFZMQdJq3D7J6TuLrW6A3W5.jpg",
-  "backdrop": "https://image.tmdb.org/t/p/original/aKnxz5bTgKGIPwwoDNXmWB6TEZx.jpg",
-  "description": "Raghu and Zoya are enjoying their lives together until a gang leader with harmful intentions turns their world upside down.",
+  "title": "Dude",
+  "year": "2025",
+  "genre": "Action, Comedy, Drama, Romance",
+  "rating": "6.2",
+  "poster": "https://image.tmdb.org/t/p/original/i0Nbs2ixGW1MK3cdizeNJlb6ndj.jpg",
+  "backdrop": "https://image.tmdb.org/t/p/original/kDRkOFPkjYjubhiIcvurBKuLSRI.jpg",
+  "description": "Childhood friends Agan and Kural are inseparable. When Kural encounters romantic troubles, Agan must balance his hidden feelings for her with his desire to ensure her happiness.",
   "trailer_embed": "",
   "downloads": [
     {
-      "quality": "[HINDI] 720p 10bit WEB-DL x265 HEVC",
-      "size": "1.2 GB",
-      "link": "https://cloudz.flixar.workers.dev/0:/Movies/2019/Marjaavaan%20(2019)%20%5BHIN%5D/%5B%40FlixArUniqx%5D.Marjaavaan.(2019).HINDI.720p.10bit.WEB-DL.x265.HEVC.E-Sub.mkv"
+      "quality": "[MULTI5] 720p DS4K 10bit WEB-DL x265 HEVC",
+      "size": "1.9 GB",
+      "link": "https://cloudz.flixar.workers.dev/0:/Movies/2025/Dude%20(2025)%20%5BTAM%5D/%5B%40FlixArUniqx%5D.Dude.(2025).MULTI5.720p.DS4K.10bit.WEB-DL.x265.HEVC.E-Sub.mkv"
+    },
+    {
+      "quality": "[MULTI5] 1080p DS4K 10bit WEB-DL DDP5.1 x265 HEVC",
+      "size": "5.4 GB",
+      "link": "https://cloudz.flixar.workers.dev/0:/Movies/2025/Dude%20(2025)%20%5BTAM%5D/%5B%40FlixArUniqx%5D.Dude.(2025).MULTI5.1080p.DS4K.10bit.WEB-DL.DDP.x265.HEVC.E-Sub.mkv"
     }
   ]
 },
@@ -66,6 +71,26 @@
       "quality": "1080p BluRay HDR x265",
       "size": "2.1GB",
       "link": "https://cloudz.flixar.workers.dev/0:/Collections/Home%20Alone%20(Film%20Series)/Home%20Alone%20(1990)/%5B%40FlixArUniqx%5D.Home.Alone.(1990).1080p.HDR10%2B.10bit.BluRay.DDP.x265.HEVC.E-Sub.mkv"
+    }
+  ]
+},
+  {
+  "id": "Marjaavaan-2019",
+  "type": "Movie",
+  "layout_mode": "movie",
+  "title": "Marjaavaan",
+  "year": "2019",
+  "genre": "Action, Drama, Romance",
+  "rating": "3.7",
+  "poster": "https://image.tmdb.org/t/p/original/xILMQFZMQdJq3D7J6TuLrW6A3W5.jpg",
+  "backdrop": "https://image.tmdb.org/t/p/original/aKnxz5bTgKGIPwwoDNXmWB6TEZx.jpg",
+  "description": "Raghu and Zoya are enjoying their lives together until a gang leader with harmful intentions turns their world upside down.",
+  "trailer_embed": "",
+  "downloads": [
+    {
+      "quality": "[HINDI] 720p 10bit WEB-DL x265 HEVC",
+      "size": "1.2 GB",
+      "link": "https://cloudz.flixar.workers.dev/0:/Movies/2019/Marjaavaan%20(2019)%20%5BHIN%5D/%5B%40FlixArUniqx%5D.Marjaavaan.(2019).HINDI.720p.10bit.WEB-DL.x265.HEVC.E-Sub.mkv"
     }
   ]
 },
