@@ -10,25 +10,18 @@
     <div id="bg-layer"></div>
     
     <div class="container">
-        <a href="../index.html" class="nav-back">
+        <a href="../" class="nav-back">
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg> 
             Back to Library
         </a>
 
         <div class="content-grid">
-            <div class="poster-col">
-                <img id="poster" class="poster-img" src="">
-            </div>
+            <div class="poster-col"><img id="poster" class="poster-img" src=""></div>
             
             <div class="details-col">
-                <div class="trailer-wrapper" id="trailer-wrap">
-                    <iframe id="trailer" allowfullscreen></iframe>
-                </div>
-
+                <div class="trailer-wrapper" id="trailer-wrap"><iframe id="trailer" allowfullscreen></iframe></div>
                 <h1 id="title" class="title-large"></h1>
-                
                 <div class="meta-row" id="meta"></div>
-
                 <p id="desc" class="desc"></p>
 
                 <div class="dl-section">
@@ -43,61 +36,43 @@
     <script src="../app.js"></script>
     <script>
         const id = new URLSearchParams(window.location.search).get('id');
-        
-        fetch('../movies.json?t=' + Date.now())
-            .then(r => r.json())
-            .then(data => {
-                const m = data.find(i => i.id === id);
-                if(m) {
-                    // 1. Text & Images
-                    document.title = `${m.title} - ${CONFIG.siteName}`;
-                    document.getElementById('bg-layer').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
-                    document.getElementById('poster').src = m.poster;
-                    document.getElementById('title').innerText = m.title;
-                    document.getElementById('desc').innerText = m.description;
+        fetch('../movies.json?t=' + Date.now()).then(r => r.json()).then(data => {
+            const m = data.find(i => i.id === id);
+            if(m) {
+                document.title = `${m.title} - ${CONFIG.siteName}`;
+                document.getElementById('bg-layer').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
+                document.getElementById('poster').src = m.poster;
+                document.getElementById('title').innerText = m.title;
+                document.getElementById('desc').innerText = m.description;
 
-                    // 2. Trailer Logic
-                    if(m.trailer_embed && m.trailer_embed.length > 5) {
-                        const cleanUrl = m.trailer_embed + (m.trailer_embed.includes('?') ? '&' : '?') + "modestbranding=1&rel=0&iv_load_policy=3&color=white";
-                        document.getElementById('trailer').src = cleanUrl;
-                        document.getElementById('trailer-wrap').classList.add('active');
-                    }
-
-                    // 3. Meta Tags
-                    const meta = document.getElementById('meta');
-                    meta.innerHTML = `<span class="rating-pill">IMDb ${m.rating}</span>`;
-                    meta.innerHTML += `<span class="tag" onclick="window.location.href='../index.html?year=${m.year}'">${m.year}</span>`;
-                    if(m.genre) {
-                        m.genre.split(',').forEach(g => {
-                            meta.innerHTML += `<span class="tag" onclick="window.location.href='../index.html?genre=${g.trim()}'">${g.trim()}</span>`;
-                        });
-                    }
-
-                    // 4. DOWNLOAD LIST GENERATOR
-                    const list = document.getElementById('dl-list');
-                    if(m.downloads && m.downloads.length > 0) {
-                        m.downloads.forEach(d => {
-                            list.innerHTML += `
-                                <div class="dl-row">
-                                    <div class="ep-info">
-                                        <div style="font-size:1rem;">${d.quality}</div>
-                                        <div>File Size: ${d.size}</div>
-                                    </div>
-                                    <a href="${d.link}" class="btn-dl" target="_blank">
-                                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right:5px;"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                                        Download
-                                    </a>
-                                </div>`;
-                        });
-                    } else {
-                        list.innerHTML = `<div style="padding:20px; text-align:center; color:var(--text-dim);">No download links available.</div>`;
-                    }
-
-                } else {
-                    document.querySelector('.container').innerHTML = "<h2 style='text-align:center; margin-top:100px'>Movie not found.</h2>";
+                if(m.trailer_embed && m.trailer_embed.length > 5) {
+                    const cleanUrl = m.trailer_embed + "?modestbranding=1&rel=0&iv_load_policy=3&color=white";
+                    document.getElementById('trailer').src = cleanUrl;
+                    document.getElementById('trailer-wrap').classList.add('active');
                 }
-            })
-            .catch(e => console.error(e));
+
+                const meta = document.getElementById('meta');
+                meta.innerHTML = `<span class="rating-pill">IMDb ${m.rating}</span>`;
+                meta.innerHTML += `<span class="tag" onclick="window.location.href='../?year=${m.year}'">${m.year}</span>`;
+                if(m.genre) m.genre.split(',').forEach(g => meta.innerHTML += `<span class="tag" onclick="window.location.href='../?genre=${g.trim()}'">${g.trim()}</span>`);
+
+                const list = document.getElementById('dl-list');
+                if(m.downloads) {
+                    m.downloads.forEach(d => {
+                        list.innerHTML += `
+                            <div class="dl-row">
+                                <div class="ep-info">
+                                    <div class="dl-title">${d.quality}</div>
+                                    <div class="dl-meta">Size: ${d.size}</div>
+                                </div>
+                                <a href="${d.link}" class="btn-dl" target="_blank">Download</a>
+                            </div>`;
+                    });
+                }
+            } else {
+                document.querySelector('.container').innerHTML = "<h1>Movie not found</h1>";
+            }
+        });
     </script>
 </body>
 </html>
