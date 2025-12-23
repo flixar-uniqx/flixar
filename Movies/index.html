@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Shared CSS from Index (Simplified for brevity, but include full block from above in real file) */
+        :root { --bg: #0f1014; --primary: #00d2ff; --text: #f5f5f5; --nav-bg: rgba(22, 23, 27, 0.98); }
+        body { margin: 0; font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); animation: fadeIn 0.5s; }
+        @keyframes fadeIn { to { opacity: 1; } } a { text-decoration: none; color: inherit; }
+        
+        /* Nav & Footer styles SAME as index.html */
+        .nav { padding: 12px 4%; background: var(--nav-bg); border-bottom: 1px solid #2a2b30; position: sticky; top: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; }
+        .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.2rem; text-transform: uppercase; } .logo img { height: 24px; }
+        .nav-right { display: flex; gap: 15px; } .search-box { background: #23242a; border: 1px solid #333; color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.85rem; outline: none; width: 140px; }
+        
+        /* Layout */
+        #bg-layer { position: fixed; inset: 0; z-index: -1; background-size: cover; background-position: center; filter: blur(35px); opacity: 0.25; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; min-height: 80vh; }
+        .nav-back { color: #888; font-weight: 600; display: inline-flex; margin-bottom: 20px; font-size: 0.9rem; } .nav-back:hover { color: var(--primary); }
+
+        .grid-layout { display: grid; grid-template-columns: 1fr; gap: 30px; }
+        @media(min-width: 768px) { .grid-layout { grid-template-columns: 240px 1fr; } }
+
+        .poster { width: 160px; margin: 0 auto; display: block; border-radius: 8px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }
+        @media(min-width: 768px) { .poster { width: 100%; } }
+
+        .trailer-box { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 10px; overflow: hidden; background: #000; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .trailer-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .title { font-size: 1.8rem; margin: 0 0 10px; font-weight: 700; line-height: 1.1; text-align: center; }
+        @media(min-width: 768px) { .title { text-align: left; font-size: 2.2rem; } }
+
+        .meta { display: flex; gap: 10px; font-size: 0.85rem; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+        @media(min-width: 768px) { .meta { justify-content: flex-start; } }
+        
+        .meta-tag { background: rgba(0,210,255,0.1); padding: 4px 10px; border-radius: 4px; color: var(--primary); border: 1px solid rgba(0,210,255,0.2); cursor: pointer; }
+        .desc { line-height: 1.6; color: #ccc; font-size: 0.95rem; margin-bottom: 30px; text-align: center; }
+        @media(min-width: 768px) { .desc { text-align: left; } }
+
+        /* Tables */
+        .dl-header { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; border-left: 4px solid var(--primary); padding-left: 10px; }
+        .movie-table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 0.9rem; }
+        .movie-table th, .movie-table td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .btn-dl { background: #1a1b20; color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; border: 1px solid #333; transition: 0.2s; white-space: nowrap; }
+        .btn-dl:hover { border-color: var(--primary); color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div id="bg-layer"></div>
+    <nav class="nav">
+        <a href="../index.html" class="logo"><img src="https://cdn-icons-png.flaticon.com/512/2503/2503508.png"> StreamHub</a>
+    </nav>
+    <div class="container">
+        <a href="../index.html" class="nav-back">← Back to Library</a>
+        <div class="grid-layout">
+            <img id="poster" class="poster" src="">
+            <div class="content">
+                <div class="trailer-box"><iframe id="trailer-frame" allowfullscreen></iframe></div>
+                <h1 id="title" class="title">Loading...</h1>
+                <div class="meta" id="meta-container"></div>
+                <p id="desc" class="desc"></p>
+                <div class="dl-header">Downloads</div>
+                <div id="download-area"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const id = new URLSearchParams(window.location.search).get('id');
+        fetch('../movies.json?t=' + Date.now()).then(res => res.json()).then(data => {
+            const m = data.find(item => item.id === id);
+            if(m) {
+                document.title = m.title;
+                document.getElementById('bg-layer').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
+                document.getElementById('poster').src = m.poster;
+                document.getElementById('title').innerText = m.title;
+                document.getElementById('desc').innerText = m.description;
+                
+                // Clean YouTube Embed
+                if(m.trailer_embed) {
+                    const cleanUrl = m.trailer_embed + "?modestbranding=1&rel=0&iv_load_policy=3&controls=1&color=white";
+                    document.getElementById('trailer-frame').src = cleanUrl;
+                } else document.querySelector('.trailer-box').style.display = 'none';
+
+                // Metadata Links
+                const meta = document.getElementById('meta-container');
+                meta.innerHTML = `<span>★ ${m.rating}</span>`;
+                meta.innerHTML += `<span class="meta-tag" onclick="window.location.href='../index.html?year=${m.year}'">${m.year}</span>`;
+                m.genre.split(',').forEach(g => {
+                    meta.innerHTML += `<span class="meta-tag" onclick="window.location.href='../index.html?genre=${g.trim()}'">${g.trim()}</span>`;
+                });
+
+                // Movie Table
+                let html = '<table class="movie-table"><thead><tr><th>Quality</th><th>Size</th><th>Link</th></tr></thead><tbody>';
+                (m.downloads || []).forEach(dl => {
+                    html += `<tr><td style="color:#ddd; font-weight:600">${dl.quality}</td><td style="color:#888">${dl.size}</td><td><a href="${dl.link}" class="btn-dl" target="_blank">Download</a></td></tr>`;
+                });
+                document.getElementById('download-area').innerHTML = html + '</tbody></table>';
+            }
+        });
+    </script>
+</body>
+</html>
