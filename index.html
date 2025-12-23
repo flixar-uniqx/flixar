@@ -3,33 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>StreamHub - Home</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container" id="main-content"></div>
+    <div class="container" id="content"></div>
 
     <script src="config.js"></script>
     <script src="app.js"></script>
     <script>
-        // Page Specific Logic
         fetch('movies.json?t=' + Date.now()).then(r => r.json()).then(data => {
             const params = new URLSearchParams(window.location.search);
-            const container = document.getElementById('main-content');
+            const container = document.getElementById('content');
             
-            if(params.has('search')) renderGrid(container, `Search: "${params.get('search')}"`, data.filter(m => m.title.toLowerCase().includes(params.get('search').toLowerCase())));
-            else if(params.has('type')) renderGrid(container, params.get('type'), data.filter(m => m.type === params.get('type')));
-            else if(params.has('genre')) renderGrid(container, params.get('genre'), data.filter(m => m.genre.includes(params.get('genre'))));
-            else if(params.has('year')) renderGrid(container, params.get('year'), data.filter(m => m.year === params.get('year')));
+            // Filtering Logic
+            let list = data;
+            let title = "";
+
+            if(params.has('search')) {
+                const q = params.get('search').toLowerCase();
+                list = data.filter(m => m.title.toLowerCase().includes(q));
+                title = `Search Results: "${q}"`;
+                renderSection(container, title, list);
+            } 
+            else if(params.has('genre') || params.has('year') || params.has('type')) {
+                if(params.has('genre')) list = list.filter(m => m.genre.includes(params.get('genre')));
+                if(params.has('year')) list = list.filter(m => m.year === params.get('year'));
+                if(params.has('type')) list = list.filter(m => m.type === params.get('type'));
+                renderSection(container, "Filtered Results", list);
+            } 
             else {
-                // Default Home Layout
-                renderGrid(container, "Latest Uploads", data.slice(0, CONFIG.latestCount));
-                renderGrid(container, "Movies", data.filter(m => m.type === "Movie"));
-                renderGrid(container, "TV Series", data.filter(m => m.type === "TV Series"));
+                // Default Homepage
+                renderSection(container, "Latest Uploads", data.slice(0, CONFIG.latestCount));
+                renderSection(container, "Movies", data.filter(m => m.type === "Movie"));
+                renderSection(container, "TV Series", data.filter(m => m.type === "TV Series"));
             }
         });
 
-        function renderGrid(container, title, list) {
+        function renderSection(container, title, list) {
             if(list.length === 0) return;
             const section = document.createElement('div');
             section.innerHTML = `<div class="section-header">${title}</div>`;
@@ -37,10 +48,10 @@
             grid.className = 'grid';
             
             list.forEach(m => {
+                // Determine folder based on type
                 const folder = m.type === 'TV Series' ? 'series' : 'movie';
-                // CLEAN URL LOGIC handled by browser looking for index.html folder automatically
                 grid.innerHTML += `
-                    <div class="card" onclick="window.location.href='${folder}/?id=${m.id}'">
+                    <div class="card" onclick="window.location.href='${P(folder)}?id=${m.id}'">
                         <img src="${m.poster}" class="poster" loading="lazy">
                         <div class="card-info">
                             <div class="card-title">${m.title}</div>
