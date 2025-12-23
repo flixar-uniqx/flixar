@@ -1,0 +1,20 @@
+// Inside series/index.html Script
+if (m.seasons) {
+    let html = '';
+    m.seasons.forEach(s => {
+        html += `<div style="border:1px solid #333; border-radius:6px; margin-bottom:10px; background:rgba(0,0,0,0.3);">
+            <div style="padding:12px; cursor:pointer; font-weight:600; display:flex; justify-content:space-between;" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='block'?'none':'block'">
+                ${s.name} <span>+</span>
+            </div>
+            <div style="display:none; padding:10px; background:rgba(255,255,255,0.02); border-top:1px solid #333;">`;
+        
+        s.episodes.forEach(ep => {
+            html += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.9rem;">
+                <div>${ep.title} <span style="font-size:0.75rem; color:#666; margin-left:5px;">${ep.size}</span></div>
+                <a href="${ep.link}" class="btn-dl" target="_blank">Download</a>
+            </div>`;
+        });
+        html += `</div></div>`;
+    });
+    document.getElementById('download-area').innerHTML = html;
+}
