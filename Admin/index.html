@@ -2,42 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>JSON Generator</title>
+    <title>StreamHub Admin</title>
     <style>
-        body { background: #111; color: #fff; font-family: sans-serif; padding: 20px; }
-        input, select, textarea { width: 100%; padding: 8px; margin: 5px 0 15px; background: #222; border: 1px solid #444; color: white; }
-        button { padding: 10px 20px; cursor: pointer; background: #00d2ff; border: none; font-weight: bold; }
+        body { background: #111; color: #eee; font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0 15px; background: #222; border: 1px solid #444; color: white; box-sizing: border-box; }
+        button { padding: 12px 20px; cursor: pointer; background: #00d2ff; border: none; font-weight: bold; color: black; width: 100%; }
         .row { display: flex; gap: 10px; }
+        .row > div { flex: 1; }
+        label { font-size: 0.9rem; color: #aaa; text-transform: uppercase; }
     </style>
 </head>
 <body>
-    <h2>Add New Entry</h2>
-    <label>ID (Unique):</label> <input type="text" id="id">
-    <label>Type:</label> <select id="type"><option>Movie</option><option>TV Series</option></select>
-    <label>Title:</label> <input type="text" id="title">
+    <h2 style="color:#00d2ff">Add New Entry</h2>
+    
     <div class="row">
-        <div><label>Year:</label><input type="text" id="year"></div>
-        <div><label>Rating:</label><input type="text" id="rating"></div>
+        <div><label>ID (Unique)</label><input type="text" id="id" placeholder="mv_001 or tv_001"></div>
+        <div><label>Type</label><select id="type"><option>Movie</option><option>TV Series</option></select></div>
     </div>
-    <label>Genre (comma separated):</label> <input type="text" id="genre">
-    <label>Poster URL:</label> <input type="text" id="poster">
-    <label>Backdrop URL:</label> <input type="text" id="backdrop">
-    <label>YouTube Embed URL:</label> <input type="text" id="trailer">
-    <label>Description:</label> <textarea id="desc" rows="4"></textarea>
 
-    <h3>Downloads (JSON Format)</h3>
-    <textarea id="dl_json" rows="4" placeholder='[{"quality":"1080p","size":"1GB","link":"url"}]'></textarea>
+    <label>Title</label>
+    <input type="text" id="title">
 
-    <button onclick="generate()">Generate JSON</button>
+    <div class="row">
+        <div><label>Year</label><input type="text" id="year"></div>
+        <div><label>Rating</label><input type="text" id="rating"></div>
+    </div>
+
+    <label>Genre (Comma separated)</label>
+    <input type="text" id="genre">
+
+    <label>Poster URL</label>
+    <input type="text" id="poster">
+
+    <label>Backdrop URL</label>
+    <input type="text" id="backdrop">
+
+    <label>YouTube Embed URL</label>
+    <input type="text" id="trailer">
+
+    <label>Description</label>
+    <textarea id="desc" rows="3"></textarea>
+
+    <h3 style="color:#00d2ff; border-top:1px solid #333; padding-top:10px;">Downloads / Episodes (JSON)</h3>
+    <p style="font-size:0.8rem; color:#666;">Paste the array for downloads or seasons here.</p>
+    <textarea id="extra_json" rows="5" placeholder='[{"quality":"1080p","size":"1GB","link":"#"}]'></textarea>
+
+    <button onclick="generate()">GENERATE JSON CODE</button>
     <br><br>
-    <textarea id="output" rows="10" style="background:#000; color:#0f0;"></textarea>
+    <textarea id="output" rows="10" style="background:#000; color:#0f0; border:1px solid #333;"></textarea>
 
     <script>
         function generate() {
-            const obj = {
+            const type = document.getElementById('type').value;
+            const extra = document.getElementById('extra_json').value;
+            
+            let obj = {
                 id: document.getElementById('id').value,
+                type: type,
                 title: document.getElementById('title').value,
-                type: document.getElementById('type').value,
                 year: document.getElementById('year').value,
                 genre: document.getElementById('genre').value,
                 rating: document.getElementById('rating').value,
@@ -47,13 +69,16 @@
                 trailer_embed: document.getElementById('trailer').value
             };
 
-            // Parse downloads manually or use a builder logic
             try {
-                if(obj.type === 'Movie') obj.downloads = JSON.parse(document.getElementById('dl_json').value);
-                else obj.seasons = JSON.parse(document.getElementById('dl_json').value);
-            } catch(e) { alert("Invalid Download JSON format"); return; }
+                const parsedExtra = JSON.parse(extra || "[]");
+                if(type === 'Movie') obj.downloads = parsedExtra;
+                else obj.seasons = parsedExtra;
+            } catch(e) {
+                alert("Invalid JSON in Downloads/Episodes box!");
+                return;
+            }
 
-            document.getElementById('output').value = ",\n" + JSON.stringify(obj, null, 2);
+            document.getElementById('output').value = "," + JSON.stringify(obj, null, 2);
         }
     </script>
 </body>
