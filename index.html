@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamHub</title>
+    <style>
+        /* UI/UX OPTIMIZED DARK THEME */
+        :root { --bg: #141414; --card: #1f1f1f; --primary: #e50914; --text: #ffffff; --subtext: #b3b3b3; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: var(--bg); color: var(--text); }
+        
+        /* Layout */
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        /* Hero Section */
+        .hero { height: 60vh; background-size: cover; background-position: center; position: relative; display: flex; align-items: flex-end; }
+        .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg), transparent); }
+        .hero-content { position: relative; z-index: 2; padding: 40px; max-width: 600px; }
+        .hero h1 { font-size: 3.5rem; margin: 0 0 10px 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+        .hero p { font-size: 1.2rem; margin-bottom: 20px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
+        .btn { padding: 12px 30px; border-radius: 4px; border: none; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; transition: 0.2s; }
+        .btn-play { background: var(--primary); color: white; }
+        .btn-play:hover { background: #b20710; }
+
+        /* Grid Section */
+        h2 { margin-left: 20px; border-left: 5px solid var(--primary); padding-left: 15px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding: 20px; }
+        .card { background: var(--card); border-radius: 4px; overflow: hidden; transition: transform 0.3s ease; cursor: pointer; position: relative; }
+        .card:hover { transform: scale(1.05); z-index: 10; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        .card-info { padding: 10px; }
+        .card-title { font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-year { font-size: 0.8rem; color: var(--subtext); }
+
+        /* Mobile Fixes */
+        @media (max-width: 768px) { .hero h1 { font-size: 2rem; } .grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+
+    <div id="hero" class="hero" style="display:none;">
+        <div class="hero-content">
+            <h1 id="hero-title">Loading...</h1>
+            <p id="hero-desc"></p>
+            <a id="hero-btn" href="#" class="btn btn-play">▶ Play Now</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Latest Uploads</h2>
+        <div id="grid" class="grid">Loading library...</div>
+    </div>
+
+    <script>
+        // CONFIGURATION
+        const DB_URL = 'movies.json?v=' + new Date().getTime(); // Anti-cache
+        
+        fetch(DB_URL)
+            .then(res => res.json())
+            .then(data => {
+                const grid = document.getElementById('grid');
+                grid.innerHTML = '';
+
+                // 1. Set up Hero (First movie in list)
+                if(data.length > 0) {
+                    const feat = data[0];
+                    const hero = document.getElementById('hero');
+                    hero.style.display = 'flex';
+                    hero.style.backgroundImage = `url('${feat.backdrop || feat.poster}')`;
+                    document.getElementById('hero-title').innerText = feat.title;
+                    document.getElementById('hero-desc').innerText = feat.description;
+                    document.getElementById('hero-btn').href = `player.html?id=${feat.id}`;
+                }
+
+                // 2. Populate Grid
+                data.forEach(movie => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.onclick = () => window.location.href = `player.html?id=${movie.id}`;
+                    card.innerHTML = `
+                        <img src="${movie.poster}" loading="lazy" alt="${movie.title}">
+                        <div class="card-info">
+                            <div class="card-title">${movie.title}</div>
+                            <div class="card-year">${movie.year}</div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            })
+            .catch(e => document.getElementById('grid').innerText = "Error loading movies.");
+    </script>
+</body>
+</html>
