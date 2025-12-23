@@ -9,13 +9,13 @@
 <body>
     <div id="bg-layer"></div>
     <div class="container">
-        <a href="../index.html" style="color:var(--text-dim); display:inline-flex; align-items:center; gap:5px; margin-bottom:20px; font-weight:600;">‹ Back to Home</a>
+        <a href="../index.html" class="nav-back">‹ Back to Library</a>
 
         <div class="content-grid">
             <div class="poster-col"><img id="poster" class="poster-img" src=""></div>
             <div class="details-col">
-                <div class="trailer-wrapper"><iframe id="trailer" allowfullscreen></iframe></div>
-                <h1 id="title" class="title-large">Loading...</h1>
+                <div class="trailer-wrapper" id="trailer-wrap"><iframe id="trailer" allowfullscreen></iframe></div>
+                <h1 id="title" class="title-large"></h1>
                 <div class="meta-row" id="meta"></div>
                 <p id="desc" class="desc"></p>
 
@@ -39,7 +39,12 @@
                 document.getElementById('poster').src = m.poster;
                 document.getElementById('title').innerText = m.title;
                 document.getElementById('desc').innerText = m.description;
-                document.getElementById('trailer').src = m.trailer_embed + "?modestbranding=1&rel=0&iv_load_policy=3&color=white";
+
+                if(m.trailer_embed && m.trailer_embed.length > 5) {
+                    const cleanUrl = m.trailer_embed + "?modestbranding=1&rel=0&iv_load_policy=3&color=white";
+                    document.getElementById('trailer').src = cleanUrl;
+                    document.getElementById('trailer-wrap').classList.add('has-video');
+                }
 
                 const meta = document.getElementById('meta');
                 meta.innerHTML = `<span style="color:#ffcc00; font-weight:800; font-size:1.1rem; margin-right:10px;">★ ${m.rating}</span>`;
@@ -51,13 +56,18 @@
                     m.seasons.forEach((s, idx) => {
                         let eps = '';
                         s.episodes.forEach(ep => {
+                            let linksHTML = '';
+                            // Support single link string OR array of link objects
+                            if(Array.isArray(ep.links)){
+                                ep.links.forEach(l => linksHTML += `<a href="${l.link}" class="btn-dl" style="padding:4px 12px; font-size:0.7rem; margin-left:5px" target="_blank">${l.label || 'DL'}</a>`);
+                            } else {
+                                linksHTML = `<a href="${ep.link}" class="btn-dl" style="padding:4px 12px; font-size:0.7rem;" target="_blank">Download</a>`;
+                            }
+
                             eps += `
-                                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-                                    <div>
-                                        <div style="font-weight:600; font-size:0.95rem; color:#ddd">${ep.title}</div>
-                                        <div style="font-size:0.75rem; color:#666">${ep.quality} • ${ep.size}</div>
-                                    </div>
-                                    <a href="${ep.link}" class="btn-dl" style="padding:6px 15px; font-size:0.75rem;" target="_blank">Download</a>
+                                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                                    <div style="font-size:0.9rem; color:#ddd">${ep.title} <span style="font-size:0.75rem; color:#666; margin-left:5px">${ep.size || ''}</span></div>
+                                    <div>${linksHTML}</div>
                                 </div>`;
                         });
 
