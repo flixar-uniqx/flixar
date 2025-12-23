@@ -1,26 +1,27 @@
 [
   {
-    "id": "mv_001",
-    "title": "Example Movie Title",
-    "year": "2023",
+    "id": "MV_0000001",
+    "title": "Marjaavaan",
+    "year": "2019",
     "genre": "Action, Sci-Fi",
     "rating": "8.5",
     "poster": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/q6y0Go1rZgVoTFzwOv0zGewuyVk.jpg",
     "backdrop": "https://image.tmdb.org/t/p/original/jZDkP95m1fLd5L8a7Y4wzF8f.jpg",
     "description": "This is a synopsis of the movie. You can write whatever you want here.",
     "trailer": "https://www.youtube.com/embed/YoHD9XEInc0",
-    "gdrive_id": "PASTE_YOUR_GOOGLE_DRIVE_FILE_ID_HERE"
+    "gdrive_id": "145PmckVQ41-CExGKMCFb6nGV7T16P92n"
   },
   {
-    "id": "mv_002",
-    "title": "Another Movie",
-    "year": "2024",
-    "genre": "Drama",
-    "rating": "9.0",
-    "poster": "https://via.placeholder.com/600x900",
-    "backdrop": "https://via.placeholder.com/1920x1080",
-    "description": "Another description.",
-    "trailer": "",
-    "gdrive_id": "PASTE_ANOTHER_FILE_ID_HERE"
+  {
+    "id": "MV_0000002",
+    "title": "Marjaavaan",
+    "year": "2019",
+    "genre": "Action, Sci-Fi",
+    "rating": "8.5",
+    "poster": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/q6y0Go1rZgVoTFzwOv0zGewuyVk.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/jZDkP95m1fLd5L8a7Y4wzF8f.jpg",
+    "description": "This is a synopsis of the movie. You can write whatever you want here.",
+    "trailer": "https://www.youtube.com/embed/YoHD9XEInc0",
+    "gdrive_id": "145PmckVQ41-CExGKMCFb6nGV7T16P92n"
   }
 ]
