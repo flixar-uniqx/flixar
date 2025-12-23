@@ -8,9 +8,8 @@
 </head>
 <body>
     <div id="bg-layer"></div>
-    
     <div class="container">
-        <a href="../index.html" style="color:var(--text-dim); display:inline-flex; align-items:center; gap:5px; margin-bottom:20px; font-weight:600;">‹ Back to Home</a>
+        <a href="../index.html" class="nav-back">‹ Back to Library</a>
 
         <div class="content-grid">
             <div class="poster-col">
@@ -18,9 +17,11 @@
             </div>
             
             <div class="details-col">
-                <div class="trailer-wrapper"><iframe id="trailer" allowfullscreen></iframe></div>
-                
-                <h1 id="title" class="title-large">Loading...</h1>
+                <div class="trailer-wrapper" id="trailer-wrap">
+                    <iframe id="trailer" allowfullscreen></iframe>
+                </div>
+
+                <h1 id="title" class="title-large"></h1>
                 <div class="meta-row" id="meta"></div>
                 <p id="desc" class="desc"></p>
 
@@ -37,7 +38,6 @@
     <script>
         const id = new URLSearchParams(window.location.search).get('id');
         
-        // Fetch from ../movies.json
         fetch('../movies.json?t=' + Date.now())
             .then(r => r.json())
             .then(data => {
@@ -48,9 +48,15 @@
                     document.getElementById('poster').src = m.poster;
                     document.getElementById('title').innerText = m.title;
                     document.getElementById('desc').innerText = m.description;
-                    document.getElementById('trailer').src = m.trailer_embed + "?modestbranding=1&rel=0&iv_load_policy=3&color=white";
 
-                    // Meta
+                    // SMART TRAILER LOGIC
+                    if(m.trailer_embed && m.trailer_embed.length > 5) {
+                        const cleanUrl = m.trailer_embed + (m.trailer_embed.includes('?') ? '&' : '?') + "modestbranding=1&rel=0&iv_load_policy=3&color=white";
+                        document.getElementById('trailer').src = cleanUrl;
+                        document.getElementById('trailer-wrap').classList.add('has-video'); // Only show if valid
+                    }
+
+                    // Metadata
                     const meta = document.getElementById('meta');
                     meta.innerHTML = `<span style="color:#ffcc00; font-weight:800; font-size:1.1rem; margin-right:10px;">★ ${m.rating}</span>`;
                     meta.innerHTML += `<span class="tag" onclick="window.location.href='../index.html?year=${m.year}'">${m.year}</span>`;
@@ -58,7 +64,7 @@
                         meta.innerHTML += `<span class="tag" onclick="window.location.href='../index.html?genre=${g.trim()}'">${g.trim()}</span>`;
                     });
 
-                    // Movie Downloads
+                    // Links
                     const list = document.getElementById('dl-list');
                     if(m.downloads) {
                         m.downloads.forEach(d => {
@@ -75,8 +81,7 @@
                 } else {
                     document.querySelector('.container').innerHTML = "<h1>Movie not found</h1>";
                 }
-            })
-            .catch(e => console.error("Error loading movie:", e));
+            });
     </script>
 </body>
 </html>
