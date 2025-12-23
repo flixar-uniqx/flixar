@@ -6,45 +6,42 @@
     <title>Loading...</title>
     <link rel="stylesheet" href="../style.css">
     <style>
-        /* Specific Movie Styles */
-        #bg-layer { position: fixed; inset: 0; z-index: -1; background-size: cover; background-position: center; filter: blur(40px); opacity: 0.2; transform: scale(1.1); }
-        .grid-layout { display: grid; grid-template-columns: 1fr; gap: 30px; }
-        @media(min-width: 900px) { .grid-layout { grid-template-columns: 300px 1fr; gap: 50px; } .poster-col { position: sticky; top: 100px; align-self: start; } }
-        .poster { width: 100%; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); max-width: 300px; margin: 0 auto; display: block; }
-        .trailer-box { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 16px; overflow: hidden; background: #000; margin-bottom: 30px; box-shadow: 0 0 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
-        .trailer-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        .title { font-size: 2.5rem; margin-bottom: 10px; font-weight: 800; line-height: 1.1; }
-        .meta-row { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
-        .tag { background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 8px; font-size: 0.85rem; cursor: pointer; transition:0.2s; }
-        .tag:hover { background: var(--primary); color: #000; }
-        .desc { line-height: 1.8; color: #ccc; margin-bottom: 40px; font-size: 1rem; }
+        /* Page Specific Overrides */
+        #bg-layer { position: fixed; inset: 0; z-index: -1; background-size: cover; background-position: center; filter: blur(50px); opacity: 0.15; transform: scale(1.1); }
+        .details-grid { display: grid; grid-template-columns: 1fr; gap: 30px; }
+        @media(min-width: 900px) { .details-grid { grid-template-columns: 300px 1fr; gap: 50px; } .poster-col { position: sticky; top: 100px; align-self: start; } }
         
-        /* Table */
-        .dl-box { background: rgba(255,255,255,0.03); border-radius: 16px; padding: 25px; border: 1px solid rgba(255,255,255,0.05); }
-        .dl-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .dl-btn { background: var(--primary); color: #000; padding: 8px 20px; border-radius: 50px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 5px; }
-        .share-btn { margin-top:30px; background: rgba(255,255,255,0.1); color: #fff; border:none; padding: 10px 20px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 8px; width: fit-content; }
+        .poster-img { width: 100%; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); max-width: 320px; margin: 0 auto; display: block; border: 1px solid rgba(255,255,255,0.1); }
+        .trailer-box { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 16px; overflow: hidden; background: #000; box-shadow: 0 0 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); margin-bottom: 30px; }
+        .trailer-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        
+        .meta-tags { display: flex; gap: 10px; margin: 15px 0 25px; flex-wrap: wrap; }
+        .tag { background: rgba(255,255,255,0.08); padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; border: 1px solid rgba(255,255,255,0.05); }
+        .tag:hover { border-color: var(--primary); color: var(--primary); }
+        
+        .dl-container { background: rgba(255,255,255,0.03); border-radius: 16px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .dl-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .dl-btn { background: var(--primary); color: #000; padding: 8px 24px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; }
+        .share-row { margin-top: 30px; display: flex; gap: 15px; }
     </style>
 </head>
 <body>
     <div id="bg-layer"></div>
     <div class="container">
-        <a href="../" style="display:inline-flex; align-items:center; gap:5px; margin-bottom:20px; color:#888; font-weight:600;">‹ Back</a>
-        
-        <div class="grid-layout">
-            <div class="poster-col"><img id="poster" class="poster"></div>
-            <div class="content">
+        <div class="details-grid">
+            <div class="poster-col"><img id="poster" class="poster-img"></div>
+            <div class="content-col">
                 <div class="trailer-box"><iframe id="trailer" allowfullscreen></iframe></div>
-                <h1 id="title"></h1>
-                <div class="meta-row" id="meta"></div>
-                <p id="desc"></p>
-                <div class="dl-box">
-                    <h3 style="margin-top:0; border-left:4px solid var(--primary); padding-left:10px;">Downloads</h3>
-                    <div id="links"></div>
+                <h1 id="title" style="font-size: 2.5rem; line-height: 1.1; margin-bottom: 5px;"></h1>
+                <div class="meta-tags" id="meta"></div>
+                <p id="desc" style="line-height:1.7; color:#bbb; margin-bottom: 40px; font-size:1.05rem;"></p>
+                
+                <h3 style="border-left:4px solid var(--primary); padding-left:12px; margin-bottom:20px;">Downloads</h3>
+                <div class="dl-container" id="dl-list"></div>
+
+                <div class="share-row">
+                    <button class="tag" onclick="navigator.clipboard.writeText(window.location.href); alert('Link Copied!')">Copy Link</button>
                 </div>
-                <button class="share-btn" onclick="sharePage()">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/></svg> Share
-                </button>
             </div>
         </div>
     </div>
@@ -63,28 +60,22 @@
                 document.getElementById('desc').innerText = m.description;
                 document.getElementById('trailer').src = m.trailer_embed + "?modestbranding=1&rel=0&iv_load_policy=3&color=white";
                 
-                // Meta
                 const meta = document.getElementById('meta');
-                meta.innerHTML = `<span style="color:#ffbf00; font-weight:800">★ ${m.rating}</span>`;
-                m.genre.split(',').forEach(g=>meta.innerHTML+=`<span class="tag" onclick="window.location.href='../?genre=${g.trim()}'">${g.trim()}</span>`);
+                meta.innerHTML = `<span style="color:#ffcc00; font-weight:700">★ ${m.rating}</span>`;
+                meta.innerHTML += `<span class="tag" onclick="window.location.href='${P('')}?year=${m.year}'">${m.year}</span>`;
+                m.genre.split(',').forEach(g=>meta.innerHTML+=`<span class="tag" onclick="window.location.href='${P('')}?genre=${g.trim()}'">${g.trim()}</span>`);
 
-                // Downloads
-                const links = document.getElementById('links');
-                if(m.downloads){
-                    m.downloads.forEach(d=>{
-                        links.innerHTML += `<div class="dl-row">
-                            <div><div style="font-weight:700; color:#fff">${d.quality}</div><div style="font-size:0.8rem; color:#888">${d.size}</div></div>
+                const list = document.getElementById('dl-list');
+                if(m.downloads) {
+                    m.downloads.forEach(d => {
+                        list.innerHTML += `<div class="dl-row">
+                            <div><div style="font-weight:600; color:#fff">${d.quality}</div><div style="font-size:0.8rem; color:#888">${d.size}</div></div>
                             <a href="${d.link}" class="dl-btn" target="_blank">Download</a>
                         </div>`;
                     });
                 }
             }
         });
-
-        function sharePage() {
-            if(navigator.share) navigator.share({title:document.title, url:window.location.href});
-            else { navigator.clipboard.writeText(window.location.href); alert("Link copied!"); }
-        }
     </script>
 </body>
 </html>
