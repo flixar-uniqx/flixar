@@ -3,87 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLIXAR</title>
+    <title>Movies Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0f1014; --card: #1b1c22; --primary: #00d2ff; --text: #f5f5f5; --sub: #888; }
+        :root { --bg: #0f1014; --card: #1b1c22; --primary: #00d2ff; --text: #f5f5f5; --sub: #888; --nav-bg: rgba(22, 23, 27, 0.95); }
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); }
-        
-        /* Navbar */
-        .nav { padding: 15px 4%; background: #16171b; border-bottom: 1px solid #2a2b30; position: sticky; top: 0; z-index: 100; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px; }
-        .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.4rem; color: var(--text); text-decoration: none; }
-        .logo img { height: 35px; }
+        body { margin: 0; font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); opacity: 0; animation: fadeIn 0.5s forwards; }
 
-        .filters { display: flex; gap: 10px; flex-wrap: wrap; }
-        select, input { background: #23242a; border: 1px solid #333; color: white; padding: 8px 12px; border-radius: 4px; font-family: inherit; font-size: 0.9rem; outline: none; }
-        select:focus, input:focus { border-color: var(--primary); }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        /* Navbar */
+        .nav { padding: 15px 4%; background: var(--nav-bg); border-bottom: 1px solid #2a2b30; position: sticky; top: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; backdrop-filter: blur(10px); }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.2rem; color: var(--text); text-decoration: none; text-transform: uppercase; letter-spacing: 1px; }
+        .logo img { height: 28px; }
+
+        /* Search & Menu Btn */
+        .nav-right { display: flex; gap: 15px; align-items: center; }
+        .search-box { background: #23242a; border: 1px solid #333; color: white; padding: 6px 12px; border-radius: 20px; font-family: inherit; font-size: 0.85rem; outline: none; width: 150px; transition: 0.3s; }
+        .search-box:focus { border-color: var(--primary); width: 200px; }
+        .menu-btn { cursor: pointer; font-size: 1.5rem; color: var(--text); }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: none; opacity: 0; transition: opacity 0.3s; }
+        .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: #16171b; z-index: 2001; transition: 0.3s; padding: 25px; overflow-y: auto; border-left: 1px solid #333; box-shadow: -10px 0 30px rgba(0,0,0,0.8); }
+        .sidebar.active { right: 0; }
+        .sidebar-overlay.active { display: block; opacity: 1; }
         
+        .sidebar h3 { color: var(--primary); font-size: 0.9rem; text-transform: uppercase; margin: 20px 0 10px; letter-spacing: 1px; }
+        .filter-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .filter-tag { background: #23242a; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; border: 1px solid #333; transition: 0.2s; }
+        .filter-tag:hover, .filter-tag.active { border-color: var(--primary); color: var(--primary); background: rgba(0,210,255,0.05); }
+        .close-menu { font-size: 1.5rem; cursor: pointer; position: absolute; top: 15px; right: 20px; }
+
+        /* Content */
+        .container { padding: 20px 4%; min-height: 80vh; }
+        .section-header { margin: 40px 0 15px; font-size: 1.1rem; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 12px; display: flex; justify-content: space-between; align-items: center; }
+
         /* Grid */
-        .container { padding: 30px 4%; min-height: 80vh; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; margin-top: 20px; }
-        .card { background: var(--card); border-radius: 8px; overflow: hidden; transition: 0.3s; cursor: pointer; border: 1px solid transparent; }
-        .card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
-        .info { padding: 12px; }
-        .title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .meta { display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.8rem; color: var(--sub); }
-        .badge { background: var(--primary); color: #000; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+        .card { background: var(--card); border-radius: 8px; overflow: hidden; transition: 0.3s; cursor: pointer; position: relative; }
+        .card:hover { transform: translateY(-5px); z-index: 10; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
+        .card-info { padding: 10px; }
+        .card-title { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-meta { display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.75rem; color: var(--sub); }
+        .badge { background: var(--primary); color: #000; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 0.65rem; }
 
         /* Footer */
-        .footer { text-align: center; padding: 40px; background: #0a0a0c; border-top: 1px solid #222; margin-top: 50px; font-size: 0.9rem; color: var(--sub); }
+        .footer { background: #08080a; padding: 40px 20px; margin-top: 60px; border-top: 1px solid #222; text-align: center; font-size: 0.85rem; color: #666; }
+        .footer a { color: #888; text-decoration: none; margin: 0 10px; transition: 0.2s; }
+        .footer a:hover { color: var(--primary); }
 
-        @media(max-width: 600px) { .nav { flex-direction: column; align-items: stretch; } .filters { justify-content: space-between; } select, input { width: 100%; } }
+        /* Mobile Optimization */
+        @media(max-width: 600px) {
+            .grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; } /* Smaller tiles */
+            .search-box { width: 120px; }
+            .search-box:focus { width: 100%; position: absolute; left: 15px; right: 15px; top: 60px; width: auto; }
+            .card-title { font-size: 0.8rem; }
+            .nav { padding: 12px 15px; }
+            .section-header { font-size: 1rem; margin-top: 30px; }
+        }
     </style>
 </head>
 <body>
 
     <nav class="nav">
         <a href="index.html" class="logo">
-            <img src="https://cdn-icons-png.flaticon.com/512/2503/2503508.png" alt="Icon"> MOVIES HUB
+            <img src="https://cdn-icons-png.flaticon.com/512/2503/2503508.png" alt="Icon"> 
+            StreamHub
         </a>
-        
-        <div class="filters">
-            <input type="text" id="search" placeholder="Search title..." oninput="applyFilters()">
-            <select id="filter-type" onchange="applyFilters()">
-                <option value="All">All Types</option>
-            </select>
-            <select id="filter-genre" onchange="applyFilters()">
-                <option value="All">All Genres</option>
-            </select>
-            <select id="filter-year" onchange="applyFilters()">
-                <option value="All">All Years</option>
-            </select>
+        <div class="nav-right">
+            <input type="text" id="search" class="search-box" placeholder="Search..." oninput="globalSearch()">
+            <div class="menu-btn" onclick="toggleMenu()">☰</div>
         </div>
     </nav>
 
-    <div class="container">
-        <div id="grid" class="grid"></div>
-        <div id="no-result" style="display:none; text-align:center; margin-top:50px; color:#666;">No results found.</div>
+    <div class="sidebar-overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar">
+        <div class="close-menu" onclick="toggleMenu()">✕</div>
+        <h2>Filter Library</h2>
+        
+        <h3>Content Type</h3>
+        <div class="filter-group" id="filter-type"></div>
+
+        <h3>Genre</h3>
+        <div class="filter-group" id="filter-genre"></div>
+
+        <h3>Year</h3>
+        <div class="filter-group" id="filter-year"></div>
+
+        <div style="margin-top:30px; border-top:1px solid #333; padding-top:20px;">
+            <a href="index.html" style="color:white; text-decoration:none; display:block; padding:8px 0;">Home</a>
+            <a href="contact.html" style="color:white; text-decoration:none; display:block; padding:8px 0;">Contact Us</a>
+            <a href="disclaimer.html" style="color:white; text-decoration:none; display:block; padding:8px 0;">Disclaimer</a>
+        </div>
     </div>
 
+    <div class="container" id="main-container">
+        </div>
+
     <div class="footer">
-        &copy; 2025 Movies Hub. All Rights Reserved. <br> 
-        Designed for speed and simplicity.
+        <div style="margin-bottom:15px;">
+            <a href="index.html">Home</a> • 
+            <a href="contact.html">Contact</a> • 
+            <a href="disclaimer.html">Disclaimer</a>
+        </div>
+        &copy; 2025 StreamHub. All Rights Reserved. <br>
+        We do not host any files on our servers.
     </div>
 
     <script>
         let allMovies = [];
         
-        // 1. Fetch & Initialize
+        // Fetch Data
         fetch('movies.json?t=' + Date.now())
             .then(res => res.json())
             .then(data => {
                 allMovies = data;
-                populateDropdowns(data);
-                renderMovies(data);
+                populateFilters(data);
+                renderHomepage(data);
             });
 
-        // 2. Populate Filters Dynamically
-        function populateDropdowns(data) {
+        function populateFilters(data) {
             const types = new Set();
-            const years = new Set();
             const genres = new Set();
+            const years = new Set();
 
             data.forEach(m => {
                 if(m.type) types.add(m.type);
@@ -91,69 +135,96 @@
                 if(m.genre) m.genre.split(',').forEach(g => genres.add(g.trim()));
             });
 
-            fillSelect('filter-type', Array.from(types).sort());
-            fillSelect('filter-year', Array.from(years).sort().reverse());
-            fillSelect('filter-genre', Array.from(genres).sort());
+            createFilterTags('filter-type', types, 'type');
+            createFilterTags('filter-genre', genres, 'genre');
+            createFilterTags('filter-year', Array.from(years).sort().reverse(), 'year');
         }
 
-        function fillSelect(id, list) {
-            const el = document.getElementById(id);
-            list.forEach(item => {
-                const opt = document.createElement('option');
-                opt.value = item;
-                opt.innerText = item;
-                el.appendChild(opt);
+        function createFilterTags(id, set, key) {
+            const container = document.getElementById(id);
+            container.innerHTML = `<div class="filter-tag" onclick="resetFilter('${key}')">All</div>`;
+            set.forEach(val => {
+                const tag = document.createElement('div');
+                tag.className = 'filter-tag';
+                tag.innerText = val;
+                tag.onclick = () => filterBy(key, val);
+                container.appendChild(tag);
             });
         }
 
-        // 3. Render Grid
-        function renderMovies(list) {
-            const grid = document.getElementById('grid');
-            const noRes = document.getElementById('no-result');
-            grid.innerHTML = '';
+        // Render Categorized Sections
+        function renderHomepage(data) {
+            const container = document.getElementById('main-container');
+            container.innerHTML = '';
 
-            if(list.length === 0) {
-                noRes.style.display = 'block';
-                return;
-            } else {
-                noRes.style.display = 'none';
-            }
+            // 1. Latest Uploads (First 4)
+            addSection(container, "Latest Uploads", data.slice(0, 4));
 
+            // 2. Movies
+            const movies = data.filter(m => m.type === 'Movie');
+            if(movies.length) addSection(container, "Movies", movies);
+
+            // 3. TV Series
+            const series = data.filter(m => m.type === 'TV Series');
+            if(series.length) addSection(container, "TV Series", series);
+
+            // 4. By Genre (Example: Action)
+            const action = data.filter(m => m.genre && m.genre.includes('Action'));
+            if(action.length) addSection(container, "Action Movies", action);
+        }
+
+        function addSection(container, title, list) {
+            const section = document.createElement('div');
+            section.innerHTML = `<div class="section-header">${title}</div>`;
+            
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            
             list.forEach(m => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.onclick = () => window.location.href = `movie.html?id=${m.id}`;
-                card.innerHTML = `
-                    <img src="${m.poster}" class="poster" loading="lazy">
-                    <div class="info">
-                        <div class="title" title="${m.title}">${m.title}</div>
-                        <div class="meta">
-                            <span>${m.year}</span>
-                            <span class="badge">${m.type}</span>
-                            <span>★ ${m.rating}</span>
+                grid.innerHTML += `
+                    <div class="card" onclick="window.location.href='movie.html?id=${m.id}'">
+                        <img src="${m.poster}" class="poster" loading="lazy">
+                        <div class="card-info">
+                            <div class="card-title">${m.title}</div>
+                            <div class="card-meta">
+                                <span>${m.year}</span>
+                                <span class="badge">${m.type}</span>
+                            </div>
                         </div>
                     </div>
                 `;
-                grid.appendChild(card);
             });
+            section.appendChild(grid);
+            container.appendChild(section);
         }
 
-        // 4. Filtering Logic
-        function applyFilters() {
-            const search = document.getElementById('search').value.toLowerCase();
-            const type = document.getElementById('filter-type').value;
-            const genre = document.getElementById('filter-genre').value;
-            const year = document.getElementById('filter-year').value;
+        // Search & Filter Logic
+        function globalSearch() {
+            const q = document.getElementById('search').value.toLowerCase();
+            const filtered = allMovies.filter(m => m.title.toLowerCase().includes(q));
+            
+            const container = document.getElementById('main-container');
+            container.innerHTML = '';
+            addSection(container, `Search Results for "${q}"`, filtered);
+        }
 
+        function filterBy(key, val) {
+            toggleMenu(); // Close menu
             const filtered = allMovies.filter(m => {
-                const matchSearch = m.title.toLowerCase().includes(search);
-                const matchType = type === 'All' || m.type === type;
-                const matchYear = year === 'All' || m.year === year;
-                const matchGenre = genre === 'All' || m.genre.includes(genre);
-                return matchSearch && matchType && matchYear && matchGenre;
+                if(key === 'genre') return m.genre.includes(val);
+                return m[key] === val;
             });
+            const container = document.getElementById('main-container');
+            container.innerHTML = '';
+            addSection(container, `${val} Results`, filtered);
+        }
 
-            renderMovies(filtered);
+        function resetFilter() { renderHomepage(allMovies); toggleMenu(); }
+
+        // Sidebar Toggles
+        function toggleMenu() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
         }
     </script>
 </body>
