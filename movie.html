@@ -6,96 +6,99 @@
     <title>Movie Details</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #00d2ff; --bg-overlay: rgba(11, 12, 15, 0.95); --border: rgba(255,255,255,0.08); }
+        :root { --bg: #0f1014; --primary: #00d2ff; --text: #f5f5f5; --bg-overlay: rgba(11, 12, 15, 0.96); --nav-bg: rgba(22, 23, 27, 0.95); }
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: 'Raleway', sans-serif; background-color: #0b0c0f; color: white; min-height: 100vh; }
+        body { margin: 0; font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); animation: fadeIn 0.5s forwards; opacity: 0; }
+        @keyframes fadeIn { to { opacity: 1; } }
 
-        /* Dynamic Background */
-        #bg-layer { position: fixed; inset: 0; z-index: -1; background-size: cover; background-position: center; filter: blur(30px); opacity: 0.3; transform: scale(1.1); }
-        #overlay { position: fixed; inset: 0; z-index: -1; background: var(--bg-overlay); }
-
-        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
-        .nav-back { color: #888; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; margin-bottom: 30px; transition: 0.2s; font-size: 0.9rem; }
-        .nav-back:hover { color: var(--primary); }
-
-        /* Layout Grid */
-        .grid-layout { display: grid; grid-template-columns: 300px 1fr; gap: 50px; align-items: start; }
+        /* Navbar & Footer (Copied from Index for consistency) */
+        .nav { padding: 15px 4%; background: var(--nav-bg); border-bottom: 1px solid #2a2b30; position: sticky; top: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; backdrop-filter: blur(10px); }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.2rem; color: var(--text); text-decoration: none; text-transform: uppercase; }
+        .logo img { height: 28px; }
+        .menu-btn { cursor: pointer; font-size: 1.5rem; }
         
-        /* Left Column */
-        .poster { width: 100%; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid var(--border); }
-        
-        /* Right Column */
-        .trailer-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: #000; margin-bottom: 30px; border: 1px solid var(--border); }
-        .trailer-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        /* Sidebar (Same logic required) */
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: none; }
+        .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: #16171b; z-index: 2001; transition: 0.3s; padding: 25px; border-left: 1px solid #333; }
+        .sidebar.active { right: 0; }
+        .sidebar-overlay.active { display: block; }
+        .close-menu { font-size: 1.5rem; cursor: pointer; position: absolute; top: 15px; right: 20px; }
 
-        .title { font-size: 2.8rem; margin: 0 0 10px; font-weight: 700; line-height: 1.1; }
-        .meta-row { display: flex; gap: 15px; color: var(--primary); font-weight: 600; font-size: 0.95rem; margin-bottom: 20px; align-items: center; }
-        .tag { background: rgba(0, 210, 255, 0.1); padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(0, 210, 255, 0.2); }
-        
-        .desc { line-height: 1.8; color: #ccc; font-size: 1.05rem; margin-bottom: 40px; }
+        /* Page Specific */
+        #bg-layer { position: fixed; inset: 0; z-index: -1; background-size: cover; background-position: center; filter: blur(35px); opacity: 0.25; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
 
-        /* --- DOWNLOAD SECTION --- */
-        .dl-header { font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; border-left: 4px solid var(--primary); padding-left: 15px; }
-
-        /* MOVIE TABLE STYLE */
-        .movie-table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.02); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
-        .movie-table th, .movie-table td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border); }
-        .movie-table th { background: rgba(255,255,255,0.05); color: #aaa; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        /* Layout */
+        .grid-layout { display: grid; grid-template-columns: 240px 1fr; gap: 40px; margin-top: 20px; }
+        .poster { width: 100%; border-radius: 8px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); }
         
-        /* SERIES ACCORDION STYLE */
-        .accordion { display: flex; flex-direction: column; gap: 10px; }
-        .season-item { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: rgba(255,255,255,0.02); transition: 0.3s; }
-        .season-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1rem; background: rgba(255,255,255,0.03); user-select: none; transition: 0.2s; }
-        .season-header:hover { background: rgba(255,255,255,0.06); color: var(--primary); }
-        .season-header::after { content: '+'; font-size: 1.5rem; font-weight: 300; }
-        
-        .season-item.active .season-header { background: var(--primary); color: #000; }
-        .season-item.active .season-header::after { content: '-'; }
+        .trailer-box { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 10px; overflow: hidden; background: #000; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .trailer-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-        .season-body { display: none; padding: 0; background: #0e0f12; }
-        .season-item.active .season-body { display: block; animation: slideDown 0.3s ease; }
+        /* Fonts Scaled Down */
+        .title { font-size: 2rem; margin: 0 0 10px; font-weight: 700; line-height: 1.1; }
+        .meta { display: flex; gap: 15px; font-size: 0.9rem; color: var(--primary); font-weight: 600; margin-bottom: 15px; flex-wrap: wrap; }
+        .tag { background: rgba(0, 210, 255, 0.1); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(0, 210, 255, 0.2); }
+        .desc { line-height: 1.6; color: #ccc; font-size: 0.95rem; margin-bottom: 30px; }
 
-        .episode-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; border-bottom: 1px solid var(--border); transition: 0.2s; }
-        .episode-row:hover { background: rgba(255,255,255,0.03); }
-        .episode-row:last-child { border-bottom: none; }
-        
-        .ep-title { font-weight: 600; font-size: 0.95rem; color: #ddd; }
-        .ep-meta { font-size: 0.85rem; color: #666; margin-left: 10px; }
-        
-        .btn-dl { background: #1a1b20; color: white; text-decoration: none; padding: 8px 18px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; border: 1px solid #333; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
-        .btn-dl:hover { border-color: var(--primary); color: var(--primary); background: rgba(0, 210, 255, 0.05); }
+        /* Tables & Accordions */
+        .dl-header { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; border-left: 4px solid var(--primary); padding-left: 10px; }
+        .movie-table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 0.9rem; }
+        .movie-table th, .movie-table td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .btn-dl { background: #1a1b20; color: white; text-decoration: none; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; border: 1px solid #333; transition: 0.2s; white-space: nowrap; }
+        .btn-dl:hover { border-color: var(--primary); color: var(--primary); }
 
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        @media(max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } .poster { max-width: 300px; margin: 0 auto 30px; display: block; } }
+        /* Accordion */
+        .season-header { padding: 12px 15px; background: rgba(255,255,255,0.05); cursor: pointer; font-weight: 600; margin-bottom: 2px; border-radius: 4px; display: flex; justify-content: space-between; font-size: 0.95rem; }
+        .season-body { display: none; padding: 10px; background: rgba(0,0,0,0.2); }
+        .season-item.active .season-body { display: block; }
+        .episode-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+
+        .footer { background: #08080a; padding: 30px; margin-top: 50px; text-align: center; font-size: 0.8rem; color: #666; border-top: 1px solid #222; }
+        .footer a { color: #888; text-decoration: none; margin: 0 8px; }
+
+        @media(max-width: 768px) {
+            .grid-layout { grid-template-columns: 1fr; gap: 20px; }
+            .poster { width: 160px; margin: 0 auto; display: block; } /* Smaller poster on mobile */
+            .title { font-size: 1.6rem; text-align: center; }
+            .meta { justify-content: center; font-size: 0.8rem; }
+            .desc { font-size: 0.9rem; text-align: center; }
+            .container { padding: 15px; }
+        }
     </style>
 </head>
 <body>
 
     <div id="bg-layer"></div>
-    <div id="overlay"></div>
+
+    <nav class="nav">
+        <a href="index.html" class="logo"><img src="https://cdn-icons-png.flaticon.com/512/2503/2503508.png"> StreamHub</a>
+        <div class="menu-btn" onclick="toggleMenu()">☰</div>
+    </nav>
+
+    <div class="sidebar-overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar">
+        <div class="close-menu" onclick="toggleMenu()">✕</div>
+        <h3>Menu</h3>
+        <a href="index.html" style="color:white; text-decoration:none; display:block; padding:10px 0; border-bottom:1px solid #333;">Home</a>
+        <a href="contact.html" style="color:white; text-decoration:none; display:block; padding:10px 0; border-bottom:1px solid #333;">Contact Us</a>
+        <a href="disclaimer.html" style="color:white; text-decoration:none; display:block; padding:10px 0;">Disclaimer</a>
+    </div>
 
     <div class="container">
-        <a href="index.html" class="nav-back">← Back to Library</a>
-
         <div class="grid-layout">
-            <div>
-                <img id="poster" class="poster" src="" alt="Poster">
-            </div>
-
+            <div><img id="poster" class="poster" src=""></div>
+            
             <div class="content">
-                <div class="trailer-container">
-                    <iframe id="trailer-frame" allowfullscreen></iframe>
-                </div>
-
-                <h1 id="title" class="title">Loading...</h1>
+                <div class="trailer-box"><iframe id="trailer-frame" allowfullscreen></iframe></div>
                 
-                <div class="meta-row">
-                    <span id="type" class="tag">Movie</span>
+                <h1 id="title" class="title">Loading...</h1>
+                <div class="meta">
+                    <span id="type" class="tag"></span>
                     <span>★ <span id="rating"></span></span>
                     <span id="year"></span>
                     <span id="genre" style="color:#ccc; font-weight:400"></span>
                 </div>
-
                 <p id="desc" class="desc"></p>
 
                 <div class="dl-header">Downloads</div>
@@ -104,103 +107,58 @@
         </div>
     </div>
 
+    <div class="footer">
+        <a href="index.html">Home</a> • <a href="contact.html">Contact</a> • <a href="disclaimer.html">Disclaimer</a><br><br>
+        &copy; 2025 StreamHub.
+    </div>
+
     <script>
+        // Same Sidebar Logic
+        function toggleMenu() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
+        }
+
+        // Movie Data Logic
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
 
-        fetch('movies.json?t=' + Date.now())
-            .then(res => res.json())
-            .then(data => {
-                const movie = data.find(m => m.id === id);
-                
-                if(movie) {
-                    // Populate Basic Info
-                    document.title = movie.title;
-                    document.getElementById('bg-layer').style.backgroundImage = `url('${movie.backdrop || movie.poster}')`;
-                    document.getElementById('poster').src = movie.poster;
-                    document.getElementById('title').innerText = movie.title;
-                    document.getElementById('type').innerText = movie.type;
-                    document.getElementById('rating').innerText = movie.rating;
-                    document.getElementById('year').innerText = movie.year;
-                    document.getElementById('genre').innerText = movie.genre;
-                    document.getElementById('desc').innerText = movie.description;
+        fetch('movies.json?t=' + Date.now()).then(res => res.json()).then(data => {
+            const movie = data.find(m => m.id === id);
+            if(movie) {
+                document.title = movie.title;
+                document.getElementById('bg-layer').style.backgroundImage = `url('${movie.backdrop || movie.poster}')`;
+                document.getElementById('poster').src = movie.poster;
+                document.getElementById('title').innerText = movie.title;
+                document.getElementById('type').innerText = movie.type;
+                document.getElementById('rating').innerText = movie.rating;
+                document.getElementById('year').innerText = movie.year;
+                document.getElementById('genre').innerText = movie.genre;
+                document.getElementById('desc').innerText = movie.description;
 
-                    // Handle Trailer
-                    if(movie.trailer_embed) {
-                        document.getElementById('trailer-frame').src = movie.trailer_embed;
-                    } else {
-                        document.querySelector('.trailer-container').style.display = 'none';
-                    }
+                if(movie.trailer_embed) document.getElementById('trailer-frame').src = movie.trailer_embed;
+                else document.querySelector('.trailer-box').style.display = 'none';
 
-                    // --- LOGIC: DETECT LAYOUT MODE ---
-                    const dlArea = document.getElementById('download-area');
-
-                    if (movie.layout_mode === 'series' && movie.seasons) {
-                        // RENDER SERIES ACCORDION
-                        let html = '<div class="accordion">';
-                        
-                        movie.seasons.forEach((season, index) => {
-                            html += `
-                                <div class="season-item ${index === 0 ? '' : ''}"> 
-                                    <div class="season-header" onclick="toggleSeason(this)">${season.name}</div>
-                                    <div class="season-body">
-                            `;
-                            
-                            season.episodes.forEach(ep => {
-                                html += `
-                                    <div class="episode-row">
-                                        <div>
-                                            <span class="ep-title">${ep.title}</span>
-                                            <span class="ep-meta">${ep.quality} • ${ep.size}</span>
-                                        </div>
-                                        <a href="${ep.link}" class="btn-dl" target="_blank">Download</a>
-                                    </div>
-                                `;
-                            });
-
-                            html += `</div></div>`;
+                const dlArea = document.getElementById('download-area');
+                if (movie.layout_mode === 'series' && movie.seasons) {
+                    let html = '<div class="accordion">';
+                    movie.seasons.forEach(s => {
+                        html += `<div class="season-item"><div class="season-header" onclick="this.parentElement.classList.toggle('active')">${s.name} <span style="font-weight:300">+</span></div><div class="season-body">`;
+                        s.episodes.forEach(ep => {
+                            html += `<div class="episode-row"><div><div style="font-weight:600; color:#ddd">${ep.title}</div><div style="font-size:0.75rem; color:#666">${ep.quality} • ${ep.size}</div></div><a href="${ep.link}" class="btn-dl" target="_blank">Get</a></div>`;
                         });
-                        html += '</div>';
-                        dlArea.innerHTML = html;
-
-                    } else {
-                        // RENDER MOVIE TABLE (Default)
-                        let html = `
-                            <table class="movie-table">
-                                <thead><tr><th>Quality</th><th>Size</th><th>Link</th></tr></thead>
-                                <tbody>
-                        `;
-                        
-                        if(movie.downloads && movie.downloads.length > 0) {
-                            movie.downloads.forEach(dl => {
-                                html += `
-                                    <tr>
-                                        <td style="font-weight:600; color:#ddd">${dl.quality}</td>
-                                        <td style="color:#888">${dl.size}</td>
-                                        <td><a href="${dl.link}" class="btn-dl" target="_blank">Download File</a></td>
-                                    </tr>
-                                `;
-                            });
-                        } else {
-                            html += '<tr><td colspan="3">No links available</td></tr>';
-                        }
-                        
-                        html += '</tbody></table>';
-                        dlArea.innerHTML = html;
-                    }
-
+                        html += `</div></div>`;
+                    });
+                    dlArea.innerHTML = html + '</div>';
                 } else {
-                    document.querySelector('.container').innerHTML = '<h1>Movie not found</h1>';
+                    let html = '<table class="movie-table"><tbody>';
+                    (movie.downloads || []).forEach(dl => {
+                        html += `<tr><td style="color:#ddd; font-weight:600">${dl.quality}</td><td style="color:#888">${dl.size}</td><td><a href="${dl.link}" class="btn-dl" target="_blank">Get</a></td></tr>`;
+                    });
+                    dlArea.innerHTML = html + '</tbody></table>';
                 }
-            });
-
-        // Function to toggle Series Accordion
-        function toggleSeason(header) {
-            const item = header.parentElement;
-            // Optional: Close others when opening one? 
-            // document.querySelectorAll('.season-item').forEach(i => { if(i !== item) i.classList.remove('active'); });
-            item.classList.toggle('active');
-        }
+            }
+        });
     </script>
 </body>
 </html>
