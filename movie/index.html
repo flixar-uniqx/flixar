@@ -5,42 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loading...</title>
     <link rel="stylesheet" href="../style.css">
-    <style>
-        /* Page Specific Overrides */
-        #bg-layer { position: fixed; inset: 0; z-index: -1; background-size: cover; background-position: center; filter: blur(50px); opacity: 0.15; transform: scale(1.1); }
-        .details-grid { display: grid; grid-template-columns: 1fr; gap: 30px; }
-        @media(min-width: 900px) { .details-grid { grid-template-columns: 300px 1fr; gap: 50px; } .poster-col { position: sticky; top: 100px; align-self: start; } }
-        
-        .poster-img { width: 100%; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); max-width: 320px; margin: 0 auto; display: block; border: 1px solid rgba(255,255,255,0.1); }
-        .trailer-box { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 16px; overflow: hidden; background: #000; box-shadow: 0 0 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); margin-bottom: 30px; }
-        .trailer-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        
-        .meta-tags { display: flex; gap: 10px; margin: 15px 0 25px; flex-wrap: wrap; }
-        .tag { background: rgba(255,255,255,0.08); padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; border: 1px solid rgba(255,255,255,0.05); }
-        .tag:hover { border-color: var(--primary); color: var(--primary); }
-        
-        .dl-container { background: rgba(255,255,255,0.03); border-radius: 16px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .dl-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .dl-btn { background: var(--primary); color: #000; padding: 8px 24px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; }
-        .share-row { margin-top: 30px; display: flex; gap: 15px; }
-    </style>
 </head>
 <body>
     <div id="bg-layer"></div>
+    
     <div class="container">
-        <div class="details-grid">
-            <div class="poster-col"><img id="poster" class="poster-img"></div>
-            <div class="content-col">
-                <div class="trailer-box"><iframe id="trailer" allowfullscreen></iframe></div>
-                <h1 id="title" style="font-size: 2.5rem; line-height: 1.1; margin-bottom: 5px;"></h1>
-                <div class="meta-tags" id="meta"></div>
-                <p id="desc" style="line-height:1.7; color:#bbb; margin-bottom: 40px; font-size:1.05rem;"></p>
-                
-                <h3 style="border-left:4px solid var(--primary); padding-left:12px; margin-bottom:20px;">Downloads</h3>
-                <div class="dl-container" id="dl-list"></div>
+        <a href="../index.html" style="color:var(--text-dim); display:inline-flex; align-items:center; gap:5px; margin-bottom:20px; font-weight:600;">‹ Back to Home</a>
 
-                <div class="share-row">
-                    <button class="tag" onclick="navigator.clipboard.writeText(window.location.href); alert('Link Copied!')">Copy Link</button>
+        <div class="content-grid">
+            <div class="poster-col">
+                <img id="poster" class="poster-img" src="">
+            </div>
+            
+            <div class="details-col">
+                <div class="trailer-wrapper"><iframe id="trailer" allowfullscreen></iframe></div>
+                
+                <h1 id="title" class="title-large">Loading...</h1>
+                <div class="meta-row" id="meta"></div>
+                <p id="desc" class="desc"></p>
+
+                <div class="dl-section">
+                    <div style="font-weight:700; margin-bottom:15px; color:#fff; border-left:4px solid var(--primary); padding-left:10px;">DOWNLOADS</div>
+                    <div id="dl-list"></div>
                 </div>
             </div>
         </div>
@@ -50,32 +36,47 @@
     <script src="../app.js"></script>
     <script>
         const id = new URLSearchParams(window.location.search).get('id');
-        fetch('../movies.json?t='+Date.now()).then(r=>r.json()).then(data=>{
-            const m = data.find(i=>i.id===id);
-            if(m){
-                document.title = m.title;
-                document.getElementById('bg-layer').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
-                document.getElementById('poster').src = m.poster;
-                document.getElementById('title').innerText = m.title;
-                document.getElementById('desc').innerText = m.description;
-                document.getElementById('trailer').src = m.trailer_embed + "?modestbranding=1&rel=0&iv_load_policy=3&color=white";
-                
-                const meta = document.getElementById('meta');
-                meta.innerHTML = `<span style="color:#ffcc00; font-weight:700">★ ${m.rating}</span>`;
-                meta.innerHTML += `<span class="tag" onclick="window.location.href='${P('')}?year=${m.year}'">${m.year}</span>`;
-                m.genre.split(',').forEach(g=>meta.innerHTML+=`<span class="tag" onclick="window.location.href='${P('')}?genre=${g.trim()}'">${g.trim()}</span>`);
+        
+        // Fetch from ../movies.json
+        fetch('../movies.json?t=' + Date.now())
+            .then(r => r.json())
+            .then(data => {
+                const m = data.find(i => i.id === id);
+                if(m) {
+                    document.title = m.title;
+                    document.getElementById('bg-layer').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
+                    document.getElementById('poster').src = m.poster;
+                    document.getElementById('title').innerText = m.title;
+                    document.getElementById('desc').innerText = m.description;
+                    document.getElementById('trailer').src = m.trailer_embed + "?modestbranding=1&rel=0&iv_load_policy=3&color=white";
 
-                const list = document.getElementById('dl-list');
-                if(m.downloads) {
-                    m.downloads.forEach(d => {
-                        list.innerHTML += `<div class="dl-row">
-                            <div><div style="font-weight:600; color:#fff">${d.quality}</div><div style="font-size:0.8rem; color:#888">${d.size}</div></div>
-                            <a href="${d.link}" class="dl-btn" target="_blank">Download</a>
-                        </div>`;
+                    // Meta
+                    const meta = document.getElementById('meta');
+                    meta.innerHTML = `<span style="color:#ffcc00; font-weight:800; font-size:1.1rem; margin-right:10px;">★ ${m.rating}</span>`;
+                    meta.innerHTML += `<span class="tag" onclick="window.location.href='../index.html?year=${m.year}'">${m.year}</span>`;
+                    m.genre.split(',').forEach(g => {
+                        meta.innerHTML += `<span class="tag" onclick="window.location.href='../index.html?genre=${g.trim()}'">${g.trim()}</span>`;
                     });
+
+                    // Movie Downloads
+                    const list = document.getElementById('dl-list');
+                    if(m.downloads) {
+                        m.downloads.forEach(d => {
+                            list.innerHTML += `
+                                <div class="dl-row">
+                                    <div>
+                                        <div style="font-weight:600; color:#fff">${d.quality}</div>
+                                        <div style="font-size:0.8rem; color:var(--text-dim)">${d.size}</div>
+                                    </div>
+                                    <a href="${d.link}" class="btn-dl" target="_blank">Download</a>
+                                </div>`;
+                        });
+                    }
+                } else {
+                    document.querySelector('.container').innerHTML = "<h1>Movie not found</h1>";
                 }
-            }
-        });
+            })
+            .catch(e => console.error("Error loading movie:", e));
     </script>
 </body>
 </html>
