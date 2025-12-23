@@ -8,8 +8,12 @@
 </head>
 <body>
     <div id="bg-layer"></div>
+    
     <div class="container">
-        <a href="../index.html" class="nav-back">‹ Back to Library</a>
+        <a href="../index.html" class="nav-back">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg> 
+            Back to Library
+        </a>
 
         <div class="content-grid">
             <div class="poster-col">
@@ -22,11 +26,16 @@
                 </div>
 
                 <h1 id="title" class="title-large"></h1>
+                
                 <div class="meta-row" id="meta"></div>
+
                 <p id="desc" class="desc"></p>
 
                 <div class="dl-section">
-                    <div style="font-weight:700; margin-bottom:15px; color:#fff; border-left:4px solid var(--primary); padding-left:10px;">DOWNLOADS</div>
+                    <div style="font-weight:800; margin-bottom:20px; color:#fff; font-size:1.1rem; display:flex; align-items:center; gap:10px;">
+                        <span style="width:4px; height:20px; background:var(--primary); border-radius:4px;"></span>
+                        DOWNLOADS
+                    </div>
                     <div id="dl-list"></div>
                 </div>
             </div>
@@ -43,43 +52,41 @@
             .then(data => {
                 const m = data.find(i => i.id === id);
                 if(m) {
-                    document.title = m.title;
+                    document.title = `${m.title} - ${CONFIG.siteName}`;
                     document.getElementById('bg-layer').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
                     document.getElementById('poster').src = m.poster;
                     document.getElementById('title').innerText = m.title;
                     document.getElementById('desc').innerText = m.description;
 
-                    // SMART TRAILER LOGIC
                     if(m.trailer_embed && m.trailer_embed.length > 5) {
+                        // Clean YouTube UI params
                         const cleanUrl = m.trailer_embed + (m.trailer_embed.includes('?') ? '&' : '?') + "modestbranding=1&rel=0&iv_load_policy=3&color=white";
                         document.getElementById('trailer').src = cleanUrl;
-                        document.getElementById('trailer-wrap').classList.add('has-video'); // Only show if valid
+                        document.getElementById('trailer-wrap').classList.add('has-video');
                     }
 
-                    // Metadata
                     const meta = document.getElementById('meta');
-                    meta.innerHTML = `<span style="color:#ffcc00; font-weight:800; font-size:1.1rem; margin-right:10px;">★ ${m.rating}</span>`;
+                    meta.innerHTML = `<span class="rating-pill">IMDb ${m.rating}</span>`;
                     meta.innerHTML += `<span class="tag" onclick="window.location.href='../index.html?year=${m.year}'">${m.year}</span>`;
                     m.genre.split(',').forEach(g => {
                         meta.innerHTML += `<span class="tag" onclick="window.location.href='../index.html?genre=${g.trim()}'">${g.trim()}</span>`;
                     });
 
-                    // Links
                     const list = document.getElementById('dl-list');
                     if(m.downloads) {
                         m.downloads.forEach(d => {
                             list.innerHTML += `
                                 <div class="dl-row">
                                     <div>
-                                        <div style="font-weight:600; color:#fff">${d.quality}</div>
-                                        <div style="font-size:0.8rem; color:var(--text-dim)">${d.size}</div>
+                                        <div style="font-weight:700; font-size:1rem; color:#fff">${d.quality}</div>
+                                        <div style="font-size:0.8rem; color:var(--text-dim); margin-top:4px;">${d.size}</div>
                                     </div>
                                     <a href="${d.link}" class="btn-dl" target="_blank">Download</a>
                                 </div>`;
                         });
                     }
                 } else {
-                    document.querySelector('.container').innerHTML = "<h1>Movie not found</h1>";
+                    document.querySelector('.container').innerHTML = "<h2 style='text-align:center; margin-top:50px'>Movie not found.</h2>";
                 }
             });
     </script>
