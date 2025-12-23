@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .admin-box { max-width: 800px; margin: 50px auto; background: var(--card); padding: 40px; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.1); }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; color: #888; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+        input, select, textarea { width: 100%; padding: 12px; background: #0f1014; border: 1px solid #333; color: white; border-radius: 8px; outline: none; font-family: inherit; }
+        input:focus, textarea:focus { border-color: var(--primary); }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        .dynamic-list { border: 1px solid #333; padding: 15px; border-radius: 8px; margin-bottom: 10px; background: rgba(0,0,0,0.2); }
+        .btn-add { background: #333; color: white; padding: 5px 10px; font-size: 0.8rem; border-radius: 4px; cursor: pointer; border: none; margin-top: 5px; }
+        .btn-gen { width: 100%; background: var(--primary); color: #000; font-weight: 800; padding: 15px; border-radius: 50px; border: none; cursor: pointer; margin-top: 20px; font-size: 1rem; }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    
+    <div id="login-screen" class="container" style="text-align:center; padding-top:100px;">
+        <h2>Admin Login</h2>
+        <input type="password" id="password" placeholder="Password" style="max-width:300px; text-align:center;">
+        <br><br>
+        <button class="btn-gen" style="max-width:300px" onclick="login()">Access</button>
+    </div>
+
+    <div id="admin-panel" class="container hidden">
+        <div class="admin-box">
+            <h2 style="color:var(--primary); margin-top:0;">Add New Content</h2>
+            
+            <div class="row">
+                <div class="form-group"><label>Type</label><select id="type" onchange="toggleMode()"><option>Movie</option><option>TV Series</option></select></div>
+                <div class="form-group"><label>ID (Unique)</label><input type="text" id="id" placeholder="mv_001"></div>
+            </div>
+
+            <div class="form-group"><label>Title</label><input type="text" id="title"></div>
+            
+            <div class="row">
+                <div class="form-group"><label>Year</label><input type="text" id="year"></div>
+                <div class="form-group"><label>Rating</label><input type="text" id="rating"></div>
+            </div>
+
+            <div class="form-group"><label>Genres</label><input type="text" id="genre" placeholder="Action, Drama"></div>
+            <div class="form-group"><label>Poster URL</label><input type="text" id="poster"></div>
+            <div class="form-group"><label>Backdrop URL</label><input type="text" id="backdrop"></div>
+            <div class="form-group"><label>YouTube Embed</label><input type="text" id="trailer"></div>
+            <div class="form-group"><label>Description</label><textarea id="desc" rows="3"></textarea></div>
+
+            <div id="movie-links">
+                <label style="color:var(--primary)">Download Links</label>
+                <div id="movie-link-container"></div>
+                <button class="btn-add" onclick="addMovieLink()">+ Add Link</button>
+            </div>
+
+            <div id="series-links" class="hidden">
+                <label style="color:var(--primary)">Seasons & Episodes</label>
+                <div id="season-container"></div>
+                <button class="btn-add" onclick="addSeason()">+ Add Season</button>
+            </div>
+
+            <button class="btn-gen" onclick="generate()">Generate JSON Code</button>
+            <textarea id="output" rows="10" style="margin-top:20px; background:#000; color:#0f0; font-family:monospace"></textarea>
+        </div>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../app.js"></script>
+    <script>
+        // CONFIG
+        const PASS = "1234"; // Change this
+
+        function login() {
+            if(document.getElementById('password').value === PASS) {
+                document.getElementById('login-screen').style.display='none';
+                document.getElementById('admin-panel').style.display='block';
+            } else alert('Incorrect Password');
+        }
+
+        function toggleMode() {
+            const isSeries = document.getElementById('type').value === 'TV Series';
+            document.getElementById('movie-links').style.display = isSeries ? 'none' : 'block';
+            document.getElementById('series-links').style.display = isSeries ? 'block' : 'none';
+        }
+
+        // MOVIE LOGIC
+        function addMovieLink() {
+            const div = document.createElement('div');
+            div.className = 'dynamic-list row';
+            div.innerHTML = `<input placeholder="Quality (1080p)"><input placeholder="Size (1GB)"><input placeholder="Link" style="grid-column: span 2">`;
+            document.getElementById('movie-link-container').appendChild(div);
+        }
+
+        // SERIES LOGIC
+        function addSeason() {
+            const div = document.createElement('div');
+            div.className = 'dynamic-list';
+            div.style.borderColor = 'var(--primary)';
+            const id = Date.now();
+            div.innerHTML = `
+                <input placeholder="Season Name (e.g. Season 1)" class="s-name">
+                <div id="ep-${id}"></div>
+                <button class="btn-add" onclick="addEpisode('ep-${id}')">+ Add Episode</button>
+            `;
+            document.getElementById('season-container').appendChild(div);
+        }
+
+        function addEpisode(containerId) {
+            const div = document.createElement('div');
+            div.style.marginLeft = '20px';
+            div.style.marginTop = '10px';
+            div.className = 'dynamic-list';
+            div.innerHTML = `
+                <input placeholder="Episode Title" class="ep-title">
+                <div class="row">
+                    <input placeholder="Label (1080p)" class="l-label">
+                    <input placeholder="URL" class="l-url">
+                </div>
+            `;
+            document.getElementById(containerId).appendChild(div);
+        }
+
+        function generate() {
+            let obj = {
+                id: document.getElementById('id').value,
+                type: document.getElementById('type').value,
+                title: document.getElementById('title').value,
+                year: document.getElementById('year').value,
+                genre: document.getElementById('genre').value,
+                rating: document.getElementById('rating').value,
+                poster: document.getElementById('poster').value,
+                backdrop: document.getElementById('backdrop').value,
+                description: document.getElementById('desc').value,
+                trailer_embed: document.getElementById('trailer').value
+            };
+
+            if(obj.type === 'Movie') {
+                obj.downloads = [];
+                document.querySelectorAll('#movie-link-container .dynamic-list').forEach(row => {
+                    const i = row.querySelectorAll('input');
+                    if(i[0].value) obj.downloads.push({ quality: i[0].value, size: i[1].value, link: i[2].value });
+                });
+            } else {
+                obj.seasons = [];
+                document.querySelectorAll('#season-container > .dynamic-list').forEach(sDiv => {
+                    let season = { name: sDiv.querySelector('.s-name').value, episodes: [] };
+                    sDiv.querySelectorAll('.dynamic-list').forEach(epDiv => {
+                        let ep = { 
+                            title: epDiv.querySelector('.ep-title').value,
+                            links: [{ label: epDiv.querySelector('.l-label').value, url: epDiv.querySelector('.l-url').value }]
+                        };
+                        season.episodes.push(ep);
+                    });
+                    obj.seasons.push(season);
+                });
+            }
+
+            document.getElementById('output').value = ",\n" + JSON.stringify(obj, null, 2);
+        }
+    </script>
+</body>
+</html>
