@@ -3,91 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamHub</title>
+    <title>Movies Hub</title>
     <style>
-        /* UI/UX OPTIMIZED DARK THEME */
-        :root { --bg: #141414; --card: #1f1f1f; --primary: #e50914; --text: #ffffff; --subtext: #b3b3b3; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: var(--bg); color: var(--text); }
+        :root { --bg: #141414; --card: #1f1f1f; --primary: #e50914; --text: #fff; --sub: #b3b3b3; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); }
         
-        /* Layout */
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        
-        /* Hero Section */
-        .hero { height: 60vh; background-size: cover; background-position: center; position: relative; display: flex; align-items: flex-end; }
-        .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg), transparent); }
-        .hero-content { position: relative; z-index: 2; padding: 40px; max-width: 600px; }
-        .hero h1 { font-size: 3.5rem; margin: 0 0 10px 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
-        .hero p { font-size: 1.2rem; margin-bottom: 20px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
-        .btn { padding: 12px 30px; border-radius: 4px; border: none; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; transition: 0.2s; }
-        .btn-play { background: var(--primary); color: white; }
-        .btn-play:hover { background: #b20710; }
+        /* Navbar */
+        .nav { padding: 20px 4%; display: flex; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); position: fixed; width: 100%; top: 0; z-index: 50; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
 
-        /* Grid Section */
-        h2 { margin-left: 20px; border-left: 5px solid var(--primary); padding-left: 15px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding: 20px; }
-        .card { background: var(--card); border-radius: 4px; overflow: hidden; transition: transform 0.3s ease; cursor: pointer; position: relative; }
-        .card:hover { transform: scale(1.05); z-index: 10; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
-        .card-info { padding: 10px; }
-        .card-title { font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card-year { font-size: 0.8rem; color: var(--subtext); }
+        /* Hero */
+        .hero { height: 70vh; background-size: cover; background-position: center; position: relative; display: flex; align-items: flex-end; }
+        .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 10%, transparent 90%); }
+        .hero-content { position: relative; z-index: 2; padding: 0 4% 100px; max-width: 600px; }
+        .hero-title { font-size: 3rem; margin: 0 0 10px; text-shadow: 2px 2px 4px black; }
+        .hero-desc { color: #ddd; margin-bottom: 20px; font-size: 1.1rem; line-height: 1.5; text-shadow: 1px 1px 2px black; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .btn { padding: 10px 25px; border-radius: 4px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; text-decoration: none; display: inline-block; }
+        .btn-play { background: var(--text); color: black; }
+        .btn-play:hover { background: #ccc; }
 
-        /* Mobile Fixes */
-        @media (max-width: 768px) { .hero h1 { font-size: 2rem; } .grid { grid-template-columns: repeat(2, 1fr); } }
+        /* Grid */
+        .section-title { padding: 0 4%; margin-top: -50px; position: relative; z-index: 10; font-size: 1.2rem; font-weight: 500; color: #e5e5e5; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; padding: 20px 4%; }
+        .card { position: relative; aspect-ratio: 2/3; border-radius: 4px; overflow: hidden; cursor: pointer; transition: transform 0.3s ease; }
+        .card img { width: 100%; height: 100%; object-fit: cover; }
+        .card:hover { transform: scale(1.05); z-index: 20; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .card-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, black, transparent); padding: 10px; opacity: 0; transition: opacity 0.3s; }
+        .card:hover .card-overlay { opacity: 1; }
+        .card-title { font-size: 0.9rem; font-weight: bold; }
+        .card-meta { font-size: 0.75rem; color: #46d369; margin-top: 5px; }
+
+        @media(max-width: 768px) { .hero-title { font-size: 2rem; } .grid { grid-template-columns: repeat(3, 1fr); } }
     </style>
 </head>
 <body>
 
-    <div id="hero" class="hero" style="display:none;">
+    <nav class="nav">
+        <div class="logo">MOVIES HUB</div>
+    </nav>
+
+    <div id="hero" class="hero">
         <div class="hero-content">
-            <h1 id="hero-title">Loading...</h1>
-            <p id="hero-desc"></p>
-            <a id="hero-btn" href="#" class="btn btn-play">▶ Play Now</a>
+            <h1 id="hero-title" class="hero-title">Loading...</h1>
+            <p id="hero-desc" class="hero-desc"></p>
+            <a id="hero-btn" href="#" class="btn btn-play">▶ Play</a>
         </div>
     </div>
 
-    <div class="container">
-        <h2>Latest Uploads</h2>
-        <div id="grid" class="grid">Loading library...</div>
-    </div>
+    <h2 class="section-title">Latest Added</h2>
+    <div id="grid" class="grid"></div>
 
     <script>
-        // CONFIGURATION
-        const DB_URL = 'movies.json?v=' + new Date().getTime(); // Anti-cache
-        
+        // Force refresh to avoid caching issues
+        const DB_URL = 'movies.json?t=' + new Date().getTime();
+
         fetch(DB_URL)
             .then(res => res.json())
             .then(data => {
-                const grid = document.getElementById('grid');
-                grid.innerHTML = '';
-
-                // 1. Set up Hero (First movie in list)
+                // 1. Setup Hero (First movie in list)
                 if(data.length > 0) {
                     const feat = data[0];
                     const hero = document.getElementById('hero');
-                    hero.style.display = 'flex';
                     hero.style.backgroundImage = `url('${feat.backdrop || feat.poster}')`;
                     document.getElementById('hero-title').innerText = feat.title;
                     document.getElementById('hero-desc').innerText = feat.description;
-                    document.getElementById('hero-btn').href = `player.html?id=${feat.id}`;
+                    document.getElementById('hero-btn').href = `watch.html?id=${feat.id}`;
                 }
 
-                // 2. Populate Grid
+                // 2. Setup Grid
+                const grid = document.getElementById('grid');
                 data.forEach(movie => {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.onclick = () => window.location.href = `player.html?id=${movie.id}`;
-                    card.innerHTML = `
-                        <img src="${movie.poster}" loading="lazy" alt="${movie.title}">
-                        <div class="card-info">
+                    const div = document.createElement('div');
+                    div.className = 'card';
+                    div.onclick = () => window.location.href = `watch.html?id=${movie.id}`;
+                    div.innerHTML = `
+                        <img src="${movie.poster}" alt="${movie.title}" loading="lazy">
+                        <div class="card-overlay">
                             <div class="card-title">${movie.title}</div>
-                            <div class="card-year">${movie.year}</div>
+                            <div class="card-meta">${movie.year} • ${movie.rating} ★</div>
                         </div>
                     `;
-                    grid.appendChild(card);
+                    grid.appendChild(div);
                 });
-            })
-            .catch(e => document.getElementById('grid').innerText = "Error loading movies.");
+            });
     </script>
 </body>
 </html>
