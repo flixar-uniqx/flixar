@@ -32,61 +32,70 @@
 
     <script src="../config.js"></script>
     <script src="../app.js"></script>
-    <script>
-        // ... (Keep your existing JS Logic for fetching JSON here) ...
+        <script>
         const id = new URLSearchParams(window.location.search).get('id');
         fetch('../movies.json?t=' + Date.now()).then(r => r.json()).then(data => {
             const m = data.find(i => i.id === id);
             if(m) {
-                // ... (Same population logic as before) ...
                 document.title = `${m.title} - ${CONFIG.siteName}`;
                 document.getElementById('bg-layer').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
                 document.getElementById('poster').src = m.poster;
                 document.getElementById('title').innerText = m.title;
                 document.getElementById('desc').innerText = m.description;
 
-                if(m.trailer_embed) {
-                    document.getElementById('trailer').src = m.trailer_embed;
+                if(m.trailer_embed && m.trailer_embed.length > 5) {
+                    const cleanUrl = m.trailer_embed + "?modestbranding=1&rel=0&iv_load_policy=3&color=white";
+                    document.getElementById('trailer').src = cleanUrl;
                     document.getElementById('trailer-wrap').classList.add('active');
                 }
 
-                // ... (Meta logic) ...
-                
-                // Accordion
+                const meta = document.getElementById('meta');
+                meta.innerHTML = `<span class="rating-pill">IMDb ${m.rating}</span>`;
+                meta.innerHTML += `<span class="tag" onclick="window.location.href='../?year=${m.year}'">${m.year}</span>`;
+                if(m.genre) m.genre.split(',').forEach(g => meta.innerHTML += `<span class="tag" onclick="window.location.href='../?genre=${g.trim()}'">${g.trim()}</span>`);
+
                 const list = document.getElementById('dl-list');
                 if(m.seasons) {
                     m.seasons.forEach((s, idx) => {
                         let eps = '';
                         s.episodes.forEach(ep => {
                             let linksHTML = '';
-                            if(Array.isArray(ep.links)){
-                                ep.links.forEach(l => linksHTML += `<a href="${l.link}" class="btn-dl" style="padding:6px 14px; font-size:0.7rem; margin-left:8px;" target="_blank">${l.label || 'DL'}</a>`);
+                            // Handle Array of links OR Single link
+                            if(Array.isArray(ep.links)) {
+                                ep.links.forEach(l => {
+                                    linksHTML += `<a href="${l.link}" class="btn-dl" style="padding:6px 14px; font-size:0.7rem; margin-left:8px;" target="_blank">${l.label || 'DL'}</a>`;
+                                });
                             } else {
                                 linksHTML = `<a href="${ep.link}" class="btn-dl" style="padding:6px 14px; font-size:0.7rem;" target="_blank">Download</a>`;
                             }
 
+                            // Render Episode Row
                             eps += `
-                                <div class="dl-row" style="margin-bottom:5px;">
+                                <div class="episode-row">
                                     <div class="ep-info">
-                                        <div class="dl-title">${ep.title}</div>
-                                        <div class="dl-meta">${ep.quality} • ${ep.size || ''}</div>
+                                        <div class="ep-title">${ep.title}</div>
+                                        <div class="ep-meta">${ep.quality} • ${ep.size || ''}</div>
                                     </div>
                                     <div style="display:flex;">${linksHTML}</div>
                                 </div>`;
                         });
 
+                        // Render Season Card
                         list.innerHTML += `
                             <div class="season-card ${idx===0 ? 'open' : ''}">
                                 <div class="season-head" onclick="this.parentElement.classList.toggle('open')">
-                                    ${s.name} <span style="font-size:1.5rem; font-weight:300">+</span>
+                                    ${s.name} <span>+</span>
                                 </div>
                                 <div class="season-body">${eps}</div>
                             </div>`;
                     });
                 }
+            } else {
+                document.querySelector('.container').innerHTML = "<h1>Series Not Found</h1>";
             }
         });
     </script>
+
 </body>
 </html>
 
