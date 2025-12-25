@@ -1,14 +1,20 @@
 const CONFIG = {
-    siteName: "StreamHub",
+    siteName: "FLIXᐃR",
     logoUrl: "https://cdn-icons-png.flaticon.com/512/2503/2503508.png",
     
+    // FILE SERVER DOMAIN (Ends with /)
+    fileBaseUrl: "https://cloudz.flixar.workers.dev/0:/",
+
     colors: {
-        primary: "#00d2ff",
-        bg: "#0a0a0a",
-        card: "#121212",
-        text: "#ffffff"
+        primary: "#00d2ff",      // Main Accent (Blue)
+        bg: "#050505",           // Main Background (Very Dark)
+        card: "#121212",         // Card Background
+        surface: "#1a1a1a",      // Search bar, Season headers
+        text: "#ffffff",         // Main Text
+        textDim: "#9ca3af",      // Subtitles / Meta text
+        border: "rgba(255,255,255,0.08)" // Subtle Borders
     },
 
-    footerText: "© 2025 StreamHub. All Rights Reserved.",
+    footerText: "FLIXᐃR © 2025. All Rights Reserved.\nDeveloped & Maintained by UNIQX Family.",
     latestCount: 12
 };
