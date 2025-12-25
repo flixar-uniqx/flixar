@@ -287,14 +287,12 @@ a { text-decoration: none; color: inherit; cursor: pointer; transition: 0.2s; }
 
 /* --- MOBILE OPTIMIZATION (Fixed Header) --- */
 @media(max-width: 600px) {
+    /* 1. Header Layout */
     .nav { padding: 0 12px; gap: 8px; }
-    
-    /* 1. SHOW SITE NAME */
-    .logo { font-size: 1rem; } /* Slightly smaller text to fit */
-    .logo span { display: block; } /* This makes the name visible */
+    .logo { font-size: 1rem; }
+    .logo span { display: block; } /* Site Name Visible */
     .logo img { height: 24px; }
     
-    /* 2. SEARCH BAR (Balanced Width) */
     .nav-right { gap: 8px; flex-grow: 1; }
     .search-wrapper { flex-grow: 1; max-width: 100%; }
     .search-box { width: 100%; padding: 8px 10px 8px 32px; font-size: 0.85rem; }
@@ -302,20 +300,33 @@ a { text-decoration: none; color: inherit; cursor: pointer; transition: 0.2s; }
     
     .menu-btn { width: 35px; height: 35px; font-size: 1.2rem; }
 
-    /* 3. MOBILE GRID & TILES */
-    .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .card-title { font-size: 0.7rem; margin-bottom: 3px; }
-    .card-info { padding: 8px; }
+    /* 2. Smaller Tiles (3 Columns, tighter spacing) */
+    .grid { 
+        grid-template-columns: repeat(3, 1fr); /* Force 3 columns */
+        gap: 6px; /* Smaller gap makes tiles feel more compact */
+    }
     
-    /* Side-by-Side Meta (Year | Type) */
-    .card-meta { flex-direction: row; align-items: center; gap: 4px; }
-    .badge { display: block; font-size: 0.5rem; padding: 2px 4px; }
-    .card-meta span:first-child { display: block; font-size: 0.6rem; }
+    .card-title { font-size: 0.65rem; margin-bottom: 2px; line-height: 1.1; }
+    .card-info { padding: 6px; } /* Less padding inside cards */
     
-    /* Mobile Hover Fix */
-    .card:hover { transform: none; box-shadow: none; z-index: 1; } /* Disable hover lift on phones */
+    /* 3. Mobile Hover Effects (Restored but Controlled) */
+    .card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .card:active, .card:focus-within { 
+        transform: translateY(-3px) scale(1.02); /* Subtle lift on tap */
+        z-index: 20; 
+        box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        border-color: var(--primary);
+    }
+    /* Brightness boost on touch */
+    .card:active .poster { filter: brightness(1.2); }
 
+    /* Meta Info */
+    .card-meta { flex-direction: row; align-items: center; gap: 3px; }
+    .badge { display: block; font-size: 0.5rem; padding: 1px 3px; }
+    .card-meta span:first-child { display: block; font-size: 0.6rem; }
+
+    /* Container & Share adjustments */
     .share-box { flex-direction: column; align-items: stretch; text-align: center; }
     .share-actions { justify-content: center; }
-    .container { padding: 15px; }
+    .container { padding: 15px 10px; }
 }
