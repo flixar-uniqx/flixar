@@ -79,6 +79,25 @@
   ]
 },
 {
+  "id": "Now-You-See-Me-Now-You-Dont-2025",
+  "type": "Movie",
+  "title": "Now You See Me: Now You Don't",
+  "year": "2025",
+  "genre": "Crime, Thriller",
+  "rating": "6",
+  "poster": "https://image.tmdb.org/t/p/original/oD3Eey4e4Z259XLm3eD3WGcoJAh.jpg",
+  "backdrop": "https://image.tmdb.org/t/p/original/k3Cr2PY8TSvn4giiym404JDLOJC.jpg",
+  "description": "The original Four Horsemen reunite with a new generation of illusionists to take on powerful diamond heiress Veronika Vanderberg, who leads a criminal empire built on money laundering and trafficking. The new and old magicians must overcome their differences to work together on their most ambitious heist yet.",
+  "trailer_embed": "https://www.youtube.com/embed/-E3lMRx7HRQ",
+  "downloads": [
+    {
+      "quality": "720p 10bit WEB-DL x265 HEVC E-Sub",
+      "size": "898.5 MB",
+      "link": "https://cloudz.flixar.workers.dev/0:/Collections/Now%20You%20See%20Me%20(Film%20Franchise)/Now%20You%20See%20Me%3A%20Now%20You%20Don't%20(2025)/%5B%40FlixArUniqx%5D.Now.You.See.Me.Now.You.Dont.(2025).720p.10bit.WEB-DL.x265.HEVC.E-Sub.mkv"
+    }
+  ]
+},
+{
   "id": "Wake-Up-Dead-Man-2025",
   "type": "Movie",
   "layout_mode": "movie",
