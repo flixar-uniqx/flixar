@@ -229,3 +229,42 @@ a { text-decoration: none; color: inherit; cursor: pointer; transition: 0.2s; }
     .share-actions { justify-content: center; }
     .container { padding: 15px; }
 }
+/* --- SERIES EPISODE HIERARCHY --- */
+.episode-block {
+    margin-bottom: 20px;
+    background: rgba(255,255,255,0.02); /* Subtle bg for the whole group */
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid transparent;
+    transition: 0.2s;
+}
+.episode-block:hover {
+    border-color: rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.04);
+}
+
+.ep-header {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--primary); /* Accent color for Title */
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.ep-header::before {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    background: var(--primary);
+    border-radius: 50%;
+}
+
+.quality-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; /* Spacing between qualities */
+    padding-left: 15px; /* Indent the links */
+    border-left: 1px solid rgba(255,255,255,0.1);
+}
