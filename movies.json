@@ -16,12 +16,18 @@
       "episodes": [
         {
           "title": "Episode 01 - Chapter 1",
-          "quality": "720p 10bit WEB-DL x265 HEVC E-Sub",
-          "size": "145.7 MB",
-          "link": "https://cloudz.flixar.workers.dev/0:/TV%20Series/Man%20vs%20Baby%20(2025)/720p%2010bit%20WEB-DL%20x265%20HEVC/%5B%40FlixArUniqx%5D.Man.vs.Baby.(S01E01).720p.10bit.WEB-DL.x265.HEVC.E-Sub.mkv"
-          "quality": "1080p 10bit WEB-DL x265 HEVC E-Sub",
-          "size": "336.4 MB",
-          "link": "https://cloudz.flixar.workers.dev/0:/TV%20Series/Man%20vs%20Baby%20(2025)/1080p%2010bit%20WEB-DL%20x265%20HEVC/%5B%40FlixArUniqx%5D.Man.vs.Baby.(S01E01).1080p.10bit.WEB-DL.x265.HEVC.E-Sub.mkv"
+          "links": [
+            {
+              "quality": "720p 10bit WEB-DL x265 HEVC E-Sub",
+              "size": "145.7 MB",
+              "link" : "https://cloudz.flixar.workers.dev/0:/TV%20Series/Man%20vs%20Baby%20(2025)/720p%2010bit%20WEB-DL%20x265%20HEVC/%5B%40FlixArUniqx%5D.Man.vs.Baby.(S01E01).720p.10bit.WEB-DL.x265.HEVC.E-Sub.mkv"
+            },
+            {
+              "quality": "1080p 10bit WEB-DL x265 HEVC E-Sub",
+              "size": "336.4 MB",
+              "link": "https://cloudz.flixar.workers.dev/0:/TV%20Series/Man%20vs%20Baby%20(2025)/1080p%2010bit%20WEB-DL%20x265%20HEVC/%5B%40FlixArUniqx%5D.Man.vs.Baby.(S01E01).1080p.10bit.WEB-DL.x265.HEVC.E-Sub.mkv"
+            }
+          ]
         },
         {
           "title": "Episode 02 - Chapter 2",
