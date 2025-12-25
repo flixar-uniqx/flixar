@@ -18,8 +18,11 @@
         
         /* Dynamic Lists */
         .item-box { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); }
+        .sub-item-box { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; margin-top: 10px; border-left: 2px solid var(--primary); }
+        
         .btn { background: var(--primary); color: #000; padding: 12px 25px; border-radius: 50px; font-weight: 700; border: none; cursor: pointer; width: 100%; margin-top: 20px; }
-        .btn-small { background: #333; color: white; padding: 5px 15px; font-size: 0.8rem; border-radius: 4px; border: none; cursor: pointer; display: inline-block; margin-top: 5px; }
+        .btn-small { background: #333; color: white; padding: 6px 12px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer; display: inline-block; margin-top: 5px; margin-right: 5px; }
+        .btn-small:hover { background: #444; }
         
         .hidden { display: none; }
     </style>
@@ -37,7 +40,7 @@
         
         <div class="row">
             <div><label>Type</label><select id="type" onchange="toggleType()"><option>Movie</option><option>TV Series</option></select></div>
-            <div><label>ID (Unique)</label><input id="id" placeholder="mv_001"></div>
+            <div><label>ID (Unique)</label><input id="id" placeholder="man-vs-baby"></div>
         </div>
 
         <label>Title</label><input id="title">
@@ -50,7 +53,7 @@
         <label>Genre</label><input id="genre" placeholder="Action, Drama">
         <label>Poster URL</label><input id="poster">
         <label>Backdrop URL</label><input id="backdrop">
-        <label>Trailer (Embed URL)</label><input id="trailer">
+        <label>Trailer (Direct URL)</label><input id="trailer">
         <label>Description</label><textarea id="desc" rows="3"></textarea>
 
         <div id="movie-area">
@@ -65,14 +68,14 @@
             <button class="btn-small" onclick="addSeason()">+ Add Season</button>
         </div>
 
-        <button class="btn" onclick="generate()">Generate Code</button>
-        <textarea id="output" rows="10" style="margin-top:20px; font-family:monospace; color:#0f0; background:#000;"></textarea>
+        <button class="btn" onclick="generate()">Generate JSON Code</button>
+        <textarea id="output" rows="10" style="margin-top:20px; font-family:monospace; color:#0f0; background:#000; width:100%; border:1px solid #333;"></textarea>
     </div>
 
     <script src="../config.js"></script>
     <script src="../app.js"></script>
     <script>
-        const PASS = "1234"; // Change this
+        const PASS = "1234"; // Change your password here
 
         function checkPass() {
             if(document.getElementById('pass').value === PASS) {
@@ -87,6 +90,7 @@
             document.getElementById('series-area').style.display = isSeries ? 'block' : 'none';
         }
 
+        // --- MOVIE LOGIC ---
         function addMovieLink() {
             const div = document.createElement('div');
             div.className = 'item-box row';
@@ -94,80 +98,109 @@
             document.getElementById('movie-links').appendChild(div);
         }
 
+        // --- SERIES LOGIC (Nested) ---
         function addSeason() {
             const div = document.createElement('div');
             div.className = 'item-box';
             div.style.borderColor = 'var(--primary)';
-            const id = Date.now();
-            div.innerHTML = `<input placeholder="Season Name (Season 1)" class="s-name" style="margin-bottom:10px; font-weight:bold;">
-                             <div id="ep-${id}"></div>
-                             <button class="btn-small" onclick="addEp('ep-${id}')">+ Add Episode</button>`;
+            const sId = 'season-' + Date.now();
+            
+            div.innerHTML = `
+                <input placeholder="Season Name (e.g. Season 1)" class="s-name" style="margin-bottom:10px; font-weight:bold;">
+                <div id="${sId}" style="margin-left:10px; border-left:1px solid #333; padding-left:10px;"></div>
+                <button class="btn-small" onclick="addEpisode('${sId}')" style="margin-top:10px;">+ Add Episode</button>
+            `;
             document.getElementById('season-list').appendChild(div);
         }
 
-        function addEp(id) {
+        function addEpisode(seasonId) {
             const div = document.createElement('div');
-            div.className = 'item-box';
-            div.style.background = 'rgba(255,255,255,0.05)';
-            div.innerHTML = `<input placeholder="Title" class="e-title"><div class="row"><input placeholder="Quality" class="e-q"><input placeholder="Size" class="e-s"></div><input placeholder="Link" class="e-l">`;
-            document.getElementById(id).appendChild(div);
+            div.className = 'item-box'; 
+            div.style.background = 'rgba(255,255,255,0.02)';
+            const epId = 'ep-' + Math.random().toString(36).substr(2, 9);
+
+            div.innerHTML = `
+                <input placeholder="Episode Title (e.g. Episode 1)" class="e-title">
+                <div id="${epId}"></div>
+                <button class="btn-small" onclick="addEpLink('${epId}')">+ Add Quality Link</button>
+            `;
+            document.getElementById(seasonId).appendChild(div);
+            
+            // Add one link by default
+            addEpLink(epId);
         }
 
-        function getEmbedUrl(url) {
-        if (!url) return "";
-        if (url.includes("/embed/")) return url; // Already correct
-        
-        let videoId = "";
-        if (url.includes("youtu.be/")) {
-            videoId = url.split("youtu.be/")[1].split("?")[0];
-        } else if (url.includes("watch?v=")) {
-            videoId = url.split("watch?v=")[1].split("&")[0];
+        function addEpLink(epId) {
+            const div = document.createElement('div');
+            div.className = 'sub-item-box row';
+            div.innerHTML = `<input placeholder="Quality (1080p)" class="l-label"><input placeholder="Size" class="l-size"><input placeholder="Link" class="l-url" style="grid-column:span 2">`;
+            document.getElementById(epId).appendChild(div);
         }
-        
-        if (videoId) return `https://www.youtube.com/embed/${videoId}`;
-        return url; // Return original if pattern not matched
-    }
+
+        // --- GENERATOR ---
+        function getEmbedUrl(url) {
+            if (!url) return "";
+            if (url.includes("/embed/")) return url;
+            let videoId = "";
+            if (url.includes("youtu.be/")) videoId = url.split("youtu.be/")[1].split("?")[0];
+            else if (url.includes("watch?v=")) videoId = url.split("watch?v=")[1].split("&")[0];
+            if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+            return url;
+        }
 
         function generate() {
-            let rawTrailer = document.getElementById('trailer').value;
-            
             let obj = {
-            id: document.getElementById('id').value,
-            type: document.getElementById('type').value,
-            title: document.getElementById('title').value,
-            year: document.getElementById('year').value,
-            genre: document.getElementById('genre').value,
-            rating: document.getElementById('rating').value,
-            poster: document.getElementById('poster').value,
-            backdrop: document.getElementById('backdrop').value,
-            description: document.getElementById('desc').value,
-            trailer_embed: getEmbedUrl(rawTrailer) // AUTO CONVERT HERE
-        };
+                id: document.getElementById('id').value,
+                type: document.getElementById('type').value,
+                title: document.getElementById('title').value,
+                year: document.getElementById('year').value,
+                genre: document.getElementById('genre').value,
+                rating: document.getElementById('rating').value,
+                poster: document.getElementById('poster').value,
+                backdrop: document.getElementById('backdrop').value,
+                description: document.getElementById('desc').value,
+                trailer_embed: getEmbedUrl(document.getElementById('trailer').value)
+            };
 
-            if(obj.type === 'Movie') {
+            if (obj.type === 'Movie') {
                 obj.downloads = [];
                 document.querySelectorAll('#movie-links .item-box').forEach(row => {
-                    obj.downloads.push({
-                        quality: row.querySelector('.q').value,
-                        size: row.querySelector('.s').value,
-                        link: row.querySelector('.l').value
-                    });
+                    if(row.querySelector('.q').value) {
+                        obj.downloads.push({
+                            quality: row.querySelector('.q').value,
+                            size: row.querySelector('.s').value,
+                            link: row.querySelector('.l').value
+                        });
+                    }
                 });
             } else {
                 obj.seasons = [];
-                document.querySelectorAll('#season-list > .item-box').forEach(s => {
-                    let season = { name: s.querySelector('.s-name').value, episodes: [] };
-                    s.querySelectorAll('div[id^="ep"] .item-box').forEach(ep => {
-                        season.episodes.push({
-                            title: ep.querySelector('.e-title').value,
-                            quality: ep.querySelector('.e-q').value,
-                            size: ep.querySelector('.e-s').value,
-                            link: ep.querySelector('.e-l').value
+                document.querySelectorAll('#season-list > .item-box').forEach(sDiv => {
+                    let season = { name: sDiv.querySelector('.s-name').value, episodes: [] };
+                    
+                    // Loop Episodes
+                    sDiv.querySelectorAll('div[id^="season-"] > .item-box').forEach(epDiv => {
+                        let ep = { 
+                            title: epDiv.querySelector('.e-title').value,
+                            links: [] 
+                        };
+
+                        // Loop Links inside Episode
+                        epDiv.querySelectorAll('.sub-item-box').forEach(lDiv => {
+                            if(lDiv.querySelector('.l-label').value) {
+                                ep.links.push({
+                                    label: lDiv.querySelector('.l-label').value,
+                                    size: lDiv.querySelector('.l-size').value,
+                                    link: lDiv.querySelector('.l-url').value
+                                });
+                            }
                         });
+                        season.episodes.push(ep);
                     });
                     obj.seasons.push(season);
                 });
             }
+
             document.getElementById('output').value = ",\n" + JSON.stringify(obj, null, 2);
         }
     </script>
