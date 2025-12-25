@@ -139,7 +139,24 @@ a { text-decoration: none; color: inherit; cursor: pointer; transition: 0.2s; }
 .season-card.open { border-color: var(--primary); box-shadow: 0 5px 20px rgba(0,0,0,0.4); }
 .season-card.open .season-body { display: flex; flex-direction: column; gap: 5px; animation: slideDown 0.3s ease; }
 
-.episode-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-radius: 8px; transition: 0.2s; border: 1px solid transparent; }
+/* Update this specific block in style.css */
+.episode-row { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; /* Keeps title centered relative to buttons */
+    padding: 12px 15px; 
+    border-radius: 8px; 
+    transition: 0.2s; 
+    border: 1px solid transparent; 
+}
+
+/* NEW: Container for vertical buttons */
+.ep-links-col {
+    display: flex;
+    flex-direction: column; /* Stacks buttons vertically */
+    gap: 5px; /* Space between stacked buttons */
+    align-items: flex-end; /* Aligns them to the right */
+}
 .episode-row:hover { background: rgba(255,255,255,0.05); border-color: var(--border); }
 .ep-title { font-weight: 600; color: #eee; font-size: 0.95rem; }
 .ep-meta { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
