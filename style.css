@@ -20,6 +20,20 @@
 /* --- RESET & GLOBAL --- */
 * { box-sizing: border-box; }
 
+/* --- FUTURISTIC SHEEN EFFECT --- */
+.card { position: relative; overflow: hidden; }
+.card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: skewX(-25deg);
+    transition: 0.5s;
+    pointer-events: none;
+}
+.card:hover::after, .card:active::after { left: 150%; transition: 0.7s ease-in-out; }
+
 body { 
     margin: 0; 
     font-family: 'Inter', sans-serif; 
@@ -285,48 +299,65 @@ a { text-decoration: none; color: inherit; cursor: pointer; transition: 0.2s; }
     .trailer-wrapper { border-radius: 12px; margin-bottom: 30px; }
 }
 
-/* --- MOBILE OPTIMIZATION (Fixed Header) --- */
+/* --- MOBILE OPTIMIZATION (Futuristic & Smart) --- */
 @media(max-width: 600px) {
-    /* 1. Header Layout */
-    .nav { padding: 0 12px; gap: 8px; }
-    .logo { font-size: 1rem; }
-    .logo span { display: block; } /* Site Name Visible */
+    /* 1. Header: Compact & Techy */
+    .nav { padding: 0 10px; gap: 8px; height: 65px; backdrop-filter: blur(20px) saturate(180%); }
+    .logo { font-size: 1rem; letter-spacing: -0.5px; }
+    .logo span { display: block; }
     .logo img { height: 24px; }
     
     .nav-right { gap: 8px; flex-grow: 1; }
     .search-wrapper { flex-grow: 1; max-width: 100%; }
-    .search-box { width: 100%; padding: 8px 10px 8px 32px; font-size: 0.85rem; }
-    .search-icon { left: 10px; width: 14px; height: 14px; }
+    .search-box { 
+        width: 100%; padding: 8px 10px 8px 32px; font-size: 0.8rem; 
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+    }
+    .search-icon { left: 10px; width: 14px; }
     
-    .menu-btn { width: 35px; height: 35px; font-size: 1.2rem; }
-
-    /* 2. Smaller Tiles (3 Columns, tighter spacing) */
+    /* 2. The Grid: Ultra Tight */
+    .container { padding: 15px 5px; } /* Minimal side padding */
     .grid { 
-        grid-template-columns: repeat(3, 1fr); /* Force 3 columns */
-        gap: 6px; /* Smaller gap makes tiles feel more compact */
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 4px; /* Very tight spacing */
     }
     
-    .card-title { font-size: 0.65rem; margin-bottom: 2px; line-height: 1.1; }
-    .card-info { padding: 6px; } /* Less padding inside cards */
-    
-    /* 3. Mobile Hover Effects (Restored but Controlled) */
-    .card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-    .card:active, .card:focus-within { 
-        transform: translateY(-3px) scale(1.02); /* Subtle lift on tap */
-        z-index: 20; 
-        box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-        border-color: var(--primary);
+    /* 3. Futuristic Tile Logic */
+    .card {
+        border-radius: 4px; /* Sharper, tech feel */
+        background: transparent; /* Remove card bg to save space */
+        border: none;
+        transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
     }
-    /* Brightness boost on touch */
-    .card:active .poster { filter: brightness(1.2); }
 
-    /* Meta Info */
-    .card-meta { flex-direction: row; align-items: center; gap: 3px; }
-    .badge { display: block; font-size: 0.5rem; padding: 1px 3px; }
-    .card-meta span:first-child { display: block; font-size: 0.6rem; }
+    /* 4. Touch Interaction (Tactile & Neon) */
+    .card:active { 
+        transform: scale(0.95); /* Buttons feel "pressed" */
+        z-index: 50;
+        box-shadow: 0 0 15px var(--primary); /* Neon Glow on touch */
+        border-radius: 8px; /* Round out when active */
+    }
+    .card:active .poster { 
+        filter: brightness(1.2) contrast(1.1); /* Energy surge */
+    }
 
-    /* Container & Share adjustments */
-    .share-box { flex-direction: column; align-items: stretch; text-align: center; }
+    /* 5. Compact Info */
+    .card-info { padding: 6px 2px; }
+    .card-title { 
+        font-size: 0.65rem; margin-bottom: 3px; line-height: 1.1; 
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+    }
+    
+    /* Micro Meta (Side-by-Side) */
+    .card-meta { flex-direction: row; align-items: center; gap: 4px; opacity: 0.8; }
+    .badge { 
+        display: block; font-size: 0.45rem; padding: 1px 3px; 
+        border: 1px solid var(--primary); background: transparent; /* Outline style */
+        color: var(--primary); letter-spacing: 0.5px;
+    }
+    .card-meta span:first-child { display: block; font-size: 0.55rem; font-weight: 700; }
+
+    /* Fix Share Section Mobile */
+    .share-box { flex-direction: column; align-items: stretch; text-align: center; gap: 15px; }
     .share-actions { justify-content: center; }
-    .container { padding: 15px 10px; }
 }
