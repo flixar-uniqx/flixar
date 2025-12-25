@@ -73,29 +73,34 @@
         fetch('../movies.json?t=' + Date.now()).then(r => r.json()).then(data => {
             const m = data.find(i => i.id === id);
             if(m) {
+                // 1. Basic Info
                 document.title = `${m.title} - ${CONFIG.siteName}`;
                 document.getElementById('bg-layer').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
                 const posterImg = document.getElementById('poster');
                 posterImg.src = m.poster;
-                posterImg.alt = `${m.title} - ${CONFIG.siteName}`; // Added Alt Text
+                posterImg.alt = `${m.title} Poster`;
+
                 document.getElementById('player-facade').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
                 document.getElementById('title').innerText = m.title;
                 document.getElementById('desc').innerText = m.description;
 
+                // 2. Trailer Logic
                 if(m.trailer_embed && m.trailer_embed.length > 5) {
                     trailerLink = m.trailer_embed + (m.trailer_embed.includes('?') ? '&' : '?') + "autoplay=1&modestbranding=1&rel=0&iv_load_policy=3&color=white";
-                    document.getElementById('trailer-section').style.display = 'block';
                     document.getElementById('trailer-wrap').classList.add('active');
+                } else {
+                    document.getElementById('trailer-wrap').style.display = 'none';
                 }
 
+                // 3. Metadata
                 const meta = document.getElementById('meta');
                 meta.innerHTML = `<span class="rating-pill">IMDb ${m.rating}</span>`;
                 meta.innerHTML += `<span class="tag" onclick="window.location.href='../?year=${m.year}'">${m.year}</span>`;
                 if(m.genre) m.genre.split(',').forEach(g => meta.innerHTML += `<span class="tag" onclick="window.location.href='../?genre=${g.trim()}'">${g.trim()}</span>`);
 
-                // MOVIE DOWNLOADS LOGIC
+                // 4. DOWNLOADS LOGIC (UPDATED with resolveDL)
                 const list = document.getElementById('dl-list');
-                if(m.downloads) {
+                if(m.downloads && m.downloads.length > 0) {
                     m.downloads.forEach(d => {
                         list.innerHTML += `
                             <div class="dl-row">
@@ -103,38 +108,31 @@
                                     <div style="font-weight:700; font-size:1rem; color:#fff">${d.quality}</div>
                                     <div style="font-size:0.8rem; color:var(--text-dim); margin-top:4px;">${d.size}</div>
                                 </div>
-                                <a href="${d.link}" class="btn-dl" target="_blank">Download</a>
+                                <a href="${resolveDL(d.link)}" class="btn-dl" target="_blank">Download</a>
                             </div>`;
                     });
+                } else {
+                    list.innerHTML = `<div style="padding:20px; text-align:center; color:var(--text-dim);">No links available.</div>`;
                 }
+            } else {
+                document.querySelector('.container').innerHTML = "<h1>Movie Not Found</h1>";
             }
         });
 
+        // Utils
         function playTrailer() { if(!trailerLink) return; document.getElementById('player-facade').style.display = 'none'; document.getElementById('video-container').innerHTML = `<iframe src="${trailerLink}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`; }
         function copyLink() { navigator.clipboard.writeText(window.location.href); showToast("Link Copied!"); }
-        /* REPLACE THE share() FUNCTION AT THE BOTTOM OF THE SCRIPT */
+        function scrollToDL() { document.querySelector('.dl-section').scrollIntoView({behavior: 'smooth'}); }
         function share(platform) {
             const url = window.location.href;
             const title = document.title;
             const text = "Watch this on " + CONFIG.siteName;
-        
-            if (platform === 'whatsapp') {
-                window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`);
-            } 
-            else if (platform === 'email') {
-                window.open(`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`);
-            } 
+
+            if (platform === 'whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`);
+            else if (platform === 'email') window.open(`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`);
             else if (platform === 'more') {
-                if (navigator.share) {
-                    navigator.share({
-                        title: title,
-                        text: text,
-                        url: url
-                    }).catch(console.error);
-                } else {
-                    // Fallback for desktop browsers that don't support native share
-                    copyLink();
-                }
+                if (navigator.share) navigator.share({title: title, text: text, url: url}).catch(console.error);
+                else copyLink();
             }
         }
     </script>
