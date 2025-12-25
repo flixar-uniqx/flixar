@@ -191,16 +191,58 @@ a { text-decoration: none; color: inherit; cursor: pointer; transition: 0.2s; }
 .season-card.open { border-color: var(--primary); box-shadow: 0 5px 20px rgba(0,0,0,0.4); }
 .season-card.open .season-body { display: block; animation: slideDown 0.3s ease; }
 
-.episode-wrapper { padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.episode-wrapper { 
+    padding: 20px 0; /* Increased from 15px */
+    border-bottom: 1px solid rgba(255,255,255,0.08); 
+}
 .episode-wrapper:last-child { border-bottom: none; }
-.ep-header-text { font-size: 1.05rem; font-weight: 700; color: var(--primary); margin-bottom: 10px; padding-left: 10px; border-left: 3px solid var(--primary); line-height: 1.2; }
-.ep-links-container { display: flex; flex-direction: column; gap: 8px; }
+
+.ep-header-text { 
+    font-size: 1.1rem; 
+    font-weight: 700; 
+    color: var(--primary); 
+    margin-bottom: 15px; /* Increased spacing below title */
+    padding-left: 12px; 
+    border-left: 3px solid var(--primary); 
+    line-height: 1.2; 
+}
+
+/* Container Spacing */
+.ep-links-container { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; /* Increased from 8px to separate rows clearly */
+}
 
 /* Clean Series Row */
-.series-dl-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 12px 15px; border-radius: 8px; transition: 0.2s; }
-.series-dl-row:hover { background: rgba(255,255,255,0.06); transform: translateX(5px); }
-.quality-label { font-weight: 600; color: #fff; font-size: 0.9rem; }
-.size-label { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
+.series-dl-row { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    background: rgba(255,255,255,0.03); 
+    padding: 15px 20px; /* Increased padding (was 12px 15px) */
+    border-radius: 12px; /* Smoother corners */
+    transition: 0.2s; 
+    border: 1px solid transparent; /* Prevents layout shift on hover */
+}
+
+.series-dl-row:hover { 
+    background: rgba(255,255,255,0.06); 
+    border-color: var(--border);
+    transform: translateX(5px); 
+}
+
+.quality-label { 
+    font-weight: 700; 
+    color: #fff; 
+    font-size: 0.95rem; /* Slightly larger text */
+}
+
+.size-label { 
+    font-size: 0.8rem; 
+    color: var(--text-dim); 
+    margin-top: 4px; 
+}
 
 /* --- ENDING SECTION (Share) --- */
 .file-ending { padding-top: 20px; border-top: 1px solid var(--border); margin-bottom: 50px; }
