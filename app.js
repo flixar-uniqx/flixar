@@ -27,7 +27,28 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(r => r.json()).then(data => window.movieData = data).catch(()=>{});
 });
 
-function applyConfig() { document.documentElement.style.setProperty('--primary', CONFIG.colors.primary); }
+function applyConfig() { 
+    const root = document.documentElement.style;
+    const c = CONFIG.colors;
+
+    if(c.primary) root.setProperty('--primary', c.primary);
+    if(c.bg) root.setProperty('--bg', c.bg);
+    if(c.card) root.setProperty('--card', c.card);
+    if(c.surface) root.setProperty('--surface', c.surface);
+    if(c.text) root.setProperty('--text', c.text);
+    if(c.textDim) root.setProperty('--text-dim', c.textDim);
+    if(c.border) root.setProperty('--border', c.border);
+    
+    // Smart Nav Background (Uses BG color with opacity)
+    if(c.bg) {
+        // This trick converts Hex to RGBA for the glass effect in the Navbar
+        const hex = c.bg.replace('#', '');
+        const r = parseInt(hex.substring(0,2), 16);
+        const g = parseInt(hex.substring(2,4), 16);
+        const b = parseInt(hex.substring(4,6), 16);
+        root.setProperty('--nav-bg', `rgba(${r}, ${g}, ${b}, 0.95)`);
+    }
+}
 
 // 3. NAVBAR (With Alt Text)
 function injectNavbar() {
