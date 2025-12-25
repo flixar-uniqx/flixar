@@ -113,19 +113,36 @@
             document.getElementById(id).appendChild(div);
         }
 
+        function getEmbedUrl(url) {
+        if (!url) return "";
+        if (url.includes("/embed/")) return url; // Already correct
+        
+        let videoId = "";
+        if (url.includes("youtu.be/")) {
+            videoId = url.split("youtu.be/")[1].split("?")[0];
+        } else if (url.includes("watch?v=")) {
+            videoId = url.split("watch?v=")[1].split("&")[0];
+        }
+        
+        if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+        return url; // Return original if pattern not matched
+    }
+
         function generate() {
+            let rawTrailer = document.getElementById('trailer').value;
+            
             let obj = {
-                id: document.getElementById('id').value,
-                type: document.getElementById('type').value,
-                title: document.getElementById('title').value,
-                year: document.getElementById('year').value,
-                genre: document.getElementById('genre').value,
-                rating: document.getElementById('rating').value,
-                poster: document.getElementById('poster').value,
-                backdrop: document.getElementById('backdrop').value,
-                description: document.getElementById('desc').value,
-                trailer_embed: document.getElementById('trailer').value
-            };
+            id: document.getElementById('id').value,
+            type: document.getElementById('type').value,
+            title: document.getElementById('title').value,
+            year: document.getElementById('year').value,
+            genre: document.getElementById('genre').value,
+            rating: document.getElementById('rating').value,
+            poster: document.getElementById('poster').value,
+            backdrop: document.getElementById('backdrop').value,
+            description: document.getElementById('desc').value,
+            trailer_embed: getEmbedUrl(rawTrailer) // AUTO CONVERT HERE
+        };
 
             if(obj.type === 'Movie') {
                 obj.downloads = [];
