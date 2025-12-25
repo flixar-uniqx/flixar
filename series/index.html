@@ -65,7 +65,9 @@
             if(m) {
                 document.title = `${m.title} - ${CONFIG.siteName}`;
                 document.getElementById('bg-layer').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
-                document.getElementById('poster').src = m.poster;
+                const posterImg = document.getElementById('poster');
+                posterImg.src = m.poster;
+                posterImg.alt = `${m.title} Poster`; // Added Alt Text
                 document.getElementById('player-facade').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
                 document.getElementById('title').innerText = m.title;
                 document.getElementById('desc').innerText = m.description;
