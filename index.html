@@ -48,6 +48,8 @@
         function renderSection(container, title, list) {
             if(list.length === 0) return;
             const section = document.createElement('div');
+            section.className = 'reveal';
+            
             section.innerHTML = `<div class="section-header">${title}</div>`;
             const grid = document.createElement('div');
             grid.className = 'grid';
@@ -68,6 +70,7 @@
             });
             section.appendChild(grid);
             container.appendChild(section);
+            if(window.observeElements) window.observeElements();
         }
     </script>
 </body>
