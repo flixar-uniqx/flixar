@@ -74,7 +74,7 @@
 
     <script src="../config.js"></script>
     <script src="../app.js"></script>
-    <script>
+<script>
         const id = new URLSearchParams(window.location.search).get('id');
         let trailerLink = "";
 
@@ -84,7 +84,10 @@
                 // 1. Basic Info
                 document.title = `${m.title} - ${CONFIG.siteName}`;
                 document.getElementById('bg-layer').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
-                document.getElementById('poster').src = m.poster;
+                const posterImg = document.getElementById('poster');
+                posterImg.src = m.poster;
+                posterImg.alt = `${m.title} Poster`;
+
                 document.getElementById('player-facade').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
                 document.getElementById('title').innerText = m.title;
                 document.getElementById('desc').innerText = m.description;
@@ -102,7 +105,7 @@
                 meta.innerHTML += `<span class="tag" onclick="window.location.href='../?year=${m.year}'">${m.year}</span>`;
                 if(m.genre) m.genre.split(',').forEach(g => meta.innerHTML += `<span class="tag" onclick="window.location.href='../?genre=${g.trim()}'">${g.trim()}</span>`);
 
-                // 4. CLEAN SERIES LOGIC
+                // 4. CLEAN SERIES LOGIC (UPDATED with resolveDL)
                 const list = document.getElementById('dl-list');
                 if(m.seasons) {
                     m.seasons.forEach((s, idx) => {
@@ -112,6 +115,7 @@
                             let linkRows = '';
 
                             // Helper to generate a row
+                            // NOTE: "lnk" passed here will be wrapped in resolveDL() below
                             const makeRow = (lbl, sz, lnk) => `
                                 <div class="series-dl-row">
                                     <div>
@@ -124,10 +128,12 @@
                             // Loop through qualities
                             if(ep.links && Array.isArray(ep.links)) {
                                 ep.links.forEach(l => {
-                                    linkRows += makeRow(l.label || l.quality || 'Download', l.size, l.link);
+                                    // WRAPPED IN resolveDL()
+                                    linkRows += makeRow(l.label || l.quality || 'Download', l.size, resolveDL(l.link));
                                 });
                             } else if(ep.link) {
-                                linkRows = makeRow(ep.quality || 'HD', ep.size, ep.link);
+                                // WRAPPED IN resolveDL()
+                                linkRows = makeRow(ep.quality || 'HD', ep.size, resolveDL(ep.link));
                             }
 
                             // Structure: Header -> List of Rows
@@ -165,11 +171,13 @@
         function scrollToDL() { document.querySelector('.dl-section').scrollIntoView({behavior: 'smooth'}); }
         function share(platform) {
             const url = window.location.href;
-            const text = "Watch " + document.title;
-            if(platform === 'whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`);
-            else if(platform === 'email') window.open(`mailto:?subject=${encodeURIComponent(text)}&body=${encodeURIComponent(url)}`);
-            else if(platform === 'more') {
-                if(navigator.share) navigator.share({title:document.title, text:text, url:url}).catch(console.error);
+            const title = document.title;
+            const text = "Watch this on " + CONFIG.siteName;
+
+            if (platform === 'whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`);
+            else if (platform === 'email') window.open(`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`);
+            else if (platform === 'more') {
+                if (navigator.share) navigator.share({title: title, text: text, url: url}).catch(console.error);
                 else copyLink();
             }
         }
