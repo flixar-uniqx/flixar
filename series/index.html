@@ -74,7 +74,7 @@
 
     <script src="../config.js"></script>
     <script src="../app.js"></script>
-<script>
+    <script>
         const id = new URLSearchParams(window.location.search).get('id');
         let trailerLink = "";
 
@@ -102,51 +102,52 @@
                 meta.innerHTML += `<span class="tag" onclick="window.location.href='../?year=${m.year}'">${m.year}</span>`;
                 if(m.genre) m.genre.split(',').forEach(g => meta.innerHTML += `<span class="tag" onclick="window.location.href='../?genre=${g.trim()}'">${g.trim()}</span>`);
 
-                // 4. ULTIMATE HIERARCHY LOGIC
+                // 4. CLEAN SERIES LOGIC
                 const list = document.getElementById('dl-list');
                 if(m.seasons) {
                     m.seasons.forEach((s, idx) => {
-                        let episodesHtml = '';
+                        let epsHtml = '';
                         
                         s.episodes.forEach(ep => {
-                            let qualityRows = '';
+                            let linkRows = '';
 
-                            // A. Helper to create a clean Quality Row
-                            const createRow = (label, size, link) => `
-                                <div class="dl-row" style="padding:10px 15px; margin:0; background:rgba(255,255,255,0.03); border:none;">
-                                    <div style="flex-grow:1;">
-                                        <div style="font-weight:600; color:#fff; font-size:0.85rem;">${label}</div>
-                                        <div style="font-size:0.75rem; color:var(--text-dim);">${size || ''}</div>
+                            // Helper to generate a row
+                            const makeRow = (lbl, sz, lnk) => `
+                                <div class="series-dl-row">
+                                    <div>
+                                        <div class="quality-label">${lbl}</div>
+                                        <div class="size-label">${sz || ''}</div>
                                     </div>
-                                    <a href="${link}" class="btn-dl" target="_blank" style="font-size:0.7rem; padding:5px 14px;">Download</a>
+                                    <a href="${lnk}" class="btn-dl" target="_blank" style="padding:6px 14px; font-size:0.75rem;">Download</a>
                                 </div>`;
 
-                            // B. Generate Rows
+                            // Loop through qualities
                             if(ep.links && Array.isArray(ep.links)) {
                                 ep.links.forEach(l => {
-                                    qualityRows += createRow(l.label || l.quality || 'Download', l.size, l.link);
+                                    linkRows += makeRow(l.label || l.quality || 'Download', l.size, l.link);
                                 });
                             } else if(ep.link) {
-                                qualityRows = createRow(ep.quality || 'HD', ep.size, ep.link);
+                                linkRows = makeRow(ep.quality || 'HD', ep.size, ep.link);
                             }
 
-                            // C. Wrap in the New Hierarchy Structure
-                            episodesHtml += `
-                                <div class="episode-block">
-                                    <div class="ep-header">${ep.title}</div>
-                                    <div class="quality-list">
-                                        ${qualityRows}
+                            // Structure: Header -> List of Rows
+                            epsHtml += `
+                                <div class="episode-wrapper">
+                                    <div class="ep-header-text">${ep.title}</div>
+                                    <div class="ep-links-container">
+                                        ${linkRows}
                                     </div>
                                 </div>`;
                         });
 
+                        // Accordion Body
                         list.innerHTML += `
                             <div class="season-card ${idx===0 ? 'open' : ''}">
                                 <div class="season-head" onclick="this.parentElement.classList.toggle('open')">
-                                    ${s.name} <span style="font-size:1.5rem; font-weight:300; transition:0.3s;">+</span>
+                                    ${s.name} <span style="font-size:1.5rem; font-weight:300">+</span>
                                 </div>
-                                <div class="season-body" style="padding:15px;">
-                                    ${episodesHtml}
+                                <div class="season-body" style="padding:10px 20px;">
+                                    ${epsHtml}
                                 </div>
                             </div>`;
                     });
