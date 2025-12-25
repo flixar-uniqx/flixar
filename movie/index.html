@@ -66,16 +66,27 @@
 
     <script src="../config.js"></script>
     <script src="../app.js"></script>
-    <script>
+        <script>
+        // --- 1. EMERGENCY VIEWPORT FIX ---
+        (function() {
+            if (!document.querySelector('meta[name="viewport"]')) {
+                var meta = document.createElement('meta');
+                meta.name = "viewport";
+                meta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
+                document.head.appendChild(meta);
+            }
+        })();
+
         const id = new URLSearchParams(window.location.search).get('id');
         let trailerLink = "";
 
         fetch('../movies.json?t=' + Date.now()).then(r => r.json()).then(data => {
             const m = data.find(i => i.id === id);
             if(m) {
-                // 1. Basic Info
+                // Basic Info
                 document.title = `${m.title} - ${CONFIG.siteName}`;
                 document.getElementById('bg-layer').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
+                
                 const posterImg = document.getElementById('poster');
                 posterImg.src = m.poster;
                 posterImg.alt = `${m.title} Poster`;
@@ -84,28 +95,28 @@
                 document.getElementById('title').innerText = m.title;
                 document.getElementById('desc').innerText = m.description;
 
-                // 2. Trailer Logic
+                // Trailer Logic
                 if(m.trailer_embed && m.trailer_embed.length > 5) {
                     trailerLink = m.trailer_embed + (m.trailer_embed.includes('?') ? '&' : '?') + "autoplay=1&modestbranding=1&rel=0&iv_load_policy=3&color=white";
                     document.getElementById('trailer-section').style.display = 'block';
                     document.getElementById('trailer-wrap').classList.add('active');
                 }
 
-                // 3. Metadata
+                // Metadata
                 const meta = document.getElementById('meta');
                 meta.innerHTML = `<span class="rating-pill">IMDb ${m.rating}</span>`;
                 meta.innerHTML += `<span class="tag" onclick="window.location.href='../?year=${m.year}'">${m.year}</span>`;
                 if(m.genre) m.genre.split(',').forEach(g => meta.innerHTML += `<span class="tag" onclick="window.location.href='../?genre=${g.trim()}'">${g.trim()}</span>`);
 
-                // 4. DOWNLOADS LOGIC
+                // Downloads Logic (Movie)
                 const list = document.getElementById('dl-list');
                 if(m.downloads && m.downloads.length > 0) {
                     m.downloads.forEach(d => {
                         list.innerHTML += `
                             <div class="dl-row">
-                                <div style="flex-grow:1">
-                                    <div style="font-weight:700; font-size:1rem; color:#fff">${d.quality}</div>
-                                    <div style="font-size:0.8rem; color:var(--text-dim); margin-top:4px;">${d.size}</div>
+                                <div style="flex-grow:1; min-width:0;">
+                                    <div class="quality-label">${d.quality}</div>
+                                    <div class="size-label">${d.size}</div>
                                 </div>
                                 <a href="${resolveDL(d.link)}" class="btn-dl" target="_blank">Download</a>
                             </div>`;
@@ -122,18 +133,20 @@
         function playTrailer() { if(!trailerLink) return; document.getElementById('player-facade').style.display = 'none'; document.getElementById('video-container').innerHTML = `<iframe src="${trailerLink}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`; }
         function copyLink() { navigator.clipboard.writeText(window.location.href); showToast("Link Copied!"); }
         function scrollToDL() { document.querySelector('.dl-section').scrollIntoView({behavior: 'smooth'}); }
+        
         function share(platform) {
             const url = window.location.href;
             const title = document.title;
-            const text = "Watch this on " + CONFIG.siteName;
+            const text = "Watch " + title + " on " + CONFIG.siteName;
 
             if (platform === 'whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`);
-            else if (platform === 'email') window.open(`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`);
+            else if (platform === 'email') window.open(`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(text + "\n" + url)}`);
             else if (platform === 'more') {
                 if (navigator.share) navigator.share({title: title, text: text, url: url}).catch(console.error);
                 else copyLink();
             }
         }
     </script>
+
 </body>
 </html>
