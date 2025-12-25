@@ -41,9 +41,9 @@
                     renderSection(container, params.get('type'), data.filter(m => m.type === params.get('type')));
                 } 
                 else {
-                    renderSection(container, `${ICONS.fire} Latest Uploads`, data.slice(0, CONFIG.latestCount));
-                    renderSection(container, `${ICONS.film} Movies`, data.filter(m => m.type === "Movie"));
-                    renderSection(container, `${ICONS.tv} TV Series`, data.filter(m => m.type === "TV Series"));
+                    renderSection(container, `Latest Uploads ${ICONS.fire}`, data.slice(0, CONFIG.latestCount));
+                    renderSection(container, `Movies ${ICONS.film}`, data.filter(m => m.type === "Movie"));
+                    renderSection(container, `TV Series ${ICONS.tv}`, data.filter(m => m.type === "TV Series"));
                 }
             })
             .catch(() => document.getElementById('content').innerHTML = "<h2 style='text-align:center;margin-top:50px'>Library Loading Error.</h2>");
