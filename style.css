@@ -285,28 +285,36 @@ a { text-decoration: none; color: inherit; cursor: pointer; transition: 0.2s; }
     .trailer-wrapper { border-radius: 12px; margin-bottom: 30px; }
 }
 
+/* --- MOBILE OPTIMIZATION (Fixed Header) --- */
 @media(max-width: 600px) {
-    .nav { padding: 0 15px; gap: 10px; }
-    .logo { font-size: 1.1rem; }
-    .logo span { display: none; } /* Hide site name on mobile */
+    .nav { padding: 0 12px; gap: 8px; }
+    
+    /* 1. SHOW SITE NAME */
+    .logo { font-size: 1rem; } /* Slightly smaller text to fit */
+    .logo span { display: block; } /* This makes the name visible */
     .logo img { height: 24px; }
     
-    .search-wrapper { flex-grow: 1; max-width: none; }
-    .search-box { width: 100%; padding-left: 35px; }
-    .search-icon { left: 12px; }
+    /* 2. SEARCH BAR (Balanced Width) */
+    .nav-right { gap: 8px; flex-grow: 1; }
+    .search-wrapper { flex-grow: 1; max-width: 100%; }
+    .search-box { width: 100%; padding: 8px 10px 8px 32px; font-size: 0.85rem; }
+    .search-icon { left: 10px; width: 14px; height: 14px; }
     
+    .menu-btn { width: 35px; height: 35px; font-size: 1.2rem; }
+
+    /* 3. MOBILE GRID & TILES */
     .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .card-title { font-size: 0.7rem; margin-bottom: 3px; }
     .card-info { padding: 8px; }
     
-    /* MOBILE TILE FIX: Side-by-Side Meta */
-    .card-meta { flex-direction: row; align-items: center; gap: 5px; }
-    .badge { display: block; font-size: 0.55rem; padding: 2px 4px; }
+    /* Side-by-Side Meta (Year | Type) */
+    .card-meta { flex-direction: row; align-items: center; gap: 4px; }
+    .badge { display: block; font-size: 0.5rem; padding: 2px 4px; }
     .card-meta span:first-child { display: block; font-size: 0.6rem; }
     
-    /* Less Aggressive Hover on Mobile */
-    .card:hover { transform: translateY(-2px) scale(1.01); z-index: 20; box-shadow: 0 5px 20px rgba(0,0,0,0.8); }
-    
+    /* Mobile Hover Fix */
+    .card:hover { transform: none; box-shadow: none; z-index: 1; } /* Disable hover lift on phones */
+
     .share-box { flex-direction: column; align-items: stretch; text-align: center; }
     .share-actions { justify-content: center; }
     .container { padding: 15px; }
