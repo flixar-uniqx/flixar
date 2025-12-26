@@ -163,3 +163,18 @@ function populateSidebarFilters(data) {
                    <h3>Year</h3><div class="chip-container">${Array.from(years).sort().reverse().slice(0,8).map(y => chip('year', y)).join('')}</div>
                    <h3>Genre</h3><div class="chip-container">${Array.from(genres).sort().map(g => chip('genre', g)).join('')}</div>`;
 }
+
+// --- LINK RESOLVER (THE GENIUS PART) ---
+function resolveDL(link) {
+    // 1. Safety check
+    if (!link) return "#";
+    
+    // 2. If it's already a full web link (http/https), return it as is.
+    if (link.startsWith("http://") || link.startsWith("https://")) {
+        return link;
+    }
+    
+    // 3. Otherwise, combine the Config Domain + The Folder Path
+    // This handles the "0:/" part automatically based on your config.
+    return (CONFIG.fileBaseUrl || "") + link;
+}
