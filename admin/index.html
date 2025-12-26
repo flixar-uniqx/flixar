@@ -75,7 +75,7 @@
     <script src="../config.js"></script>
     <script src="../app.js"></script>
     <script>
-        const PASS = "1234"; // Change your password here
+        const PASS = "1234"; // Update your password here
 
         function checkPass() {
             if(document.getElementById('pass').value === PASS) {
@@ -90,7 +90,7 @@
             document.getElementById('series-area').style.display = isSeries ? 'block' : 'none';
         }
 
-        // --- MOVIE LOGIC ---
+        // --- DYNAMIC UI ---
         function addMovieLink() {
             const div = document.createElement('div');
             div.className = 'item-box row';
@@ -98,13 +98,11 @@
             document.getElementById('movie-links').appendChild(div);
         }
 
-        // --- SERIES LOGIC (Nested) ---
         function addSeason() {
             const div = document.createElement('div');
             div.className = 'item-box';
             div.style.borderColor = 'var(--primary)';
             const sId = 'season-' + Date.now();
-            
             div.innerHTML = `
                 <input placeholder="Season Name (e.g. Season 1)" class="s-name" style="margin-bottom:10px; font-weight:bold;">
                 <div id="${sId}" style="margin-left:10px; border-left:1px solid #333; padding-left:10px;"></div>
@@ -118,15 +116,12 @@
             div.className = 'item-box'; 
             div.style.background = 'rgba(255,255,255,0.02)';
             const epId = 'ep-' + Math.random().toString(36).substr(2, 9);
-
             div.innerHTML = `
                 <input placeholder="Episode Title (e.g. Episode 1)" class="e-title">
                 <div id="${epId}"></div>
                 <button class="btn-small" onclick="addEpLink('${epId}')">+ Add Quality Link</button>
             `;
             document.getElementById(seasonId).appendChild(div);
-            
-            // Add one link by default
             addEpLink(epId);
         }
 
@@ -137,7 +132,8 @@
             document.getElementById(epId).appendChild(div);
         }
 
-        // --- GENERATOR ---
+        // --- INTELLIGENT HELPERS ---
+
         function getEmbedUrl(url) {
             if (!url) return "";
             if (url.includes("/embed/")) return url;
@@ -146,6 +142,19 @@
             else if (url.includes("watch?v=")) videoId = url.split("watch?v=")[1].split("&")[0];
             if (videoId) return `https://www.youtube.com/embed/${videoId}`;
             return url;
+        }
+
+        // --- THE GENIUS CLEANER ---
+        // This function automatically detects your domain from config.js and removes it.
+        function cleanDownLink(url) {
+            if(!url) return "";
+            const base = CONFIG.fileBaseUrl;
+            
+            // If the link starts with your Base URL, remove it.
+            if(base && url.startsWith(base)) {
+                return url.replace(base, ""); // Returns just "Folder/Movie.mkv"
+            }
+            return url; // Returns full link if it's external
         }
 
         function generate() {
@@ -165,11 +174,13 @@
             if (obj.type === 'Movie') {
                 obj.downloads = [];
                 document.querySelectorAll('#movie-links .item-box').forEach(row => {
+                    const rawLink = row.querySelector('.l').value;
                     if(row.querySelector('.q').value) {
                         obj.downloads.push({
                             quality: row.querySelector('.q').value,
                             size: row.querySelector('.s').value,
-                            link: row.querySelector('.l').value
+                            // Apply the cleaner here
+                            link: cleanDownLink(rawLink) 
                         });
                     }
                 });
@@ -178,20 +189,16 @@
                 document.querySelectorAll('#season-list > .item-box').forEach(sDiv => {
                     let season = { name: sDiv.querySelector('.s-name').value, episodes: [] };
                     
-                    // Loop Episodes
                     sDiv.querySelectorAll('div[id^="season-"] > .item-box').forEach(epDiv => {
-                        let ep = { 
-                            title: epDiv.querySelector('.e-title').value,
-                            links: [] 
-                        };
-
-                        // Loop Links inside Episode
+                        let ep = { title: epDiv.querySelector('.e-title').value, links: [] };
                         epDiv.querySelectorAll('.sub-item-box').forEach(lDiv => {
+                            const rawLink = lDiv.querySelector('.l-url').value;
                             if(lDiv.querySelector('.l-label').value) {
                                 ep.links.push({
                                     label: lDiv.querySelector('.l-label').value,
                                     size: lDiv.querySelector('.l-size').value,
-                                    link: lDiv.querySelector('.l-url').value
+                                    // Apply the cleaner here
+                                    link: cleanDownLink(rawLink) 
                                 });
                             }
                         });
