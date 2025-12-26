@@ -114,7 +114,31 @@
 
         function playTrailer() { if(!trailerLink) return; document.getElementById('player-facade').style.display = 'none'; document.getElementById('video-container').innerHTML = `<iframe src="${trailerLink}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`; }
         function copyLink() { navigator.clipboard.writeText(window.location.href); showToast("Link Copied!"); }
-        function share(platform) { const url = encodeURIComponent(window.location.href); if(platform === 'whatsapp') window.open(`https://wa.me/?text=${url}`); else if(platform === 'email') window.open(`mailto:?body=${url}`); }
+        /* REPLACE THE share() FUNCTION AT THE BOTTOM OF THE SCRIPT */
+        function share(platform) {
+            const url = window.location.href;
+            const title = document.title;
+            const text = "Watch this on " + CONFIG.siteName;
+        
+            if (platform === 'whatsapp') {
+                window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`);
+            } 
+            else if (platform === 'email') {
+                window.open(`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`);
+            } 
+            else if (platform === 'more') {
+                if (navigator.share) {
+                    navigator.share({
+                        title: title,
+                        text: text,
+                        url: url
+                    }).catch(console.error);
+                } else {
+                    // Fallback for desktop browsers that don't support native share
+                    copyLink();
+                }
+            }
+        }
     </script>
 </body>
 </html>
