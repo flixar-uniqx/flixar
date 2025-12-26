@@ -71,7 +71,7 @@
         fetch('../movies.json?t=' + Date.now()).then(r => r.json()).then(data => {
             const m = data.find(i => i.id === id);
             if(m) {
-                // 1. Setup Page Info
+                // 1. Basic Info
                 document.title = `${m.title} - ${CONFIG.siteName}`;
                 document.getElementById('bg-layer').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
                 document.getElementById('poster').src = m.poster;
@@ -79,7 +79,7 @@
                 document.getElementById('title').innerText = m.title;
                 document.getElementById('desc').innerText = m.description;
 
-                // 2. Setup Trailer
+                // 2. Trailer Logic
                 if(m.trailer_embed && m.trailer_embed.length > 5) {
                     trailerLink = m.trailer_embed + (m.trailer_embed.includes('?') ? '&' : '?') + "autoplay=1&modestbranding=1&rel=0&iv_load_policy=3&color=white";
                     document.getElementById('trailer-section').style.display = 'block';
@@ -92,55 +92,53 @@
                 meta.innerHTML += `<span class="tag" onclick="window.location.href='../?year=${m.year}'">${m.year}</span>`;
                 if(m.genre) m.genre.split(',').forEach(g => meta.innerHTML += `<span class="tag" onclick="window.location.href='../?genre=${g.trim()}'">${g.trim()}</span>`);
 
-                // 4. Seasons Logic (THE FIX)
+                // 4. CLEAN SERIES LOGIC
                 const list = document.getElementById('dl-list');
                 if(m.seasons) {
                     m.seasons.forEach((s, idx) => {
                         let epsHtml = '';
                         
                         s.episodes.forEach(ep => {
-                            let buttonsHtml = '';
-                            
-                            // Check for Multiple Quality Links
+                            let linkRows = '';
+
+                            // Helper to generate a row
+                            const makeRow = (lbl, sz, lnk) => `
+                                <div class="series-dl-row">
+                                    <div>
+                                        <div class="quality-label">${lbl}</div>
+                                        <div class="size-label">${sz || ''}</div>
+                                    </div>
+                                    <a href="${lnk}" class="btn-dl" target="_blank" style="padding:6px 14px; font-size:0.75rem;">Download</a>
+                                </div>`;
+
+                            // Loop through qualities
                             if(ep.links && Array.isArray(ep.links)) {
                                 ep.links.forEach(l => {
-                                    // Clean display of size
-                                    let sizeText = l.size ? ` <span style="opacity:0.6; font-size:0.7em;">(${l.size})</span>` : '';
-                                    
-                                    buttonsHtml += `
-                                        <a href="${l.link}" class="btn-dl" target="_blank" style="margin-left:5px;">
-                                            ${l.label || 'DL'}${sizeText}
-                                        </a>`;
+                                    linkRows += makeRow(l.label || l.quality || 'Download', l.size, l.link);
                                 });
-                            } 
-                            // Fallback for single link (Old JSON style)
-                            else if(ep.link) {
-                                buttonsHtml = `<a href="${ep.link}" class="btn-dl" target="_blank">Download</a>`;
+                            } else if(ep.link) {
+                                linkRows = makeRow(ep.quality || 'HD', ep.size, ep.link);
                             }
 
-                            // Create the Episode Row
+                            // Structure: Header -> List of Rows
                             epsHtml += `
-                                <div class="episode-row">
-                                    <div class="ep-info">
-                                        <div class="ep-title">${ep.title}</div>
-                                        <div class="ep-meta">
-                                            ${ep.quality || ''} 
-                                            ${ep.size && !ep.links ? '• ' + ep.size : ''}
-                                        </div>
-                                    </div>
-                                    <div style="display:flex; flex-wrap:wrap; gap:5px; justify-content:flex-end;">
-                                        ${buttonsHtml}
+                                <div class="episode-wrapper">
+                                    <div class="ep-header-text">${ep.title}</div>
+                                    <div class="ep-links-container">
+                                        ${linkRows}
                                     </div>
                                 </div>`;
                         });
 
-                        // Add Season Card to List
+                        // Accordion Body
                         list.innerHTML += `
                             <div class="season-card ${idx===0 ? 'open' : ''}">
                                 <div class="season-head" onclick="this.parentElement.classList.toggle('open')">
                                     ${s.name} <span style="font-size:1.5rem; font-weight:300">+</span>
                                 </div>
-                                <div class="season-body">${epsHtml}</div>
+                                <div class="season-body" style="padding:10px 20px;">
+                                    ${epsHtml}
+                                </div>
                             </div>`;
                     });
                 } else {
@@ -151,9 +149,20 @@
             }
         });
 
+        // Utils
         function playTrailer() { if(!trailerLink) return; document.getElementById('player-facade').style.display = 'none'; document.getElementById('video-container').innerHTML = `<iframe src="${trailerLink}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`; }
         function copyLink() { navigator.clipboard.writeText(window.location.href); showToast("Link Copied!"); }
-        function share(platform) { const url = encodeURIComponent(window.location.href); const text = encodeURIComponent("Watch " + document.title); if(platform === 'whatsapp') window.open(`https://wa.me/?text=${text} ${url}`); else if(platform === 'email') window.open(`mailto:?body=${url}`); }
+        function scrollToDL() { document.querySelector('.dl-section').scrollIntoView({behavior: 'smooth'}); }
+        function share(platform) {
+            const url = window.location.href;
+            const text = "Watch " + document.title;
+            if(platform === 'whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`);
+            else if(platform === 'email') window.open(`mailto:?subject=${encodeURIComponent(text)}&body=${encodeURIComponent(url)}`);
+            else if(platform === 'more') {
+                if(navigator.share) navigator.share({title:document.title, text:text, url:url}).catch(console.error);
+                else copyLink();
+            }
+        }
     </script>
 </body>
 </html>
