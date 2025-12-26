@@ -107,6 +107,9 @@
                 if(m.genre) m.genre.split(',').forEach(g => meta.innerHTML += `<span class="tag" onclick="window.location.href='../?genre=${g.trim()}'">${g.trim()}</span>`);
 
                 // 4. CLEAN SERIES LOGIC
+                // ... previous code ...
+
+                // 4. SERIES LOGIC (UPDATED)
                 const list = document.getElementById('dl-list');
                 if(m.seasons) {
                     m.seasons.forEach((s, idx) => {
@@ -115,17 +118,17 @@
                         s.episodes.forEach(ep => {
                             let linkRows = '';
 
-                            // Helper to generate a row
+                            // Helper to create a row
                             const makeRow = (lbl, sz, lnk) => `
                                 <div class="series-dl-row">
-                                    <div>
+                                    <div style="min-width:0; flex:1;">
                                         <div class="quality-label">${lbl}</div>
                                         <div class="size-label">${sz || ''}</div>
                                     </div>
-                                    <a href="${lnk}" class="btn-dl" target="_blank" style="padding:6px 14px; font-size:0.75rem;">Download</a>
+                                    <a href="${resolveDL(lnk)}" class="btn-dl" target="_blank">Download</a>
                                 </div>`;
 
-                            // Loop through qualities
+                            // Generate Rows
                             if(ep.links && Array.isArray(ep.links)) {
                                 ep.links.forEach(l => {
                                     linkRows += makeRow(l.label || l.quality || 'Download', l.size, l.link);
@@ -134,7 +137,6 @@
                                 linkRows = makeRow(ep.quality || 'HD', ep.size, ep.link);
                             }
 
-                            // Structure: Header -> List of Rows
                             epsHtml += `
                                 <div class="episode-wrapper">
                                     <div class="ep-header-text">${ep.title}</div>
@@ -143,8 +145,8 @@
                                     </div>
                                 </div>`;
                         });
-
-                        // Accordion Body
+                        
+                        // ... append to accordion ...
                         list.innerHTML += `
                             <div class="season-card ${idx===0 ? 'open' : ''}">
                                 <div class="season-head" onclick="this.parentElement.classList.toggle('open')">
