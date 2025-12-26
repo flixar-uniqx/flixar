@@ -97,17 +97,19 @@
 
                 // MOVIE DOWNLOADS LOGIC
                 const list = document.getElementById('dl-list');
-                if(m.downloads) {
+                if(m.downloads && m.downloads.length > 0) {
                     m.downloads.forEach(d => {
                         list.innerHTML += `
                             <div class="dl-row">
-                                <div style="flex-grow:1">
-                                    <div style="font-weight:700; font-size:1rem; color:#fff">${d.quality}</div>
-                                    <div style="font-size:0.8rem; color:var(--text-dim); margin-top:4px;">${d.size}</div>
+                                <div style="flex-grow:1; min-width:0;">
+                                    <div class="quality-label">${d.quality}</div>
+                                    <div class="size-label">${d.size}</div>
                                 </div>
-                                <a href="${d.link}" class="btn-dl" target="_blank">Download</a>
+                                <a href="${resolveDL(d.link)}" class="btn-dl" target="_blank">Download</a>
                             </div>`;
                     });
+                } else {
+                    list.innerHTML = `<div style="padding:20px; text-align:center; color:var(--text-dim);">No links available.</div>`;
                 }
             }
         });
