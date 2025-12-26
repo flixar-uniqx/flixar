@@ -3,7 +3,7 @@ const CONFIG = {
     logoUrl: "https://cdn-icons-png.flaticon.com/512/2503/2503508.png",
     
     // FILE SERVER DOMAIN (Ends with /)
-    fileBaseUrl: "https://cloudz.flixar.workers.dev/0:/",
+    fileBaseUrl: "https://cloud.flixar.workers.dev/0:/",
 
     colors: {
         primary: "#00d2ff",      // Main Accent (Blue)
