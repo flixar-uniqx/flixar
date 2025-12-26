@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <div id="bg-layer"></div>
+    
+    <div class="container">
+        <a href="../" class="nav-back">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg> 
+            Back to Home
+        </a>
+
+        <div class="content-grid">
+            <div class="poster-col">
+                <img id="poster" class="poster-img" src="">
+            </div>
+            
+            <div class="details-col">
+                <h1 id="title" class="title-large"></h1>
+                <div class="meta-row" id="meta"></div>
+                <p id="desc" class="desc"></p>
+
+                <div class="trailer-section" id="trailer-section" style="display:none; margin-bottom:40px;">
+                    <div class="dl-header">Watch Trailer</div>
+                    <div class="trailer-wrapper" id="trailer-wrap">
+                        <div class="player-facade" id="player-facade" onclick="playTrailer()">
+                            <div class="play-btn-circle">
+                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                            </div>
+                        </div>
+                        <div id="video-container"></div>
+                    </div>
+                </div>
+
+                <div class="dl-section">
+                    <div class="dl-header">Seasons & Episodes</div>
+                    <div id="dl-list"></div>
+                </div>
+
+                <div class="file-ending">
+                    <div class="share-box">
+                        <div class="share-left">
+                            <div class="share-label">Share This Series</div>
+                            <div class="share-sub">Share with your friends and family</div>
+                        </div>
+                        <div class="share-actions">
+                            <button class="copy-btn" onclick="copyLink()">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> Copy Link
+                            </button>
+                            
+                            <div class="share-btn" onclick="share('whatsapp')">
+                                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 003.68 4.443c-3.269 3.243-4.192 8.481-2.145 12.621L.5 21.41l4.46-.88a11.82 11.82 0 0017.06-2.253c2.723-4.224 1.587-9.85-2.503-13.94"></path></svg>
+                            </div>
+                            
+                            <div class="share-btn" onclick="share('email')">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            </div>
+                        
+                            <div class="share-btn" onclick="share('more')">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="custom-disclaimer"><strong>Disclaimer:</strong> This file is hosted for preview and personal use only. The site owner assumes no responsibility for the content or any misuse of the provided files. By downloading or viewing this content, you agree to the terms of service.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../app.js"></script>
+    <script>
+        const id = new URLSearchParams(window.location.search).get('id');
+        let trailerLink = "";
+
+        fetch('../movies.json?t=' + Date.now()).then(r => r.json()).then(data => {
+            const m = data.find(i => i.id === id);
+            if(m) {
+                // 1. Basic Info
+                document.title = `${m.title} | ${CONFIG.siteName}`;
+                document.getElementById('bg-layer').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
+                
+                const posterImg = document.getElementById('poster');
+                posterImg.src = m.poster;
+                posterImg.alt = `${m.title} | ${CONFIG.siteName}`; // Added Alt Text
+                
+                document.getElementById('player-facade').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
+                document.getElementById('title').innerText = m.title;
+                document.getElementById('desc').innerText = m.description;
+
+                // 2. Trailer Logic
+                if(m.trailer_embed && m.trailer_embed.length > 5) {
+                    trailerLink = m.trailer_embed + (m.trailer_embed.includes('?') ? '&' : '?') + "autoplay=1&modestbranding=1&rel=0&iv_load_policy=3&color=white";
+                    document.getElementById('trailer-section').style.display = 'block';
+                    document.getElementById('trailer-wrap').classList.add('active');
+                }
+
+                // 3. Metadata
+                const meta = document.getElementById('meta');
+                meta.innerHTML = `<span class="rating-pill">IMDb ${m.rating}</span>`;
+                meta.innerHTML += `<span class="tag" onclick="window.location.href='../?year=${m.year}'">${m.year}</span>`;
+                if(m.genre) m.genre.split(',').forEach(g => meta.innerHTML += `<span class="tag" onclick="window.location.href='../?genre=${g.trim()}'">${g.trim()}</span>`);
+
+                // 4. CLEAN SERIES LOGIC
+                const list = document.getElementById('dl-list');
+                if(m.seasons) {
+                    m.seasons.forEach((s, idx) => {
+                        let epsHtml = '';
+                        
+                        s.episodes.forEach(ep => {
+                            let linkRows = '';
+
+                            // Helper to generate a row
+                            const makeRow = (lbl, sz, lnk) => `
+                                <div class="series-dl-row">
+                                    <div>
+                                        <div class="quality-label">${lbl}</div>
+                                        <div class="size-label">${sz || ''}</div>
+                                    </div>
+                                    <a href="${lnk}" class="btn-dl" target="_blank" style="padding:6px 14px; font-size:0.75rem;">Download</a>
+                                </div>`;
+
+                            // Loop through qualities
+                            if(ep.links && Array.isArray(ep.links)) {
+                                ep.links.forEach(l => {
+                                    linkRows += makeRow(l.label || l.quality || 'Download', l.size, l.link);
+                                });
+                            } else if(ep.link) {
+                                linkRows = makeRow(ep.quality || 'HD', ep.size, ep.link);
+                            }
+
+                            // Structure: Header -> List of Rows
+                            epsHtml += `
+                                <div class="episode-wrapper">
+                                    <div class="ep-header-text">${ep.title}</div>
+                                    <div class="ep-links-container">
+                                        ${linkRows}
+                                    </div>
+                                </div>`;
+                        });
+
+                        // Accordion Body
+                        list.innerHTML += `
+                            <div class="season-card ${idx===0 ? 'open' : ''}">
+                                <div class="season-head" onclick="this.parentElement.classList.toggle('open')">
+                                    ${s.name} <span style="font-size:1.5rem; font-weight:300">+</span>
+                                </div>
+                                <div class="season-body" style="padding:10px 20px;">
+                                    ${epsHtml}
+                                </div>
+                            </div>`;
+                    });
+                } else {
+                    list.innerHTML = `<div style="padding:20px; text-align:center; color:#666;">No episodes available.</div>`;
+                }
+            } else {
+                document.querySelector('.container').innerHTML = "<h1>Series Not Found</h1>";
+            }
+        });
+
+        // Utils
+        function playTrailer() { if(!trailerLink) return; document.getElementById('player-facade').style.display = 'none'; document.getElementById('video-container').innerHTML = `<iframe src="${trailerLink}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`; }
+        function copyLink() { navigator.clipboard.writeText(window.location.href); showToast("Link Copied!"); }
+        function scrollToDL() { document.querySelector('.dl-section').scrollIntoView({behavior: 'smooth'}); }
+        function share(platform) {
+            const url = window.location.href;
+            const text = "Watch " + document.title;
+            if(platform === 'whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`);
+            else if(platform === 'email') window.open(`mailto:?subject=${encodeURIComponent(text)}&body=${encodeURIComponent(url)}`);
+            else if(platform === 'more') {
+                if(navigator.share) navigator.share({title:document.title, text:text, url:url}).catch(console.error);
+                else copyLink();
+            }
+        }
+    </script>
+</body>
+</html>
