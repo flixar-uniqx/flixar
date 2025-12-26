@@ -74,7 +74,7 @@
 
     <script src="../config.js"></script>
     <script src="../app.js"></script>
-    <script>
+        <script>
         const id = new URLSearchParams(window.location.search).get('id');
         let trailerLink = "";
 
@@ -84,10 +84,7 @@
                 // 1. Basic Info
                 document.title = `${m.title} - ${CONFIG.siteName}`;
                 document.getElementById('bg-layer').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
-                const posterImg = document.getElementById('poster');
-                posterImg.src = m.poster;
-                posterImg.alt = `${m.title} Poster`;
-
+                document.getElementById('poster').src = m.poster;
                 document.getElementById('player-facade').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
                 document.getElementById('title').innerText = m.title;
                 document.getElementById('desc').innerText = m.description;
@@ -105,7 +102,7 @@
                 meta.innerHTML += `<span class="tag" onclick="window.location.href='../?year=${m.year}'">${m.year}</span>`;
                 if(m.genre) m.genre.split(',').forEach(g => meta.innerHTML += `<span class="tag" onclick="window.location.href='../?genre=${g.trim()}'">${g.trim()}</span>`);
 
-                // 4. HIERARCHY SERIES LOGIC (Episode > Qualities)
+                // 4. CLEAN SERIES LOGIC
                 const list = document.getElementById('dl-list');
                 if(m.seasons) {
                     m.seasons.forEach((s, idx) => {
@@ -114,17 +111,17 @@
                         s.episodes.forEach(ep => {
                             let linkRows = '';
 
-                            // Function: Create Clean Row
+                            // Helper to generate a row
                             const makeRow = (lbl, sz, lnk) => `
                                 <div class="series-dl-row">
-                                    <div style="min-width:0; flex:1;">
+                                    <div>
                                         <div class="quality-label">${lbl}</div>
                                         <div class="size-label">${sz || ''}</div>
                                     </div>
-                                    <a href="${resolveDL(lnk)}" class="btn-dl" target="_blank">Download</a>
+                                    <a href="${lnk}" class="btn-dl" target="_blank" style="padding:6px 14px; font-size:0.75rem;">Download</a>
                                 </div>`;
 
-                            // Generate Qualities
+                            // Loop through qualities
                             if(ep.links && Array.isArray(ep.links)) {
                                 ep.links.forEach(l => {
                                     linkRows += makeRow(l.label || l.quality || 'Download', l.size, l.link);
@@ -133,7 +130,7 @@
                                 linkRows = makeRow(ep.quality || 'HD', ep.size, ep.link);
                             }
 
-                            // Add to Hierarchy (Episode Header -> Links)
+                            // Structure: Header -> List of Rows
                             epsHtml += `
                                 <div class="episode-wrapper">
                                     <div class="ep-header-text">${ep.title}</div>
@@ -143,13 +140,13 @@
                                 </div>`;
                         });
 
-                        // Add Season Accordion
+                        // Accordion Body
                         list.innerHTML += `
                             <div class="season-card ${idx===0 ? 'open' : ''}">
                                 <div class="season-head" onclick="this.parentElement.classList.toggle('open')">
                                     ${s.name} <span style="font-size:1.5rem; font-weight:300">+</span>
                                 </div>
-                                <div class="season-body">
+                                <div class="season-body" style="padding:10px 20px;">
                                     ${epsHtml}
                                 </div>
                             </div>`;
@@ -165,16 +162,18 @@
         // Utils
         function playTrailer() { if(!trailerLink) return; document.getElementById('player-facade').style.display = 'none'; document.getElementById('video-container').innerHTML = `<iframe src="${trailerLink}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`; }
         function copyLink() { navigator.clipboard.writeText(window.location.href); showToast("Link Copied!"); }
-        
+        function scrollToDL() { document.querySelector('.dl-section').scrollIntoView({behavior: 'smooth'}); }
         function share(platform) {
             const url = window.location.href;
-            const title = document.title;
-            const text = "Watch " + title + " on " + CONFIG.siteName;
-            if (platform === 'whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`);
-            else if (platform === 'email') window.open(`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(text + "\n" + url)}`);
-            else if (platform === 'more') { if (navigator.share) navigator.share({title: title, text: text, url: url}).catch(console.error); else copyLink(); }
+            const text = "Watch " + document.title;
+            if(platform === 'whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`);
+            else if(platform === 'email') window.open(`mailto:?subject=${encodeURIComponent(text)}&body=${encodeURIComponent(url)}`);
+            else if(platform === 'more') {
+                if(navigator.share) navigator.share({title:document.title, text:text, url:url}).catch(console.error);
+                else copyLink();
+            }
         }
-    </script>
+        </script>
 </body>
 </html>
 
