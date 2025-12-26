@@ -41,9 +41,9 @@
                     renderSection(container, params.get('type'), data.filter(m => m.type === params.get('type')));
                 } 
                 else {
-                    renderSection(container, `Latest Uploads ${ICONS.fire}`, data.slice(0, CONFIG.latestCount));
-                    renderSection(container, `Movies ${ICONS.film}`, data.filter(m => m.type === "Movie"));
-                    renderSection(container, `TV Series ${ICONS.tv}`, data.filter(m => m.type === "TV Series"));
+                    renderSection(container, `${ICONS.fire} Latest Uploads`, data.slice(0, CONFIG.latestCount));
+                    renderSection(container, `${ICONS.film} Movies`, data.filter(m => m.type === "Movie"));
+                    renderSection(container, `${ICONS.tv} TV Series`, data.filter(m => m.type === "TV Series"));
                 }
             })
             .catch(() => document.getElementById('content').innerHTML = "<h2 style='text-align:center;margin-top:50px'>Library Loading Error.</h2>");
@@ -64,7 +64,7 @@
                 
                 grid.innerHTML += `
                     <div class="card" onclick="window.location.href='${link}'">
-                        <img src="${m.poster}" class="poster" loading="lazy" alt="${m.title} - ${CONFIG.siteName}">
+                        <img src="${m.poster}" class="poster" loading="lazy" alt="${m.title} Poster">
                         <div class="card-info">
                             <div class="card-title">${m.title}</div>
                             <div class="card-meta"><span>${m.year}</span><span class="badge">${m.type}</span></div>
