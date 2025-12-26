@@ -1,17 +1,16 @@
 /* SAVE AS app.js */
 
-// 1. MOBILE VIEWPORT ENFORCER (Prevents "Desktop Zoom" on phones)
-(function forceMobileView() {
-    let meta = document.querySelector('meta[name="viewport"]');
-    if (!meta) {
-        meta = document.createElement('meta');
+/* --- 1. VIEWPORT ENFORCER (SAFETY NET) --- */
+(function() {
+    if (!document.querySelector('meta[name="viewport"]')) {
+        var meta = document.createElement('meta');
         meta.name = "viewport";
+        meta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
         document.head.appendChild(meta);
     }
-    meta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
 })();
 
-// 2. SMART PATH RESOLVER
+// --- 2. PATH UTILS ---
 const isLocal = window.location.protocol === 'file:' || window.location.href.includes('.html');
 function getRoot() {
     if (window.location.pathname.match(/\/(movie|series|contact|disclaimer|terms|admin)\//)) return '../';
@@ -24,14 +23,13 @@ function resolveLink(folder) {
     return isLocal ? `${ROOT}${folder}/index.html` : `${ROOT}${folder}/`;
 }
 
-// 3. LINK RESOLVER
 function resolveDL(link) {
     if (!link) return "#";
     if (link.startsWith("http://") || link.startsWith("https://")) return link;
     return (CONFIG.fileBaseUrl || "") + link;
 }
 
-// 4. INITIALIZE
+// --- 3. INITIALIZE ---
 document.addEventListener("DOMContentLoaded", () => {
     if (typeof CONFIG === 'undefined') return;
     applyConfig();
@@ -45,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(r => r.json()).then(data => window.movieData = data).catch(()=>{});
 });
 
-// 5. APPLY COLORS
+// --- 4. CONFIG APPLICATOR ---
 function applyConfig() { 
     const root = document.documentElement.style;
     const c = CONFIG.colors;
@@ -67,7 +65,7 @@ function applyConfig() {
     }
 }
 
-// 6. NAVBAR INJECTION
+// --- 5. UI INJECTORS ---
 function injectNavbar() {
     const homeLink = resolveLink('');
     const nav = document.createElement('nav');
@@ -109,14 +107,20 @@ function showSuggestions(query) {
         results.forEach(m => {
             const folder = m.type === 'TV Series' ? 'series' : 'movie';
             const link = isLocal ? `${ROOT}${folder}/index.html?id=${m.id}` : `${ROOT}${folder}/?id=${m.id}`;
-            html += `<div class="search-item" onclick="window.location.href='${link}'"><img src="${m.poster}" class="s-poster"><div class="s-info"><span class="s-title">${m.title}</span><span class="s-meta">${m.year} • ${m.type}</span></div></div>`;
+            html += `
+                <div class="search-item" onclick="window.location.href='${link}'">
+                    <img src="${m.poster}" class="s-poster" alt="thumb">
+                    <div class="s-info">
+                        <span class="s-title">${m.title}</span>
+                        <span class="s-meta">${m.year} • ${m.type}</span>
+                    </div>
+                </div>`;
         });
         dropdown.innerHTML = html;
     }
     dropdown.classList.add('active');
 }
 
-// 7. SIDEBAR INJECTION
 function injectSidebar() {
     const homeLink = resolveLink('');
     const sidebar = document.createElement('div');
@@ -125,17 +129,16 @@ function injectSidebar() {
         <div class="sidebar">
             <div class="close-menu" onclick="toggleMenu()">✕</div>
             <h3>Menu</h3>
-            <a href="${homeLink}" class="sidebar-link">Home</a>
-            <a href="${resolveLink('contact')}" class="sidebar-link">Contact Us</a>
-            <a href="${resolveLink('terms')}" class="sidebar-link">Terms & Conditions</a>
-            <a href="${resolveLink('disclaimer')}" class="sidebar-link">Disclaimer</a>
+            <a href="${homeLink}" class="sidebar-link"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> Home</a>
+            <a href="${resolveLink('contact')}" class="sidebar-link"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg> Contact Us</a>
+            <a href="${resolveLink('terms')}" class="sidebar-link"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> Terms</a>
+            <a href="${resolveLink('disclaimer')}" class="sidebar-link"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Disclaimer</a>
             <div id="side-filters"></div>
         </div>`;
     document.body.appendChild(sidebar);
     fetch(ROOT + 'movies.json?t=' + Date.now()).then(r => r.json()).then(d => populateSidebarFilters(d)).catch(()=>{});
 }
 
-// 8. FOOTER INJECTION
 function injectFooter() {
     const homeLink = resolveLink('');
     const footer = document.createElement('div');
@@ -154,7 +157,6 @@ function injectFooter() {
     document.body.appendChild(footer);
 }
 
-// 9. UTILS
 function toggleMenu() { document.querySelector('.sidebar').classList.toggle('active'); document.querySelector('.sidebar-overlay').classList.toggle('active'); }
 function setupScroll() { window.addEventListener('scroll', () => { const up = document.getElementById('go-up'); if(window.scrollY > 300) up.classList.add('visible'); else up.classList.remove('visible'); }); }
 
@@ -176,4 +178,3 @@ function populateSidebarFilters(data) {
                    <h3>Year</h3><div class="chip-container">${Array.from(years).sort().reverse().slice(0,8).map(y => chip('year', y)).join('')}</div>
                    <h3>Genre</h3><div class="chip-container">${Array.from(genres).sort().map(g => chip('genre', g)).join('')}</div>`;
 }
-
