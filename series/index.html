@@ -71,7 +71,7 @@
         fetch('../movies.json?t=' + Date.now()).then(r => r.json()).then(data => {
             const m = data.find(i => i.id === id);
             if(m) {
-                // 1. Basic Info Setup
+                // 1. Basic Info
                 document.title = `${m.title} - ${CONFIG.siteName}`;
                 document.getElementById('bg-layer').style.backgroundImage = `url('${m.backdrop || m.poster}')`;
                 document.getElementById('poster').src = m.poster;
@@ -92,7 +92,7 @@
                 meta.innerHTML += `<span class="tag" onclick="window.location.href='../?year=${m.year}'">${m.year}</span>`;
                 if(m.genre) m.genre.split(',').forEach(g => meta.innerHTML += `<span class="tag" onclick="window.location.href='../?genre=${g.trim()}'">${g.trim()}</span>`);
 
-                // 4. ULTIMATE SERIES LOGIC (The Fix)
+                // 4. SEASONS & EPISODES LOGIC
                 const list = document.getElementById('dl-list');
                 if(m.seasons) {
                     m.seasons.forEach((s, idx) => {
@@ -101,43 +101,53 @@
                         s.episodes.forEach(ep => {
                             let qualityRows = '';
 
-                            // A. Handle Multiple Links (New Array Format)
+                            // A. Handle Multiple Links (Array)
                             if(ep.links && Array.isArray(ep.links)) {
                                 ep.links.forEach(l => {
-                                    // Each link gets its own "Movie-Style" Row
+                                    // FIXED: Shows Label/Quality properly, removed blue border
                                     qualityRows += `
-                                        <div class="dl-row" style="margin-top:5px; border-left:2px solid var(--primary); background:rgba(255,255,255,0.03);">
+                                        <div class="dl-row" style="margin-top:5px; background:rgba(255,255,255,0.03);">
                                             <div style="flex-grow:1;">
-                                                <div style="font-weight:700; color:#fff; font-size:0.9rem;">${l.label || 'Download'}</div>
-                                                <div style="font-size:0.75rem; color:var(--text-dim);">${l.size || ''}</div>
+                                                <div style="font-weight:700; color:#fff; font-size:0.9rem;">
+                                                    ${l.label || l.quality || 'Download'}
+                                                </div>
+                                                <div style="font-size:0.75rem; color:var(--text-dim); margin-top:2px;">
+                                                    ${l.size || ''}
+                                                </div>
                                             </div>
                                             <a href="${l.link}" class="btn-dl" target="_blank" style="font-size:0.7rem; padding:6px 16px;">Download</a>
                                         </div>`;
                                 });
                             } 
-                            // B. Handle Single Link (Old Format Fallback)
+                            // B. Handle Single Link (Fallback)
                             else if(ep.link) {
                                 qualityRows = `
-                                    <div class="dl-row" style="margin-top:5px; border-left:2px solid var(--primary); background:rgba(255,255,255,0.03);">
+                                    <div class="dl-row" style="margin-top:5px; background:rgba(255,255,255,0.03);">
                                         <div style="flex-grow:1;">
-                                            <div style="font-weight:700; color:#fff; font-size:0.9rem;">${ep.quality || 'HD'}</div>
-                                            <div style="font-size:0.75rem; color:var(--text-dim);">${ep.size || ''}</div>
+                                            <div style="font-weight:700; color:#fff; font-size:0.9rem;">
+                                                ${ep.quality || 'HD'}
+                                            </div>
+                                            <div style="font-size:0.75rem; color:var(--text-dim); margin-top:2px;">
+                                                ${ep.size || ''}
+                                            </div>
                                         </div>
                                         <a href="${ep.link}" class="btn-dl" target="_blank" style="font-size:0.7rem; padding:6px 16px;">Download</a>
                                     </div>`;
                             }
 
-                            // Wrap everything in an Episode Block
+                            // Episode Container
                             episodesHtml += `
-                                <div style="margin-bottom:20px; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                                    <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:8px; padding-left:5px;">${ep.title}</div>
+                                <div style="margin-bottom:25px;">
+                                    <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:8px; padding-left:5px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:5px;">
+                                        ${ep.title}
+                                    </div>
                                     <div style="display:flex; flex-direction:column; gap:2px;">
                                         ${qualityRows}
                                     </div>
                                 </div>`;
                         });
 
-                        // Create Season Accordion
+                        // Season Accordion
                         list.innerHTML += `
                             <div class="season-card ${idx===0 ? 'open' : ''}">
                                 <div class="season-head" onclick="this.parentElement.classList.toggle('open')">
@@ -157,7 +167,7 @@
             }
         });
 
-        // Player & Share Utils
+        // Utils
         function playTrailer() { if(!trailerLink) return; document.getElementById('player-facade').style.display = 'none'; document.getElementById('video-container').innerHTML = `<iframe src="${trailerLink}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`; }
         function copyLink() { navigator.clipboard.writeText(window.location.href); showToast("Link Copied!"); }
         function scrollToDL() { document.querySelector('.dl-section').scrollIntoView({behavior: 'smooth'}); }
