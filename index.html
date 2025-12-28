@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>FLIXᐃR | Bring the Theatre to Your Home</title>
+    <title>StreamHub - Watch Movies & Series</title>
     <meta name="description" content="Stream and download high-quality movies and TV series in 1080p and 4K.">
     <meta property="og:site_name" content="StreamHub">
     <meta property="og:title" content="StreamHub - Watch Movies & Series">
+    <meta property="og:description" content="Browse our library of high-quality movies and series. Download for free.">
     <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/2503/2503508.png">
     <meta property="og:type" content="website">
 
@@ -16,49 +17,26 @@
     <style>
         /* HERO CAROUSEL */
         .hero-section {
-            position: relative;
-            width: 100%;
-            height: 550px; /* Tall, cinematic height */
-            border-radius: var(--radius);
-            overflow: hidden;
-            margin-bottom: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            border: 1px solid var(--border);
+            position: relative; width: 100%; height: 550px;
+            border-radius: var(--radius); overflow: hidden; margin-bottom: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid var(--border);
+            display: none; /* Hidden by default, shown by JS if on Home */
         }
-
         .hero-slide {
-            position: absolute;
-            inset: 0;
-            background-size: cover;
-            background-position: center top;
-            opacity: 0;
-            transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1;
+            position: absolute; inset: 0; background-size: cover; background-position: center top;
+            opacity: 0; transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1;
         }
         .hero-slide.active { opacity: 1; z-index: 2; }
-
-        /* Gradient Overlay for Text Readability */
         .hero-overlay {
-            position: absolute;
-            inset: 0;
+            position: absolute; inset: 0;
             background: linear-gradient(to top, #050505 5%, rgba(5,5,5,0.8) 25%, transparent 60%);
-            z-index: 3;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 40px;
+            z-index: 3; display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;
         }
-
         .hero-content {
-            position: relative;
-            z-index: 4;
-            max-width: 800px;
-            transform: translateY(20px);
-            opacity: 0;
-            transition: 0.8s;
+            position: relative; z-index: 4; max-width: 800px;
+            transform: translateY(20px); opacity: 0; transition: 0.8s;
         }
         .hero-slide.active .hero-content { transform: translateY(0); opacity: 1; }
-
         .hero-badges { display: flex; gap: 10px; margin-bottom: 15px; }
         .hero-tag { 
             background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); 
@@ -66,77 +44,40 @@
             border: 1px solid rgba(255,255,255,0.1); color: #ddd;
         }
         .hero-rating { background: #eab308; color: #000; font-weight: 800; border:none; }
-
         .hero-title {
-            font-size: 3.5rem;
-            font-weight: 800;
-            line-height: 1.1;
-            margin: 0 0 15px 0;
-            text-shadow: 0 2px 20px rgba(0,0,0,0.8);
-            font-family: 'Raleway', sans-serif;
+            font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin: 0 0 15px 0;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.8); font-family: 'Raleway', sans-serif;
         }
-
         .hero-desc {
-            font-size: 1.1rem;
-            color: #ccc;
-            margin-bottom: 30px;
-            line-height: 1.6;
-            display: -webkit-box;
-            -webkit-line-clamp: 2; /* Limit to 2 lines */
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            max-width: 600px;
-            text-shadow: 0 1px 5px rgba(0,0,0,0.8);
+            font-size: 1.1rem; color: #ccc; margin-bottom: 30px; line-height: 1.6;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+            overflow: hidden; max-width: 600px; text-shadow: 0 1px 5px rgba(0,0,0,0.8);
         }
-
         .hero-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 35px;
-            background: var(--primary);
-            color: #000;
-            font-weight: 800;
-            font-size: 1rem;
-            border-radius: 99px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 0 20px var(--shadow-color);
-            transition: 0.3s;
+            display: inline-flex; align-items: center; gap: 10px; padding: 12px 35px;
+            background: var(--primary); color: #000; font-weight: 800; font-size: 1rem;
+            border-radius: 99px; text-transform: uppercase; letter-spacing: 0.5px;
+            box-shadow: 0 0 20px var(--shadow-color); transition: 0.3s;
         }
         .hero-btn:hover { transform: scale(1.05); box-shadow: 0 0 40px var(--shadow-color); background: #fff; }
 
-        /* GENRE PILLS SCROLL */
+        /* GENRE PILLS */
         .genre-scroll {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            margin-bottom: 30px;
-            scrollbar-width: none; /* Firefox */
+            display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 30px;
+            scrollbar-width: none; display: none; /* Hidden by default */
         }
-        .genre-scroll::-webkit-scrollbar { display: none; } /* Chrome */
-        
+        .genre-scroll::-webkit-scrollbar { display: none; }
         .genre-pill {
-            white-space: nowrap;
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border);
-            border-radius: 99px;
-            color: var(--text-dim);
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: 0.2s;
+            white-space: nowrap; padding: 10px 20px; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border); border-radius: 99px; color: var(--text-dim);
+            font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.2s;
         }
         .genre-pill:hover, .genre-pill.active {
-            background: rgba(255,255,255,0.1);
-            border-color: var(--primary);
-            color: #fff;
-            transform: translateY(-2px);
+            background: rgba(255,255,255,0.1); border-color: var(--primary);
+            color: #fff; transform: translateY(-2px);
         }
 
-        /* MOBILE ADJUSTMENTS */
+        /* MOBILE TWEAKS */
         @media(max-width: 768px) {
             .hero-section { height: 450px; border-radius: 0; margin: -20px -4% 30px -4%; width: 108%; }
             .hero-overlay { padding: 20px; }
@@ -150,30 +91,21 @@
 
     <div class="container">
         
-        <div class="hero-section" id="hero-slider">
-            <div style="display:flex; height:100%; align-items:center; justify-content:center; color:#555;">
-                Loading Featured Content...
-            </div>
-        </div>
+        <div class="hero-section" id="hero-slider"></div>
 
         <div class="genre-scroll" id="genre-filters">
-            <div class="genre-pill active" onclick="filterGrid('All', this)">All</div>
-            <div class="genre-pill" onclick="filterGrid('Action', this)">Action</div>
-            <div class="genre-pill" onclick="filterGrid('Adventure', this)">Adventure</div>
-            <div class="genre-pill" onclick="filterGrid('Sci-Fi', this)">Sci-Fi</div>
-            <div class="genre-pill" onclick="filterGrid('Drama', this)">Drama</div>
-            <div class="genre-pill" onclick="filterGrid('Comedy', this)">Comedy</div>
-            <div class="genre-pill" onclick="filterGrid('Thriller', this)">Thriller</div>
-            <div class="genre-pill" onclick="filterGrid('Horror', this)">Horror</div>
-            <div class="genre-pill" onclick="filterGrid('Animation', this)">Animation</div>
+            <div class="genre-pill" onclick="window.location.href='index.html'">All</div>
+            <div class="genre-pill" onclick="window.location.href='?genre=Action'">Action</div>
+            <div class="genre-pill" onclick="window.location.href='?genre=Sci-Fi'">Sci-Fi</div>
+            <div class="genre-pill" onclick="window.location.href='?genre=Drama'">Drama</div>
+            <div class="genre-pill" onclick="window.location.href='?genre=Comedy'">Comedy</div>
+            <div class="genre-pill" onclick="window.location.href='?genre=Thriller'">Thriller</div>
+            <div class="genre-pill" onclick="window.location.href='?genre=Horror'">Horror</div>
+            <div class="genre-pill" onclick="window.location.href='?genre=Animation'">Animation</div>
+            <div class="genre-pill" onclick="window.location.href='?genre=Adventure'">Adventure</div>
         </div>
 
-        <div class="section-header">
-            Latest Releases
-        </div>
-        
-        <div class="grid" id="movie-grid">
-            </div>
+        <div id="content"></div>
 
     </div>
 
@@ -181,76 +113,90 @@
     <script src="app.js"></script>
     
     <script>
-        let allMovies = []; // Store data globally for filtering
+        // Icons from your previous version
+        const ICONS = {
+            fire: '<svg width="24" height="24" fill="none" stroke="#eab308" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"></path></svg>',
+            film: '<svg width="24" height="24" fill="none" stroke="#00d2ff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>',
+            tv: '<svg width="24" height="24" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>',
+            search: '<svg width="24" height="24" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>',
+            filter: '<svg width="24" height="24" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>'
+        };
 
         document.addEventListener('DOMContentLoaded', () => {
             fetch('movies.json?t=' + Date.now())
                 .then(r => r.json())
                 .then(data => {
-                    if(data.length === 0) return;
-                    allMovies = data.reverse(); // Newest first
-                    
-                    initHero(allMovies.slice(0, 5)); // Use top 5 for Hero
-                    initGrid(allMovies); // Show all in grid
+                    const params = new URLSearchParams(window.location.search);
+                    const container = document.getElementById('content');
+                    container.innerHTML = ''; // Clear loading
+
+                    // Sort: Newest First
+                    const allContent = data.reverse(); 
+
+                    // 1. FILTERING LOGIC (Using your URL Param Structure)
+                    if(params.has('search')) {
+                        const q = params.get('search').toLowerCase();
+                        renderSection(container, `${ICONS.search} Search: "${q}"`, allContent.filter(m => m.title.toLowerCase().includes(q)));
+                        hideHero();
+                    } 
+                    else if(params.has('genre')) {
+                        const g = params.get('genre');
+                        renderSection(container, `${ICONS.filter} Genre: ${g}`, allContent.filter(m => m.genre && m.genre.includes(g)));
+                        hideHero();
+                        highlightGenre(g);
+                    } 
+                    else if(params.has('year')) {
+                        renderSection(container, `${ICONS.filter} Year: ${params.get('year')}`, allContent.filter(m => m.year === params.get('year')));
+                        hideHero();
+                    } 
+                    else if(params.has('type')) {
+                        const t = params.get('type');
+                        const icon = t === 'Movie' ? ICONS.film : ICONS.tv;
+                        renderSection(container, `${icon} ${t}`, allContent.filter(m => m.type === t));
+                        hideHero();
+                    } 
+                    else {
+                        // 2. DASHBOARD MODE (Home)
+                        
+                        // Show Hero & Genre Bar
+                        document.getElementById('hero-slider').style.display = 'block';
+                        document.getElementById('genre-filters').style.display = 'flex';
+                        
+                        // Initialize Hero with Top 5 Items
+                        initHero(allContent.slice(0, 5));
+
+                        // Sections
+                        renderSection(container, `${ICONS.fire} Latest Uploads`, allContent.slice(0, 12));
+                        renderSection(container, `${ICONS.film} Movies`, allContent.filter(m => m.type === "Movie"));
+                        renderSection(container, `${ICONS.tv} TV Series`, allContent.filter(m => m.type === "TV Series"));
+                    }
                 })
-                .catch(err => console.error("Error:", err));
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('content').innerHTML = "<h2 style='text-align:center;margin-top:50px;color:#ef4444;'>Error loading database.</h2>";
+                });
         });
 
-        // --- 1. HERO LOGIC (Cinematic Slider) ---
-        function initHero(featured) {
-            const container = document.getElementById('hero-slider');
-            if(!featured || featured.length === 0) return;
-
-            let html = '';
-            featured.forEach((m, idx) => {
-                const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
-                const link = `${folder}/index.html?id=${m.id}`;
-                const bg = m.backdrop || m.poster; // Fallback to poster if no backdrop
-                const activeClass = idx === 0 ? 'active' : '';
-
-                html += `
-                    <div class="hero-slide ${activeClass}" style="background-image: url('${bg}')" data-index="${idx}">
-                        <div class="hero-overlay">
-                            <div class="hero-content">
-                                <div class="hero-badges">
-                                    <span class="hero-tag hero-rating">IMDb ${m.rating}</span>
-                                    <span class="hero-tag">${m.year}</span>
-                                    <span class="hero-tag">${m.type}</span>
-                                </div>
-                                <h2 class="hero-title">${m.title}</h2>
-                                <p class="hero-desc">${m.description || 'No description available.'}</p>
-                                <a href="${link}" class="hero-btn">
-                                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
-                                    Watch Now
-                                </a>
-                            </div>
-                        </div>
-                    </div>`;
-            });
-            container.innerHTML = html;
-
-            // Auto Rotation
-            let currentSlide = 0;
-            const slides = document.querySelectorAll('.hero-slide');
+        // --- RENDER SECTION ---
+        function renderSection(container, titleHtml, list) {
+            if(list.length === 0) return;
             
-            setInterval(() => {
-                slides[currentSlide].classList.remove('active');
-                currentSlide = (currentSlide + 1) % slides.length;
-                slides[currentSlide].classList.add('active');
-            }, 6000); // Change every 6 seconds
-        }
-
-        // --- 2. GRID LOGIC ---
-        function initGrid(data) {
-            const grid = document.getElementById('movie-grid');
-            grid.innerHTML = '';
+            const section = document.createElement('div');
+            section.className = 'reveal'; 
+            section.innerHTML = `<div class="section-header" style="display:flex; align-items:center; gap:10px;">${titleHtml}</div>`;
             
-            data.forEach(m => {
+            const grid = document.createElement('div');
+            grid.className = 'grid'; // Uses your style.css grid
+            
+            const isLocal = window.location.protocol === 'file:' || window.location.href.includes('.html');
+
+            list.forEach(m => {
                 const isSeries = (m.type === 'TV Series' || m.type === 'tv');
                 const folder = isSeries ? 'series' : 'movie';
+                const link = isLocal ? `${folder}/index.html?id=${m.id}` : `${folder}/?id=${m.id}`;
                 
                 grid.innerHTML += `
-                    <div class="card reveal" onclick="window.location.href='${folder}/index.html?id=${m.id}'">
+                    <div class="card" onclick="window.location.href='${link}'">
                         <img src="${m.poster}" class="poster" loading="lazy" alt="${m.title}">
                         <div class="card-info">
                             <div class="card-title">${m.title}</div>
@@ -259,11 +205,13 @@
                                 <span class="badge">${m.type}</span>
                             </div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
+            
+            section.appendChild(grid);
+            container.appendChild(section);
 
-            // Trigger Reveal Animation
+            // Animate
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if(entry.isIntersecting) {
@@ -272,21 +220,65 @@
                     }
                 });
             }, { threshold: 0.1 });
-            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            observer.observe(section);
         }
 
-        // --- 3. FILTER LOGIC ---
-        function filterGrid(genre, btn) {
-            // Update Active Pill
-            document.querySelectorAll('.genre-pill').forEach(el => el.classList.remove('active'));
-            btn.classList.add('active');
+        // --- HERO LOGIC ---
+        function initHero(featured) {
+            const container = document.getElementById('hero-slider');
+            let html = '';
+            
+            const isLocal = window.location.protocol === 'file:' || window.location.href.includes('.html');
 
-            if (genre === 'All') {
-                initGrid(allMovies);
-            } else {
-                const filtered = allMovies.filter(m => m.genre && m.genre.includes(genre));
-                initGrid(filtered);
+            featured.forEach((m, idx) => {
+                const isSeries = (m.type === 'TV Series' || m.type === 'tv');
+                const folder = isSeries ? 'series' : 'movie';
+                const link = isLocal ? `${folder}/index.html?id=${m.id}` : `${folder}/?id=${m.id}`;
+                
+                const bg = m.backdrop || m.poster;
+                const activeClass = idx === 0 ? 'active' : '';
+
+                html += `
+                    <div class="hero-slide ${activeClass}" style="background-image: url('${bg}')">
+                        <div class="hero-overlay">
+                            <div class="hero-content">
+                                <div class="hero-badges">
+                                    <span class="hero-tag hero-rating">IMDb ${m.rating}</span>
+                                    <span class="hero-tag">${m.year}</span>
+                                    <span class="hero-tag">${m.type}</span>
+                                </div>
+                                <h2 class="hero-title">${m.title}</h2>
+                                <p class="hero-desc">${m.description || ''}</p>
+                                <a href="${link}" class="hero-btn">
+                                    ${ICONS.film} Watch Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            container.innerHTML = html;
+
+            // Auto Rotate
+            let current = 0;
+            const slides = document.querySelectorAll('.hero-slide');
+            if(slides.length > 1) {
+                setInterval(() => {
+                    slides[current].classList.remove('active');
+                    current = (current + 1) % slides.length;
+                    slides[current].classList.add('active');
+                }, 6000);
             }
+        }
+
+        function hideHero() {
+            document.getElementById('hero-slider').style.display = 'none';
+            document.getElementById('genre-filters').style.display = 'none';
+        }
+
+        function highlightGenre(g) {
+            document.querySelectorAll('.genre-pill').forEach(el => {
+                if(el.innerText === g) el.classList.add('active');
+            });
         }
     </script>
 </body>
