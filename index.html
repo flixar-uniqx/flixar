@@ -2,205 +2,199 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <title>FLIXᐃR | Bring the Theatre to Your Home</title>
+    <!-- SEO -->
+    <title>StreamHub - Watch Movies & Series</title>
     <meta name="description" content="Stream and download high-quality movies and TV series.">
-    
     <meta property="og:site_name" content="StreamHub">
-    <meta property="og:title" content="StreamHub - Watch Movies & Series">
     <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/2503/2503508.png">
-    <meta property="og:type" content="website">
 
     <link rel="stylesheet" href="style.css">
 
+    <!-- PAGE SPECIFIC STYLES -->
     <style>
-        /* --- 1. HERO CAROUSEL (Fixed & Optimized) --- */
+        /* --- HERO CAROUSEL --- */
         .hero-section {
-            position: relative;
-            width: 100%;
-            /* Desktop: Cinematic but not overwhelming */
-            height: 500px; 
-            border-radius: 16px;
-            overflow: hidden;
-            margin-bottom: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            border: 1px solid var(--border);
+            position: relative; width: 100%; height: 500px;
+            border-radius: var(--radius); overflow: hidden; margin-bottom: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid var(--border);
             display: none; /* Hidden until loaded */
         }
-
         .hero-slide {
-            position: absolute; inset: 0;
-            background-size: cover; background-position: center top;
-            opacity: 0; transition: opacity 0.8s ease-in-out;
-            z-index: 1;
+            position: absolute; inset: 0; background-size: cover; background-position: center top;
+            opacity: 0; transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1;
         }
         .hero-slide.active { opacity: 1; z-index: 2; }
-
-        /* Optimized Gradient: Easier to read text */
+        
         .hero-overlay {
             position: absolute; inset: 0;
-            background: linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
-            z-index: 3; display: flex; flex-direction: column; justify-content: center; 
-            padding: 60px;
+            background: linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, transparent 100%);
+            z-index: 3; display: flex; flex-direction: column; justify-content: center; padding: 60px;
         }
 
-        .hero-content {
-            position: relative; z-index: 4; max-width: 600px;
-            transform: translateY(20px); opacity: 0; transition: 0.6s;
+        .hero-content { 
+            position: relative; z-index: 4; max-width: 650px; 
+            transform: translateY(20px); opacity: 0; transition: 0.6s 0.2s;
         }
         .hero-slide.active .hero-content { transform: translateY(0); opacity: 1; }
 
+        .hero-badges { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .hero-pill { 
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); 
+            padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; 
+            border: 1px solid rgba(255,255,255,0.1); color: #eee;
+        }
+        .hero-rating { background: #eab308; color: #000; border: none; }
+
         .hero-title {
-            font-size: 3rem; font-weight: 800; line-height: 1.1; margin: 0 0 15px 0;
-            text-shadow: 0 2px 20px rgba(0,0,0,1); font-family: 'Raleway', sans-serif;
+            font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin: 0 0 15px 0;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.8); font-family: 'Raleway', sans-serif;
+            color: #fff;
         }
         .hero-desc {
-            font-size: 1rem; color: #ddd; margin-bottom: 25px; line-height: 1.6;
+            font-size: 1rem; color: #ccc; margin-bottom: 30px; line-height: 1.6;
             display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
-            overflow: hidden; text-shadow: 0 1px 2px rgba(0,0,0,1);
+            overflow: hidden; text-shadow: 0 1px 2px rgba(0,0,0,0.8);
         }
-        
+
         .hero-btn {
-            display: inline-flex; align-items: center; gap: 10px; padding: 12px 30px;
+            display: inline-flex; align-items: center; gap: 10px; padding: 12px 32px;
             background: var(--primary); color: #000; font-weight: 800; font-size: 0.95rem;
             border-radius: 99px; text-transform: uppercase; letter-spacing: 0.5px;
             box-shadow: 0 0 20px var(--shadow-color); transition: 0.3s;
         }
         .hero-btn:hover { transform: scale(1.05); background: #fff; }
 
-        /* HERO CONTROLS (New Feature) */
-        .hero-nav {
-            position: absolute; bottom: 20px; right: 30px; z-index: 10;
-            display: flex; gap: 10px; align-items: center;
-        }
+        /* Controls */
+        .hero-nav { position: absolute; bottom: 30px; right: 30px; z-index: 10; display: flex; gap: 12px; }
         .hero-arrow {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: rgba(255,255,255,0.1); backdrop-filter: blur(5px);
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2); color: #fff;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: 0.2s;
         }
         .hero-arrow:hover { background: var(--primary); color: #000; }
         
-        .hero-dots {
-            position: absolute; bottom: 20px; left: 60px; z-index: 10; display: flex; gap: 8px;
-        }
-        .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.3); border-radius: 50%; transition: 0.3s; }
-        .dot.active { width: 25px; border-radius: 10px; background: var(--primary); }
+        .hero-dots { position: absolute; bottom: 30px; left: 60px; z-index: 10; display: flex; gap: 8px; }
+        .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.3); border-radius: 50%; transition: 0.3s; cursor: pointer; }
+        .dot.active { width: 24px; border-radius: 10px; background: var(--primary); }
 
-        /* --- 2. DYNAMIC FILTERS (Hover Fixed) --- */
+        /* --- FILTERS --- */
         .genre-scroll {
             display: flex; gap: 10px; overflow-x: auto; 
-            padding: 10px 5px 20px 5px; /* Extra bottom padding prevents hover clip */
-            margin-bottom: 10px; scrollbar-width: none;
+            padding: 5px 5px 15px 5px; margin-bottom: 20px;
+            scrollbar-width: none;
         }
         .genre-scroll::-webkit-scrollbar { display: none; }
         
         .filter-pill {
-            white-space: nowrap; padding: 8px 18px; background: rgba(255,255,255,0.05);
+            white-space: nowrap; padding: 8px 20px; background: rgba(255,255,255,0.05);
             border: 1px solid var(--border); border-radius: 99px; color: var(--text-dim);
             font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s; user-select: none;
         }
         .filter-pill:hover, .filter-pill.active {
             background: rgba(255,255,255,0.15); border-color: var(--primary);
-            color: #fff; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            color: #fff; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
-        /* --- 3. PAGINATION (New Feature) --- */
-        .pagination {
-            display: flex; justify-content: center; gap: 8px; margin-top: 50px; flex-wrap: wrap;
-        }
+        /* --- PAGINATION --- */
+        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 50px; flex-wrap: wrap; }
         .page-btn {
-            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            min-width: 40px; height: 40px; padding: 0 15px; display: flex; align-items: center; justify-content: center;
             background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-            color: var(--text-dim); cursor: pointer; transition: 0.2s; font-weight: 600;
+            color: var(--text-dim); cursor: pointer; transition: 0.2s; font-weight: 700; font-size: 0.9rem;
         }
-        .page-btn:hover, .page-btn.active {
-            background: var(--primary); color: #000; border-color: var(--primary);
-        }
+        .page-btn:hover, .page-btn.active { background: var(--primary); color: #000; border-color: var(--primary); }
         .page-btn.disabled { opacity: 0.3; pointer-events: none; }
 
-        /* --- 4. MOBILE OPTIMIZATIONS --- */
+        /* --- MOBILE --- */
         @media(max-width: 768px) {
-            /* Fix overflow and zoom issues */
-            .hero-section { 
-                height: 380px; /* Smaller on mobile */
-                width: 100%; /* Fix width */
-                margin: 0 0 25px 0;
-            }
-            .hero-overlay { 
-                background: linear-gradient(to top, rgba(0,0,0,0.95) 10%, transparent 100%);
-                justify-content: flex-end; padding: 20px;
-            }
-            .hero-title { font-size: 1.8rem; }
-            .hero-desc { font-size: 0.9rem; -webkit-line-clamp: 2; margin-bottom: 15px; }
-            .hero-nav { display: none; /* Hide arrows on mobile to save space */ }
+            .hero-section { height: 400px; margin: 0 0 25px 0; width: 100%; }
+            .hero-overlay { background: linear-gradient(to top, rgba(0,0,0,0.95) 15%, transparent 100%); padding: 20px; justify-content: flex-end; }
+            .hero-title { font-size: 2rem; }
+            .hero-desc { font-size: 0.9rem; -webkit-line-clamp: 2; }
+            .hero-nav { display: none; } /* Hide arrows on mobile */
             .hero-dots { left: 50%; transform: translateX(-50%); bottom: 15px; }
-            
-            /* Tighten Grid */
-            .container { padding: 15px; }
+            .container { padding: 15px 10px; }
         }
     </style>
 </head>
 <body>
 
+    <!-- CONTAINER -->
     <div class="container">
         
-        <div class="hero-section" id="hero-slider">
-            </div>
+        <!-- 1. HERO SLIDER -->
+        <div class="hero-section" id="hero-slider"></div>
 
-        <div class="genre-scroll" id="dynamic-filters">
-            </div>
+        <!-- 2. DYNAMIC FILTER BAR -->
+        <div class="genre-scroll" id="dynamic-filters"></div>
 
+        <!-- 3. GRID HEADER -->
         <div class="section-header" id="grid-header">
             Latest Releases
         </div>
 
+        <!-- 4. MAIN GRID -->
         <div class="grid" id="movie-grid">
             <div style="grid-column:1/-1; text-align:center; padding:50px; color:#666;">
-                Loading Library...
+                Loading...
             </div>
         </div>
 
+        <!-- 5. PAGINATION -->
         <div class="pagination" id="pagination-controls"></div>
 
     </div>
 
+    <!-- SCRIPTS -->
     <script src="config.js"></script>
     <script src="app.js"></script>
     
     <script>
-        // GLOBAL STATE
-        let db = []; // Full database
-        let filteredDB = []; // Currently filtered list
+        // --- GLOBAL VARIABLES ---
+        let db = []; 
+        let filteredDB = []; 
         let currentPage = 1;
-        const ITEMS_PER_PAGE = 24; // Number of items per page
+        const ITEMS_PER_PAGE = 24; 
+        
+        // Slider State
         let currentSlide = 0;
         let slideInterval;
+        let touchStartX = 0;
+        let touchEndX = 0;
 
         document.addEventListener('DOMContentLoaded', () => {
             fetch('movies.json?t=' + Date.now())
                 .then(r => r.json())
                 .then(data => {
-                    if(data.length === 0) return;
-                    
-                    // 1. Setup Data
-                    db = data.reverse(); // Newest first
-                    filteredDB = [...db]; // Default view is all items
+                    if(data.length === 0) {
+                        document.getElementById('movie-grid').innerHTML = "No content.";
+                        return;
+                    }
 
-                    // 2. Initialize Components
-                    initHero(db.slice(0, 5)); // Top 5 for Hero
-                    initFilters(); // Generate Genre Buttons
-                    renderPage(1); // Render Grid Page 1
+                    // 1. Prepare Data
+                    db = data.reverse(); // Newest first
+                    filteredDB = [...db];
+
+                    // 2. Init UI
+                    initHero(db.slice(0, 5)); // Featured: Top 5
+                    initFilters(); // Generate Pills from DB
+                    
+                    // 3. Handle URL Params (e.g. ?genre=Action)
+                    const params = new URLSearchParams(window.location.search);
+                    if(params.has('genre')) applyFilter(params.get('genre'), null);
+                    else if(params.has('year')) applyFilter(params.get('year'), null);
+                    else if(params.has('type')) applyFilter(params.get('type'), null);
+                    else if(params.has('search')) applySearch(params.get('search'));
+                    else renderPage(1); // Default Load
                 })
-                .catch(err => {
-                    console.error("DB Error:", err);
-                    document.getElementById('movie-grid').innerHTML = "<h3 style='text-align:center;color:red'>Failed to load content.</h3>";
-                });
+                .catch(err => console.error(err));
         });
 
-        // --- 1. HERO SYSTEM (Optimized) ---
+        // --- 1. HERO LOGIC (Swipe + Auto) ---
         function initHero(featured) {
             const container = document.getElementById('hero-slider');
             if(!featured.length) return;
@@ -210,17 +204,21 @@
 
             featured.forEach((m, idx) => {
                 const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
-                const link = `${folder}/index.html?id=${m.id}`;
+                const link = resolveLink(`${folder}/?id=${m.id}`);
                 const bg = m.backdrop || m.poster;
                 const active = idx === 0 ? 'active' : '';
 
                 slidesHTML += `
-                    <div class="hero-slide ${active}" style="background-image: url('${bg}')" id="slide-${idx}">
+                    <div class="hero-slide ${active}" style="background-image: url('${bg}')">
                         <div class="hero-overlay">
                             <div class="hero-content">
-                                <span style="background:#eab308; color:#000; padding:2px 8px; border-radius:4px; font-weight:800; font-size:0.7rem; margin-bottom:10px; display:inline-block;">IMDb ${m.rating}</span>
+                                <div class="hero-badges">
+                                    <span class="hero-pill hero-rating">IMDb ${m.rating}</span>
+                                    <span class="hero-pill">${m.year}</span>
+                                    <span class="hero-pill">${m.type}</span>
+                                </div>
                                 <h2 class="hero-title">${m.title}</h2>
-                                <p class="hero-desc">${m.description || 'No description available.'}</p>
+                                <p class="hero-desc">${m.description || ''}</p>
                                 <a href="${link}" class="hero-btn">
                                     <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
                                     Watch Now
@@ -228,11 +226,9 @@
                             </div>
                         </div>
                     </div>`;
-                
                 dotsHTML += `<div class="dot ${active}" onclick="goToSlide(${idx})"></div>`;
             });
 
-            // Add Controls
             container.innerHTML = `
                 ${slidesHTML}
                 <div class="hero-nav">
@@ -243,8 +239,19 @@
             `;
             container.style.display = 'block';
 
-            // Auto Slide
+            // Swipe Listeners
+            container.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
+            container.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+
             startSlideTimer();
+        }
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) changeSlide(1); // Swipe Left (Next)
+            if (touchEndX > touchStartX + 50) changeSlide(-1); // Swipe Right (Prev)
         }
 
         function startSlideTimer() {
@@ -255,61 +262,44 @@
         function changeSlide(dir) {
             const slides = document.querySelectorAll('.hero-slide');
             const dots = document.querySelectorAll('.dot');
-            
-            // Remove Active
+            if(slides.length === 0) return;
+
             slides[currentSlide].classList.remove('active');
             dots[currentSlide].classList.remove('active');
 
-            // Calculate New Index
             currentSlide = (currentSlide + dir + slides.length) % slides.length;
 
-            // Add Active
             slides[currentSlide].classList.add('active');
             dots[currentSlide].classList.add('active');
-            
-            startSlideTimer(); // Reset timer on manual interaction
+            startSlideTimer();
         }
 
         function goToSlide(idx) {
             currentSlide = idx;
-            const slides = document.querySelectorAll('.hero-slide');
-            const dots = document.querySelectorAll('.dot');
-            
-            slides.forEach(s => s.classList.remove('active'));
-            dots.forEach(d => d.classList.remove('active'));
-            
-            slides[currentSlide].classList.add('active');
-            dots[currentSlide].classList.add('active');
-            
-            startSlideTimer();
+            changeSlide(0); // Refresh view
         }
 
-        // --- 2. DYNAMIC FILTERS (Smart) ---
+        // --- 2. DYNAMIC FILTERS (Auto-Generated) ---
         function initFilters() {
             const container = document.getElementById('dynamic-filters');
             
-            // 1. Extract all unique Genres and Years from DB
+            // Extract Unique Values
             const genres = new Set();
             const years = new Set();
-            
             db.forEach(m => {
                 if(m.genre) m.genre.split(',').forEach(g => genres.add(g.trim()));
                 if(m.year) years.add(m.year);
             });
 
-            // 2. Build HTML
             let html = `<div class="filter-pill active" onclick="applyFilter('all', this)">All</div>`;
-            
-            // Add Movies / Series
             html += `<div class="filter-pill" onclick="applyFilter('Movie', this)">Movies</div>`;
             html += `<div class="filter-pill" onclick="applyFilter('TV Series', this)">TV Series</div>`;
             
-            // Add Top Genres (Sorted)
+            // Sort & Add Genres
             Array.from(genres).sort().forEach(g => {
                 html += `<div class="filter-pill" onclick="applyFilter('${g}', this)">${g}</div>`;
             });
-
-            // Add Recent Years
+            // Sort & Add Recent Years
             Array.from(years).sort().reverse().slice(0, 5).forEach(y => {
                 html += `<div class="filter-pill" onclick="applyFilter('${y}', this)">${y}</div>`;
             });
@@ -318,48 +308,52 @@
         }
 
         function applyFilter(criteria, btn) {
-            // UI Update
-            document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            if(btn) {
+                document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
 
-            // Logic Update
             if(criteria === 'all') {
                 filteredDB = [...db];
                 document.getElementById('grid-header').innerText = "Latest Releases";
-                document.getElementById('hero-slider').style.display = 'block'; // Show Hero on Home
+                document.getElementById('hero-slider').style.display = 'block';
             } else {
-                // Determine if criteria is Genre, Type, or Year
                 filteredDB = db.filter(m => {
                     const isType = m.type === criteria || (criteria === 'TV Series' && m.type === 'tv');
                     const isGenre = m.genre && m.genre.includes(criteria);
                     const isYear = m.year == criteria;
                     return isType || isGenre || isYear;
                 });
-                document.getElementById('grid-header').innerText = `Results for: ${criteria}`;
-                document.getElementById('hero-slider').style.display = 'none'; // Hide Hero when filtering
+                document.getElementById('grid-header').innerText = `${criteria}`;
+                document.getElementById('hero-slider').style.display = 'none';
             }
-
-            renderPage(1); // Reset to page 1
+            renderPage(1);
         }
 
-        // --- 3. PAGINATION SYSTEM (1, 2, 3...) ---
+        function applySearch(q) {
+            const query = q.toLowerCase();
+            filteredDB = db.filter(m => m.title.toLowerCase().includes(query));
+            document.getElementById('grid-header').innerText = `Search: "${q}"`;
+            document.getElementById('hero-slider').style.display = 'none';
+            renderPage(1);
+        }
+
+        // --- 3. PAGINATION RENDERER ---
         function renderPage(page) {
             currentPage = page;
             const grid = document.getElementById('movie-grid');
             grid.innerHTML = '';
             
-            // Calculate Slice
             const start = (page - 1) * ITEMS_PER_PAGE;
             const end = start + ITEMS_PER_PAGE;
             const pageItems = filteredDB.slice(start, end);
 
-            // Render Cards
             if(pageItems.length === 0) {
-                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px;">No content found.</div>`;
+                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px;">No results found.</div>`;
             } else {
                 pageItems.forEach(m => {
                     const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
-                    const link = `${folder}/index.html?id=${m.id}`;
+                    const link = resolveLink(`${folder}/?id=${m.id}`);
                     
                     grid.innerHTML += `
                         <div class="card reveal" onclick="window.location.href='${link}'">
@@ -375,36 +369,20 @@
                 });
             }
 
-            // Animate
-            setTimeout(() => {
-                document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
-            }, 50);
-
-            // Render Pagination Controls
-            renderPaginationControls();
-            
-            // Scroll to top of grid (UX)
-            if(page > 1) {
-                document.getElementById('grid-header').scrollIntoView({ behavior: 'smooth' });
-            }
+            setTimeout(() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('active')), 50);
+            renderControls();
+            if(page > 1) document.getElementById('grid-header').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function renderPaginationControls() {
+        function renderControls() {
             const container = document.getElementById('pagination-controls');
             const totalPages = Math.ceil(filteredDB.length / ITEMS_PER_PAGE);
             
-            if(totalPages <= 1) {
-                container.innerHTML = '';
-                return;
-            }
+            if(totalPages <= 1) { container.innerHTML = ''; return; }
 
-            let html = '';
-            
-            // Prev Button
-            html += `<div class="page-btn ${currentPage === 1 ? 'disabled' : ''}" onclick="renderPage(${currentPage - 1})">❮</div>`;
+            let html = `<div class="page-btn ${currentPage === 1 ? 'disabled' : ''}" onclick="renderPage(${currentPage - 1})">Prev</div>`;
 
-            // Page Numbers (Smart Logic: 1, 2 ... 5, 6, 7 ... 99)
-            // Simplified for stability: Show 2 before and 2 after current
+            // Logic to show "1 ... 4 5 6 ... 10"
             for (let i = 1; i <= totalPages; i++) {
                 if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
                     html += `<div class="page-btn ${i === currentPage ? 'active' : ''}" onclick="renderPage(${i})">${i}</div>`;
@@ -413,9 +391,7 @@
                 }
             }
 
-            // Next Button
-            html += `<div class="page-btn ${currentPage === totalPages ? 'disabled' : ''}" onclick="renderPage(${currentPage + 1})">❯</div>`;
-
+            html += `<div class="page-btn ${currentPage === totalPages ? 'disabled' : ''}" onclick="renderPage(${currentPage + 1})">Next</div>`;
             container.innerHTML = html;
         }
     </script>
