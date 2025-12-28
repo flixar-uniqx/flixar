@@ -3,85 +3,360 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>StreamHub Admin</title>
     <link rel="stylesheet" href="../style.css">
     <style>
-        .admin-container { max-width: 900px; margin: 50px auto; padding: 0 20px; }
-        .login-box { max-width: 400px; margin: 100px auto; text-align: center; background: var(--card); padding: 40px; border-radius: 12px; }
+        /* Maintaining your Exact Styling */
+        body { padding: 20px; max-width: 900px; margin: 0 auto; background: #050505; color: #fff; }
+        .item-box { background: #1a1a1a; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #333; }
+        .row { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 10px; margin-bottom: 10px; }
+        input, textarea, select { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-family: inherit; }
+        button { background: var(--primary); color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-right: 10px; transition: 0.2s; }
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
+        h2 { color: var(--primary); border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+        .btn-small { padding: 5px 10px; font-size: 0.8rem; background: #333; color: #fff; }
+        .btn-danger { background: #dc2626; color: #fff; }
         
-        /* Form Styling */
-        label { display: block; color: var(--text-dim); font-size: 0.8rem; text-transform: uppercase; margin: 15px 0 5px; font-weight: 600; letter-spacing: 1px; }
-        input, select, textarea { width: 100%; padding: 12px; background: #0a0a0a; border: 1px solid var(--border); color: #fff; border-radius: 8px; font-family: inherit; }
-        input:focus, textarea:focus { border-color: var(--primary); outline: none; }
+        /* New: Search Results Styling */
+        .search-results-panel { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .res-card { background: #111; padding: 5px; cursor: pointer; border: 1px solid #333; border-radius: 4px; transition: 0.2s; }
+        .res-card:hover { border-color: var(--primary); transform: scale(1.05); }
+        .res-poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; border-radius: 4px; }
+        .res-title { font-size: 0.75rem; text-align: center; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        
-        /* Dynamic Lists */
-        .item-box { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); }
-        .sub-item-box { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; margin-top: 10px; border-left: 2px solid var(--primary); }
-        
-        .btn { background: var(--primary); color: #000; padding: 12px 25px; border-radius: 50px; font-weight: 700; border: none; cursor: pointer; width: 100%; margin-top: 20px; }
-        .btn-small { background: #333; color: white; padding: 6px 12px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer; display: inline-block; margin-top: 5px; margin-right: 5px; }
-        .btn-small:hover { background: #444; }
-        
-        .hidden { display: none; }
+        /* Sticky Toolbar */
+        .toolbar { position: sticky; top: 0; background: rgba(5,5,5,0.95); padding: 15px 0; border-bottom: 1px solid #333; z-index: 100; margin-bottom: 20px; backdrop-filter: blur(10px); display: flex; gap: 10px; align-items: center; }
     </style>
 </head>
 <body>
 
-    <div id="login" class="login-box">
-        <h2 style="color:var(--primary); margin-bottom:20px;">Admin Access</h2>
-        <input type="password" id="pass" placeholder="Password">
-        <button class="btn" onclick="checkPass()">Login</button>
+    <div id="login" style="text-align:center; padding-top:100px;">
+        <h2>Admin Login</h2>
+        <input type="password" id="pass" placeholder="Password" style="max-width:300px;">
+        <br>
+        <button onclick="checkPass()">Login</button>
     </div>
 
-    <div id="panel" class="admin-container hidden">
-        <h1 style="border-bottom:1px solid var(--border); padding-bottom:15px; margin-bottom:30px;">Add New Entry</h1>
+    <div id="panel" style="display:none;">
         
-        <div class="row">
-            <div><label>Type</label><select id="type" onchange="toggleType()"><option>Movie</option><option>TV Series</option></select></div>
-            <div><label>ID (Unique)</label><input id="id" placeholder="man-vs-baby"></div>
+        <div class="toolbar">
+            <h3 style="margin:0; color:var(--primary);">EDITOR</h3>
+            <div style="flex-grow:1;"></div>
+            <button onclick="createNew()" class="btn-small">New Entry</button>
+            <button onclick="saveAll()" style="background:#10b981;">SAVE JSON FILE</button>
         </div>
 
-        <label>Title</label><input id="title">
-        
-        <div class="row">
-            <div><label>Year</label><input id="year"></div>
-            <div><label>Rating</label><input id="rating"></div>
+        <div class="item-box" style="border-color: var(--primary);">
+            <h3>1. Auto-Fill from Internet (TMDB)</h3>
+            <div style="display: flex; gap: 10px;">
+                <input id="tmdb-search" placeholder="Type Movie or Series name..." onkeypress="if(event.key==='Enter') searchTMDB()">
+                <button onclick="searchTMDB()" class="btn-small" style="width:100px;">Search</button>
+            </div>
+            <div id="tmdb-results" class="search-results-panel"></div>
         </div>
 
-        <label>Genre</label><input id="genre" placeholder="Action, Drama">
-        <label>Poster URL</label><input id="poster">
-        <label>Backdrop URL</label><input id="backdrop">
-        <label>Trailer (Direct URL)</label><input id="trailer">
-        <label>Description</label><textarea id="desc" rows="3"></textarea>
-
-        <div id="movie-area">
-            <h3 style="color:var(--primary); margin-top:30px;">Downloads</h3>
-            <div id="movie-links"></div>
-            <button class="btn-small" onclick="addMovieLink()">+ Add Quality</button>
+        <div class="item-box">
+            <h3>2. Edit Existing Database</h3>
+            <select id="db-list" onchange="loadFromDB(this.value)">
+                <option value="">Select a movie to edit...</option>
+            </select>
         </div>
 
-        <div id="series-area" class="hidden">
-            <h3 style="color:var(--primary); margin-top:30px;">Seasons & Episodes</h3>
-            <div id="season-list"></div>
-            <button class="btn-small" onclick="addSeason()">+ Add Season</button>
+        <hr style="border-color:#333; margin: 30px 0;">
+
+        <div id="editor-area">
+            <h2>Metadata Editor</h2>
+            
+            <label>Unique ID (IMDb ID preferred)</label>
+            <input id="id" placeholder="tt1234567">
+
+            <label>Type</label>
+            <select id="type" onchange="toggleType()">
+                <option value="Movie">Movie</option>
+                <option value="TV Series">TV Series</option>
+            </select>
+
+            <label>Title</label>
+            <input id="title">
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+                <input id="year" placeholder="Year">
+                <input id="rating" placeholder="Rating">
+                <input id="genre" placeholder="Genres">
+            </div>
+
+            <label>Poster URL</label>
+            <input id="poster" onchange="document.getElementById('preview-poster').src = this.value">
+            <img id="preview-poster" style="height:100px; border-radius:4px; margin-bottom:10px;">
+
+            <label>Backdrop URL</label>
+            <input id="backdrop">
+
+            <label>Trailer URL (YouTube)</label>
+            <input id="trailer">
+
+            <label>Description</label>
+            <textarea id="desc" rows="4"></textarea>
+
+            <div id="movie-area">
+                <h3>Download Links</h3>
+                <div id="movie-links"></div>
+                <button class="btn-small" onclick="addMovieLink()">+ Add Quality</button>
+            </div>
+
+            <div id="series-area" style="display:none;">
+                <h3>Seasons & Episodes</h3>
+                <div id="season-list"></div>
+                <div style="margin-top:10px;">
+                    <button class="btn-small" onclick="addSeason()">+ Manually Add Season</button>
+                </div>
+            </div>
+
+            <br><br>
+            <div style="padding:15px; background: rgba(255,0,0,0.1); border: 1px solid red; border-radius: 8px;">
+                <strong>Admin Note:</strong> Changes are not live until you click "SAVE JSON FILE" at the top, copy the code, and update <code>movies.json</code> in your file manager.
+            </div>
         </div>
 
-        <button class="btn" onclick="generate()">Generate JSON Code</button>
-        <textarea id="output" rows="10" style="margin-top:20px; font-family:monospace; color:#0f0; background:#000; width:100%; border:1px solid #333;"></textarea>
+    </div>
+
+    <div id="output-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:2000; padding:50px;">
+        <h2 style="color:#fff;">Copy This Code</h2>
+        <p>Replace everything in your <code>movies.json</code> file with this:</p>
+        <textarea id="final-output" style="width:100%; height:70vh;"></textarea>
+        <button onclick="document.getElementById('output-modal').style.display='none'">Close</button>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('final-output').value); alert('Copied!')">Copy to Clipboard</button>
     </div>
 
     <script src="../config.js"></script>
     <script src="../app.js"></script>
     <script>
-        const PASS = "1234"; // Update your password here
-
+        // --- SETUP ---
+        const PASS = "1234"; 
+        const API_KEY = "f5f082e0d376269661571d440079075e"; // Free Demo Key (Replace with yours for limit removal)
+        let currentDB = []; // Stores the whole movies.json
+        
+        // --- LOGIN & INIT ---
         function checkPass() {
             if(document.getElementById('pass').value === PASS) {
                 document.getElementById('login').style.display = 'none';
                 document.getElementById('panel').style.display = 'block';
+                loadCurrentDB();
             } else alert('Wrong Password');
+        }
+
+        // Load existing movies.json to memory
+        function loadCurrentDB() {
+            fetch('../movies.json?t=' + Date.now())
+                .then(r => r.json())
+                .then(data => {
+                    currentDB = data;
+                    const sel = document.getElementById('db-list');
+                    sel.innerHTML = '<option value="">Select a movie to edit...</option>';
+                    // Sort by newest first
+                    data.reverse().forEach((m, idx) => {
+                        sel.innerHTML += `<option value="${idx}">${m.title} (${m.year})</option>`;
+                    });
+                    // Restore order for saving
+                    data.reverse(); 
+                });
+        }
+
+        // --- TMDB SMART SEARCH ---
+        async function searchTMDB() {
+            const query = document.getElementById('tmdb-search').value;
+            if(!query) return;
+            
+            const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            
+            const container = document.getElementById('tmdb-results');
+            container.innerHTML = '';
+            
+            data.results.forEach(item => {
+                if(item.media_type !== 'movie' && item.media_type !== 'tv') return;
+                const title = item.title || item.name;
+                const year = (item.release_date || item.first_air_date || '').split('-')[0];
+                const poster = item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : 'https://via.placeholder.com/200x300';
+                
+                // Check if already in DB
+                const exists = currentDB.find(x => x.title === title && x.year == year);
+                const border = exists ? 'border: 2px solid #10b981;' : '';
+                
+                container.innerHTML += `
+                    <div class="res-card" style="${border}" onclick="fetchTMDBDetails('${item.id}', '${item.media_type}')">
+                        <img src="${poster}" class="res-poster">
+                        <div class="res-title">${title} (${year})</div>
+                        ${exists ? '<div style="color:#10b981; font-size:0.6rem; text-align:center;">IN DATABASE</div>' : ''}
+                    </div>
+                `;
+            });
+        }
+
+        // --- FETCH DETAILS & AUTO FILL ---
+        async function fetchTMDBDetails(id, type) {
+            // 1. Fetch Main Details
+            const res = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&append_to_response=videos,external_ids`);
+            const data = await res.json();
+
+            // 2. Fetch IMDb ID (Preferred ID)
+            let imdbId = data.external_ids ? data.external_ids.imdb_id : null;
+            if(!imdbId) imdbId = type + '-' + id; // Fallback ID
+
+            // 3. Check if we are updating existing or creating new
+            const existingIndex = currentDB.findIndex(x => x.id === imdbId || x.title === (data.title || data.name));
+            
+            if(existingIndex > -1) {
+                if(!confirm("This movie/series is already in your database. Do you want to overwrite its Metadata with new data from TMDB? (Download links will be preserved)")) return;
+                // We keep download links from existing, update metadata
+                populateForm(data, type, imdbId, currentDB[existingIndex]);
+            } else {
+                populateForm(data, type, imdbId, null);
+            }
+        }
+
+        async function populateForm(data, type, imdbId, existingData) {
+            // Basic Fields
+            document.getElementById('id').value = existingData ? existingData.id : imdbId;
+            document.getElementById('type').value = type === 'movie' ? 'Movie' : 'TV Series';
+            toggleType();
+
+            document.getElementById('title').value = data.title || data.name;
+            document.getElementById('year').value = (data.release_date || data.first_air_date || '').split('-')[0];
+            document.getElementById('rating').value = data.vote_average ? data.vote_average.toFixed(1) : '0';
+            
+            // Genres
+            const genres = data.genres.map(g => g.name).join(', ');
+            document.getElementById('genre').value = genres;
+
+            // Images
+            const poster = data.poster_path ? `https://image.tmdb.org/t/p/w500${data.poster_path}` : '';
+            const backdrop = data.backdrop_path ? `https://image.tmdb.org/t/p/original${data.backdrop_path}` : '';
+            document.getElementById('poster').value = poster;
+            document.getElementById('preview-poster').src = poster;
+            document.getElementById('backdrop').value = backdrop;
+
+            document.getElementById('desc').value = data.overview;
+
+            // Trailer
+            const vid = data.videos.results.find(v => v.type === "Trailer" && v.site === "YouTube");
+            document.getElementById('trailer').value = vid ? `https://www.youtube.com/watch?v=${vid.key}` : '';
+
+            // --- HANDLING DOWNLOAD LINKS ---
+            
+            // CASE A: MOVIE
+            if(type === 'movie') {
+                document.getElementById('movie-links').innerHTML = '';
+                
+                // If existing links, restore them
+                if(existingData && existingData.downloads) {
+                    existingData.downloads.forEach(d => addMovieLink(d));
+                } else {
+                    addMovieLink(); // Add one empty row
+                }
+            }
+
+            // CASE B: TV SERIES (The Magic Part)
+            if(type === 'tv' || type === 'TV Series') {
+                const seasonContainer = document.getElementById('season-list');
+                seasonContainer.innerHTML = ''; // Clear
+
+                // If updating, we map existing links to the new structure
+                // But first, let's fetch ALL seasons/episodes from TMDB to be "Smart"
+                
+                // Determine number of seasons
+                const seasonCount = data.number_of_seasons;
+                
+                // Loop through seasons (Limit to first 10 to avoid API rate limits/browser freeze)
+                for(let s = 1; s <= seasonCount; s++) {
+                    // Try to find existing data for this season
+                    let existSeason = existingData && existingData.seasons ? existingData.seasons.find(sea => sea.name.includes(`Season ${s}`)) : null;
+
+                    // Fetch Season Details
+                    const sRes = await fetch(`https://api.themoviedb.org/3/tv/${data.id}/season/${s}?api_key=${API_KEY}`);
+                    const sData = await sRes.json();
+
+                    // Create Season UI
+                    const sDiv = document.createElement('div');
+                    sDiv.className = 'item-box';
+                    sDiv.style.borderColor = 'var(--primary)';
+                    const sId = 'season-' + s;
+                    
+                    sDiv.innerHTML = `
+                        <input value="${sData.name || 'Season ' + s}" class="s-name" style="margin-bottom:10px; font-weight:bold;">
+                        <div id="${sId}" style="margin-left:10px; border-left:1px solid #333; padding-left:10px;"></div>
+                        <button class="btn-small" onclick="addEpisode('${sId}')" style="margin-top:10px;">+ Add Extra Episode</button>
+                    `;
+                    seasonContainer.appendChild(sDiv);
+
+                    // Add Episodes
+                    if(sData.episodes) {
+                        sData.episodes.forEach(ep => {
+                            // Check if we have links for this episode in DB
+                            let existEp = existSeason ? existSeason.episodes.find(e => e.title.includes(ep.name) || e.title.startsWith(`Episode ${ep.episode_number}`)) : null;
+                            
+                            addEpisode(sId, {
+                                title: `${ep.episode_number}. ${ep.name}`,
+                                links: existEp ? existEp.links : []
+                            });
+                        });
+                    }
+                }
+            }
+        }
+
+        // --- INTERNAL EDITOR LOGIC ---
+
+        function createNew() {
+            document.querySelectorAll('input').forEach(i => i.value = '');
+            document.querySelectorAll('textarea').forEach(i => i.value = '');
+            document.getElementById('movie-links').innerHTML = '';
+            document.getElementById('season-list').innerHTML = '';
+            document.getElementById('preview-poster').src = '';
+            addMovieLink();
+        }
+
+        function loadFromDB(index) {
+            if(index === "") return;
+            const data = currentDB[index];
+            // We reuse populateForm but pass dummy TMDB data to bypass fetching if just editing
+            // Or better, just map fields manually
+            document.getElementById('id').value = data.id;
+            document.getElementById('type').value = data.type;
+            toggleType();
+            document.getElementById('title').value = data.title;
+            document.getElementById('year').value = data.year;
+            document.getElementById('rating').value = data.rating;
+            document.getElementById('genre').value = data.genre;
+            document.getElementById('poster').value = data.poster;
+            document.getElementById('preview-poster').src = data.poster;
+            document.getElementById('backdrop').value = data.backdrop;
+            document.getElementById('desc').value = data.description;
+            document.getElementById('trailer').value = data.trailer_embed;
+
+            if(data.type === 'Movie') {
+                document.getElementById('movie-links').innerHTML = '';
+                if(data.downloads) data.downloads.forEach(d => addMovieLink(d));
+                else addMovieLink();
+            } else {
+                document.getElementById('season-list').innerHTML = '';
+                if(data.seasons) {
+                    data.seasons.forEach((s, i) => {
+                        const sId = 'season-edit-' + i;
+                        const sDiv = document.createElement('div');
+                        sDiv.className = 'item-box';
+                        sDiv.style.borderColor = 'var(--primary)';
+                        sDiv.innerHTML = `
+                            <input value="${s.name}" class="s-name" style="margin-bottom:10px; font-weight:bold;">
+                            <div id="${sId}" style="margin-left:10px; border-left:1px solid #333; padding-left:10px;"></div>
+                            <button class="btn-small" onclick="addEpisode('${sId}')" style="margin-top:10px;">+ Add Episode</button>
+                        `;
+                        document.getElementById('season-list').appendChild(sDiv);
+                        
+                        s.episodes.forEach(ep => addEpisode(sId, ep));
+                    });
+                }
+            }
         }
 
         function toggleType() {
@@ -90,49 +365,68 @@
             document.getElementById('series-area').style.display = isSeries ? 'block' : 'none';
         }
 
-        // --- DYNAMIC UI ---
-        function addMovieLink() {
+        // --- DYNAMIC UI GENERATORS ---
+
+        function addMovieLink(data = null) {
             const div = document.createElement('div');
             div.className = 'item-box row';
-            div.innerHTML = `<input placeholder="Quality (1080p)" class="q"><input placeholder="Size (2GB)" class="s"><input placeholder="Link" class="l" style="grid-column:span 2">`;
+            div.innerHTML = `
+                <input placeholder="Quality (1080p)" class="q" value="${data ? data.quality : ''}">
+                <input placeholder="Size (2GB)" class="s" value="${data ? data.size : ''}">
+                <input placeholder="Link" class="l" style="grid-column:span 2" value="${data ? (CONFIG.fileBaseUrl + data.link) : ''}">
+                <button class="btn-danger btn-small" onclick="this.parentElement.remove()">X</button>
+            `;
             document.getElementById('movie-links').appendChild(div);
         }
 
         function addSeason() {
+            const sId = 'season-man-' + Date.now();
             const div = document.createElement('div');
             div.className = 'item-box';
             div.style.borderColor = 'var(--primary)';
-            const sId = 'season-' + Date.now();
             div.innerHTML = `
-                <input placeholder="Season Name (e.g. Season 1)" class="s-name" style="margin-bottom:10px; font-weight:bold;">
+                <input placeholder="Season Name" class="s-name" value="Season 1" style="margin-bottom:10px; font-weight:bold;">
                 <div id="${sId}" style="margin-left:10px; border-left:1px solid #333; padding-left:10px;"></div>
                 <button class="btn-small" onclick="addEpisode('${sId}')" style="margin-top:10px;">+ Add Episode</button>
+                <button class="btn-danger btn-small" onclick="this.parentElement.remove()">Remove Season</button>
             `;
             document.getElementById('season-list').appendChild(div);
         }
 
-        function addEpisode(seasonId) {
+        function addEpisode(seasonId, data = null) {
             const div = document.createElement('div');
             div.className = 'item-box'; 
             div.style.background = 'rgba(255,255,255,0.02)';
             const epId = 'ep-' + Math.random().toString(36).substr(2, 9);
+            
             div.innerHTML = `
-                <input placeholder="Episode Title (e.g. Episode 1)" class="e-title">
+                <input placeholder="Episode Title" class="e-title" value="${data ? data.title : ''}">
                 <div id="${epId}"></div>
                 <button class="btn-small" onclick="addEpLink('${epId}')">+ Add Quality Link</button>
+                <button class="btn-danger btn-small" onclick="this.parentElement.remove()">X</button>
             `;
             document.getElementById(seasonId).appendChild(div);
-            addEpLink(epId);
+            
+            if(data && data.links) {
+                data.links.forEach(l => addEpLink(epId, l));
+            } else {
+                addEpLink(epId);
+            }
         }
 
-        function addEpLink(epId) {
+        function addEpLink(epId, data = null) {
             const div = document.createElement('div');
             div.className = 'sub-item-box row';
-            div.innerHTML = `<input placeholder="Quality (1080p)" class="l-label"><input placeholder="Size" class="l-size"><input placeholder="Link" class="l-url" style="grid-column:span 2">`;
+            div.innerHTML = `
+                <input placeholder="Quality" class="l-label" value="${data ? (data.label || data.quality) : ''}">
+                <input placeholder="Size" class="l-size" value="${data ? data.size : ''}">
+                <input placeholder="Link" class="l-url" style="grid-column:span 2" value="${data ? (CONFIG.fileBaseUrl + data.link) : ''}">
+                <button class="btn-danger btn-small" onclick="this.parentElement.remove()">X</button>
+            `;
             document.getElementById(epId).appendChild(div);
         }
 
-        // --- INTELLIGENT HELPERS ---
+        // --- SAVING LOGIC (THE "DATABASE" UPDATER) ---
 
         function getEmbedUrl(url) {
             if (!url) return "";
@@ -144,20 +438,17 @@
             return url;
         }
 
-        // --- THE GENIUS CLEANER ---
-        // This function automatically detects your domain from config.js and removes it.
         function cleanDownLink(url) {
             if(!url) return "";
             const base = CONFIG.fileBaseUrl;
-            
-            // If the link starts with your Base URL, remove it.
             if(base && url.startsWith(base)) {
-                return url.replace(base, ""); // Returns just "Folder/Movie.mkv"
+                return url.replace(base, "");
             }
-            return url; // Returns full link if it's external
+            return url;
         }
 
-        function generate() {
+        function saveAll() {
+            // 1. Capture current form data
             let obj = {
                 id: document.getElementById('id').value,
                 type: document.getElementById('type').value,
@@ -168,7 +459,8 @@
                 poster: document.getElementById('poster').value,
                 backdrop: document.getElementById('backdrop').value,
                 description: document.getElementById('desc').value,
-                trailer_embed: getEmbedUrl(document.getElementById('trailer').value)
+                trailer_embed: getEmbedUrl(document.getElementById('trailer').value),
+                date_added: new Date().toISOString() // Good for sorting later
             };
 
             if (obj.type === 'Movie') {
@@ -179,8 +471,7 @@
                         obj.downloads.push({
                             quality: row.querySelector('.q').value,
                             size: row.querySelector('.s').value,
-                            // Apply the cleaner here
-                            link: cleanDownLink(rawLink) 
+                            link: cleanDownLink(rawLink)
                         });
                     }
                 });
@@ -188,7 +479,6 @@
                 obj.seasons = [];
                 document.querySelectorAll('#season-list > .item-box').forEach(sDiv => {
                     let season = { name: sDiv.querySelector('.s-name').value, episodes: [] };
-                    
                     sDiv.querySelectorAll('div[id^="season-"] > .item-box').forEach(epDiv => {
                         let ep = { title: epDiv.querySelector('.e-title').value, links: [] };
                         epDiv.querySelectorAll('.sub-item-box').forEach(lDiv => {
@@ -197,8 +487,7 @@
                                 ep.links.push({
                                     label: lDiv.querySelector('.l-label').value,
                                     size: lDiv.querySelector('.l-size').value,
-                                    // Apply the cleaner here
-                                    link: cleanDownLink(rawLink) 
+                                    link: cleanDownLink(rawLink)
                                 });
                             }
                         });
@@ -208,7 +497,18 @@
                 });
             }
 
-            document.getElementById('output').value = ",\n" + JSON.stringify(obj, null, 2);
+            // 2. Update Database Array
+            const idx = currentDB.findIndex(x => x.id === obj.id);
+            if(idx > -1) {
+                currentDB[idx] = obj; // Update existing
+            } else {
+                currentDB.push(obj); // Add new
+            }
+
+            // 3. Output
+            const json = JSON.stringify(currentDB, null, 2);
+            document.getElementById('final-output').value = json;
+            document.getElementById('output-modal').style.display = 'block';
         }
     </script>
 </body>
