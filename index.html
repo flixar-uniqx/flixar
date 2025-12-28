@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
-        /* --- HERO CAROUSEL (Fixed Navigation) --- */
+        /* --- 1. HERO CAROUSEL (Premium Style) --- */
         .hero-section {
             position: relative; width: 100%; height: 500px;
             border-radius: var(--radius); overflow: hidden; margin-bottom: 30px;
@@ -21,109 +21,127 @@
         }
         .hero-slide {
             position: absolute; inset: 0; background-size: cover; background-position: center top;
-            opacity: 0; transition: opacity 0.8s ease; z-index: 1;
+            opacity: 0; transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1;
         }
         .hero-slide.active { opacity: 1; z-index: 2; }
         
         .hero-overlay {
             position: absolute; inset: 0;
-            /* Darker bottom to protect text/nav */
-            background: linear-gradient(to top, #000 0%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0.2) 100%);
-            z-index: 3; display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;
+            background: linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, transparent 100%);
+            z-index: 3; display: flex; flex-direction: column; justify-content: center; padding: 60px;
         }
 
         .hero-content { 
             position: relative; z-index: 4; max-width: 650px; 
             transform: translateY(20px); opacity: 0; transition: 0.6s 0.2s;
-            /* Added padding bottom to avoid overlap with dots on mobile */
-            padding-bottom: 40px; 
         }
         .hero-slide.active .hero-content { transform: translateY(0); opacity: 1; }
 
-        .hero-badges { display: flex; gap: 10px; margin-bottom: 10px; }
+        .hero-badges { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
         .hero-pill { 
-            background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); 
-            padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; color: #fff;
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); 
+            padding: 5px 14px; border-radius: 50px; font-size: 0.8rem; font-weight: 700; 
+            border: 1px solid rgba(255,255,255,0.1); color: #eee; display: flex; align-items: center; gap: 6px;
         }
-        .hero-rating { background: #eab308; color: #000; }
+        .hero-rating { background: #eab308; color: #000; border: none; }
 
         .hero-title {
-            font-size: 3rem; font-weight: 800; line-height: 1.1; margin: 0 0 10px 0;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.8); font-family: 'Raleway', sans-serif; color: #fff;
+            font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin: 0 0 15px 0;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.8); font-family: 'Raleway', sans-serif; color: #fff;
         }
         .hero-desc {
-            font-size: 1rem; color: #ccc; margin-bottom: 20px; line-height: 1.5;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-            overflow: hidden; max-width: 500px;
+            font-size: 1rem; color: #ccc; margin-bottom: 30px; line-height: 1.6;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+            overflow: hidden; max-width: 550px;
         }
 
         .hero-btn {
-            display: inline-flex; align-items: center; gap: 8px; padding: 10px 28px;
-            background: var(--primary); color: #000; font-weight: 800; font-size: 0.9rem;
+            display: inline-flex; align-items: center; gap: 10px; padding: 12px 35px;
+            background: var(--primary); color: #000; font-weight: 800; font-size: 0.95rem;
             border-radius: 99px; text-transform: uppercase; letter-spacing: 0.5px;
             box-shadow: 0 0 20px var(--shadow-color); transition: 0.3s;
         }
+        .hero-btn:hover { transform: scale(1.05); background: #fff; }
 
-        /* Controls - Fixed Position */
-        .hero-nav { position: absolute; bottom: 20px; right: 20px; z-index: 10; display: flex; gap: 10px; }
+        /* Hero Navigation */
+        .hero-nav { position: absolute; bottom: 30px; right: 30px; z-index: 10; display: flex; gap: 12px; }
         .hero-arrow {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: #fff;
+            width: 45px; height: 45px; border-radius: 50%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2); color: #fff;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.2s;
+            cursor: pointer; transition: 0.2s; font-size: 1.2rem;
         }
-        .hero-dots { position: absolute; bottom: 20px; left: 40px; z-index: 10; display: flex; gap: 6px; }
-        .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.3); border-radius: 50%; transition: 0.3s; }
-        .dot.active { width: 20px; border-radius: 10px; background: var(--primary); }
+        .hero-arrow:hover { background: var(--primary); color: #000; border-color: var(--primary); }
+        
+        .hero-dots { position: absolute; bottom: 30px; left: 60px; z-index: 10; display: flex; gap: 8px; }
+        .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.3); border-radius: 50%; transition: 0.3s; cursor: pointer; }
+        .dot.active { width: 25px; border-radius: 10px; background: var(--primary); }
 
-        /* --- HORIZONTAL SECTIONS (Netflix Style) --- */
-        .h-section { margin-bottom: 40px; }
-        .h-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; color:#fff; font-weight:800; font-size:1.2rem; border-left: 4px solid var(--primary); padding-left: 12px; }
+        /* --- 2. HORIZONTAL SECTIONS (Identical Styling to Grid) --- */
+        .h-section { margin-bottom: 50px; }
+        .h-header { 
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; 
+            color:#fff; font-weight:800; font-size:1.4rem; font-family: 'Raleway', sans-serif;
+            border-left: 5px solid var(--primary); padding-left: 15px; 
+        }
         
         .h-scroll {
-            display: grid;
-            grid-auto-flow: column;
-            grid-auto-columns: 160px; /* Fixed card width */
-            gap: 15px;
+            display: flex;
+            gap: 20px;
             overflow-x: auto;
-            padding-bottom: 20px;
+            padding: 10px 5px 30px 5px; /* Extra bottom padding for hover effects */
             scroll-behavior: smooth;
+            scrollbar-width: none;
+            scroll-snap-type: x mandatory;
         }
-        /* Mobile: smaller cards */
-        @media(max-width: 600px) { .h-scroll { grid-auto-columns: 130px; } }
+        .h-scroll::-webkit-scrollbar { display: none; }
+        
+        /* Enforce Width on Horizontal Cards */
+        .h-scroll .card {
+            min-width: 170px;
+            width: 170px;
+            scroll-snap-align: start;
+        }
 
-        /* --- FILTERS --- */
+        /* --- 3. FILTERS --- */
         .genre-scroll {
             display: flex; gap: 10px; overflow-x: auto; 
-            padding: 5px 5px 15px 5px; margin-bottom: 20px;
+            padding: 5px 5px 25px 5px; margin-bottom: 10px;
             scrollbar-width: none;
         }
         .filter-pill {
-            white-space: nowrap; padding: 8px 16px; background: rgba(255,255,255,0.05);
+            white-space: nowrap; padding: 10px 22px; background: rgba(255,255,255,0.05);
             border: 1px solid var(--border); border-radius: 99px; color: var(--text-dim);
-            font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.2s; user-select: none;
+            font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s; user-select: none;
         }
-        .filter-pill.active { background: var(--primary); color: #000; border-color: var(--primary); }
+        .filter-pill:hover, .filter-pill.active {
+            background: rgba(255,255,255,0.15); border-color: var(--primary);
+            color: #fff; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
 
-        /* --- PAGINATION --- */
+        /* --- 4. PAGINATION --- */
         .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 50px; flex-wrap: wrap; }
         .page-btn {
-            min-width: 35px; height: 35px; padding: 0 10px; display: flex; align-items: center; justify-content: center;
-            background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
-            color: var(--text-dim); cursor: pointer; transition: 0.2s; font-weight: 700; font-size: 0.85rem;
+            min-width: 40px; height: 40px; padding: 0 10px; display: flex; align-items: center; justify-content: center;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+            color: var(--text-dim); cursor: pointer; transition: 0.2s; font-weight: 700; font-size: 0.9rem;
         }
-        .page-btn.active { background: var(--primary); color: #000; }
+        .page-btn:hover, .page-btn.active { background: var(--primary); color: #000; border-color: var(--primary); }
 
-        /* --- MOBILE TWEAKS --- */
+        /* --- MOBILE --- */
         @media(max-width: 768px) {
-            .hero-section { height: 420px; }
-            .hero-title { font-size: 1.8rem; }
-            .hero-nav { display: none; } /* Hide arrows on phones */
-            .hero-dots { left: 50%; transform: translateX(-50%); }
-            .hero-content { align-items: center; text-align: center; max-width: 100%; padding-bottom: 50px; }
-            .hero-badges { justify-content: center; }
+            .hero-section { height: 450px; margin-bottom: 20px; }
+            .hero-overlay { background: linear-gradient(to top, rgba(0,0,0,0.95) 15%, transparent 100%); padding: 20px; justify-content: flex-end; }
+            .hero-title { font-size: 2.2rem; }
+            .hero-desc { font-size: 0.9rem; -webkit-line-clamp: 2; }
+            .hero-nav { display: none; } 
+            .hero-dots { left: 50%; transform: translateX(-50%); bottom: 20px; }
+            .container { padding: 15px 10px; }
             
-            .container { padding: 15px; }
+            /* Mobile Cards */
+            .h-scroll .card { min-width: 135px; width: 135px; }
+            .h-header { font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -136,6 +154,12 @@
         <div class="genre-scroll" id="dynamic-filters"></div>
 
         <div id="featured-rows">
+            
+            <div class="h-section">
+                <div class="h-header">Latest Uploads</div>
+                <div class="h-scroll" id="row-latest"></div>
+            </div>
+
             <div class="h-section">
                 <div class="h-header">Latest Movies <span style="font-size:0.8rem; opacity:0.7; font-weight:400; cursor:pointer;" onclick="applyFilter('Movie')">View All</span></div>
                 <div class="h-scroll" id="row-movies"></div>
@@ -166,6 +190,7 @@
         let currentPage = 1;
         const ITEMS_PER_PAGE = 24; 
         
+        // Slider State
         let currentSlide = 0;
         let slideInterval;
         let touchStartX = 0;
@@ -183,11 +208,12 @@
                     initHero(db.slice(0, 5));
                     initFilters();
                     
-                    // Render Horizontal Rows
-                    renderHorizontalRow('row-movies', db.filter(m => m.type === 'Movie').slice(0, 8));
-                    renderHorizontalRow('row-series', db.filter(m => m.type === 'TV Series' || m.type === 'tv').slice(0, 8));
+                    // Render Horizontal Rows (Using Shared Card Logic)
+                    renderHorizontalRow('row-latest', db.slice(0, 10)); // Top 10 mixed
+                    renderHorizontalRow('row-movies', db.filter(m => m.type === 'Movie').slice(0, 10)); // Top 10 Movies
+                    renderHorizontalRow('row-series', db.filter(m => m.type === 'TV Series' || m.type === 'tv').slice(0, 10)); // Top 10 Series
 
-                    // Check URL Params
+                    // Initial Page Load
                     const params = new URLSearchParams(window.location.search);
                     if(params.has('genre')) applyFilter(params.get('genre'));
                     else if(params.has('year')) applyFilter(params.get('year'));
@@ -198,13 +224,22 @@
                 .catch(err => console.error(err));
         });
 
-        // --- URL FIXER ---
-        function getPageLink(m) {
+        // --- SHARED CARD GENERATOR (Ensures Styling Consistency) ---
+        function createCardHTML(m, customClass = "") {
             const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
-            // Correctly uses resolveLink from app.js without double slashes
-            const base = resolveLink(folder); 
-            // Handle trailing slash issues safely
-            return base.endsWith('/') ? `${base}?id=${m.id}` : `${base}/?id=${m.id}`;
+            const link = resolveLink(`${folder}/?id=${m.id}`);
+            
+            return `
+                <div class="card reveal ${customClass}" onclick="window.location.href='${link}'">
+                    <img src="${m.poster}" class="poster" loading="lazy" alt="${m.title}">
+                    <div class="card-info">
+                        <div class="card-title">${m.title}</div>
+                        <div class="card-meta">
+                            <span>${m.year}</span>
+                            <span class="badge">${m.type}</span>
+                        </div>
+                    </div>
+                </div>`;
         }
 
         // --- 1. HERO SYSTEM ---
@@ -216,7 +251,8 @@
             let dotsHTML = '';
 
             featured.forEach((m, idx) => {
-                const link = getPageLink(m);
+                const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
+                const link = resolveLink(`${folder}/?id=${m.id}`);
                 const bg = m.backdrop || m.poster;
                 const active = idx === 0 ? 'active' : '';
 
@@ -251,6 +287,7 @@
             `;
             container.style.display = 'block';
 
+            // Swipe Logic
             container.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
             container.addEventListener('touchend', e => {
                 if (e.changedTouches[0].screenX < touchStartX - 50) changeSlide(1);
@@ -281,14 +318,13 @@
             const container = document.getElementById(elementId);
             if(!items.length) { container.parentElement.style.display = 'none'; return; }
             
-            container.innerHTML = items.map(m => `
-                <div class="card" onclick="window.location.href='${getPageLink(m)}'" style="min-width:140px;">
-                    <img src="${m.poster}" class="poster" loading="lazy" alt="${m.title}">
-                    <div class="card-info">
-                        <div class="card-title">${m.title}</div>
-                        <div class="card-meta"><span>${m.year}</span><span class="badge">${m.type}</span></div>
-                    </div>
-                </div>`).join('');
+            // Uses the SAME generateCardHTML function to ensure styling matches 100%
+            container.innerHTML = items.map(m => createCardHTML(m)).join('');
+            
+            // Trigger animation for horizontal items
+            setTimeout(() => {
+                container.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
+            }, 100);
         }
 
         // --- 3. FILTERS ---
@@ -347,21 +383,17 @@
             const pageItems = filteredDB.slice(start, start + ITEMS_PER_PAGE);
 
             if(pageItems.length === 0) {
-                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px;">No results.</div>`;
+                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px;">No results found.</div>`;
             } else {
+                // Uses the SAME generateCardHTML function
                 pageItems.forEach(m => {
-                    grid.innerHTML += `
-                        <div class="card reveal" onclick="window.location.href='${getPageLink(m)}'">
-                            <img src="${m.poster}" class="poster" loading="lazy">
-                            <div class="card-info">
-                                <div class="card-title">${m.title}</div>
-                                <div class="card-meta"><span>${m.year}</span><span class="badge">${m.type}</span></div>
-                            </div>
-                        </div>`;
+                    grid.innerHTML += createCardHTML(m);
                 });
             }
             
-            setTimeout(() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('active')), 50);
+            // Animation
+            setTimeout(() => document.querySelectorAll('#movie-grid .reveal').forEach(el => el.classList.add('active')), 50);
+            
             renderControls();
             if(page > 1) document.getElementById('grid-header').scrollIntoView({ behavior: 'smooth' });
         }
@@ -372,7 +404,6 @@
             if(totalPages <= 1) { container.innerHTML = ''; return; }
 
             let html = `<div class="page-btn" onclick="renderPage(${currentPage - 1})" ${currentPage === 1 ? 'style="opacity:0.3;pointer-events:none"' : ''}>Prev</div>`;
-            
             for(let i = 1; i <= totalPages; i++) {
                 if(i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
                     html += `<div class="page-btn ${i === currentPage ? 'active' : ''}" onclick="renderPage(${i})">${i}</div>`;
