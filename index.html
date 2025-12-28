@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- SEO -->
     <title>StreamHub - Watch Movies & Series</title>
     <meta name="description" content="Stream and download high-quality movies and TV series.">
     <meta property="og:site_name" content="StreamHub">
@@ -12,74 +11,86 @@
 
     <link rel="stylesheet" href="style.css">
 
-    <!-- PAGE SPECIFIC STYLES -->
     <style>
-        /* --- HERO CAROUSEL --- */
+        /* --- HERO CAROUSEL (Fixed Navigation) --- */
         .hero-section {
             position: relative; width: 100%; height: 500px;
             border-radius: var(--radius); overflow: hidden; margin-bottom: 30px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid var(--border);
-            display: none; /* Hidden until loaded */
+            display: none; 
         }
         .hero-slide {
             position: absolute; inset: 0; background-size: cover; background-position: center top;
-            opacity: 0; transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1;
+            opacity: 0; transition: opacity 0.8s ease; z-index: 1;
         }
         .hero-slide.active { opacity: 1; z-index: 2; }
         
         .hero-overlay {
             position: absolute; inset: 0;
-            background: linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, transparent 100%);
-            z-index: 3; display: flex; flex-direction: column; justify-content: center; padding: 60px;
+            /* Darker bottom to protect text/nav */
+            background: linear-gradient(to top, #000 0%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0.2) 100%);
+            z-index: 3; display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;
         }
 
         .hero-content { 
             position: relative; z-index: 4; max-width: 650px; 
             transform: translateY(20px); opacity: 0; transition: 0.6s 0.2s;
+            /* Added padding bottom to avoid overlap with dots on mobile */
+            padding-bottom: 40px; 
         }
         .hero-slide.active .hero-content { transform: translateY(0); opacity: 1; }
 
-        .hero-badges { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .hero-badges { display: flex; gap: 10px; margin-bottom: 10px; }
         .hero-pill { 
-            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); 
-            padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; 
-            border: 1px solid rgba(255,255,255,0.1); color: #eee;
+            background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); 
+            padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; color: #fff;
         }
-        .hero-rating { background: #eab308; color: #000; border: none; }
+        .hero-rating { background: #eab308; color: #000; }
 
         .hero-title {
-            font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin: 0 0 15px 0;
-            text-shadow: 0 2px 20px rgba(0,0,0,0.8); font-family: 'Raleway', sans-serif;
-            color: #fff;
+            font-size: 3rem; font-weight: 800; line-height: 1.1; margin: 0 0 10px 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8); font-family: 'Raleway', sans-serif; color: #fff;
         }
         .hero-desc {
-            font-size: 1rem; color: #ccc; margin-bottom: 30px; line-height: 1.6;
-            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
-            overflow: hidden; text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            font-size: 1rem; color: #ccc; margin-bottom: 20px; line-height: 1.5;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+            overflow: hidden; max-width: 500px;
         }
 
         .hero-btn {
-            display: inline-flex; align-items: center; gap: 10px; padding: 12px 32px;
-            background: var(--primary); color: #000; font-weight: 800; font-size: 0.95rem;
+            display: inline-flex; align-items: center; gap: 8px; padding: 10px 28px;
+            background: var(--primary); color: #000; font-weight: 800; font-size: 0.9rem;
             border-radius: 99px; text-transform: uppercase; letter-spacing: 0.5px;
             box-shadow: 0 0 20px var(--shadow-color); transition: 0.3s;
         }
-        .hero-btn:hover { transform: scale(1.05); background: #fff; }
 
-        /* Controls */
-        .hero-nav { position: absolute; bottom: 30px; right: 30px; z-index: 10; display: flex; gap: 12px; }
+        /* Controls - Fixed Position */
+        .hero-nav { position: absolute; bottom: 20px; right: 20px; z-index: 10; display: flex; gap: 10px; }
         .hero-arrow {
-            width: 44px; height: 44px; border-radius: 50%;
-            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2); color: #fff;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: #fff;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: 0.2s;
         }
-        .hero-arrow:hover { background: var(--primary); color: #000; }
+        .hero-dots { position: absolute; bottom: 20px; left: 40px; z-index: 10; display: flex; gap: 6px; }
+        .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.3); border-radius: 50%; transition: 0.3s; }
+        .dot.active { width: 20px; border-radius: 10px; background: var(--primary); }
+
+        /* --- HORIZONTAL SECTIONS (Netflix Style) --- */
+        .h-section { margin-bottom: 40px; }
+        .h-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; color:#fff; font-weight:800; font-size:1.2rem; border-left: 4px solid var(--primary); padding-left: 12px; }
         
-        .hero-dots { position: absolute; bottom: 30px; left: 60px; z-index: 10; display: flex; gap: 8px; }
-        .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.3); border-radius: 50%; transition: 0.3s; cursor: pointer; }
-        .dot.active { width: 24px; border-radius: 10px; background: var(--primary); }
+        .h-scroll {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: 160px; /* Fixed card width */
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+            scroll-behavior: smooth;
+        }
+        /* Mobile: smaller cards */
+        @media(max-width: 600px) { .h-scroll { grid-auto-columns: 130px; } }
 
         /* --- FILTERS --- */
         .genre-scroll {
@@ -87,114 +98,116 @@
             padding: 5px 5px 15px 5px; margin-bottom: 20px;
             scrollbar-width: none;
         }
-        .genre-scroll::-webkit-scrollbar { display: none; }
-        
         .filter-pill {
-            white-space: nowrap; padding: 8px 20px; background: rgba(255,255,255,0.05);
+            white-space: nowrap; padding: 8px 16px; background: rgba(255,255,255,0.05);
             border: 1px solid var(--border); border-radius: 99px; color: var(--text-dim);
-            font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s; user-select: none;
+            font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.2s; user-select: none;
         }
-        .filter-pill:hover, .filter-pill.active {
-            background: rgba(255,255,255,0.15); border-color: var(--primary);
-            color: #fff; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
+        .filter-pill.active { background: var(--primary); color: #000; border-color: var(--primary); }
 
         /* --- PAGINATION --- */
         .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 50px; flex-wrap: wrap; }
         .page-btn {
-            min-width: 40px; height: 40px; padding: 0 15px; display: flex; align-items: center; justify-content: center;
-            background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-            color: var(--text-dim); cursor: pointer; transition: 0.2s; font-weight: 700; font-size: 0.9rem;
+            min-width: 35px; height: 35px; padding: 0 10px; display: flex; align-items: center; justify-content: center;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+            color: var(--text-dim); cursor: pointer; transition: 0.2s; font-weight: 700; font-size: 0.85rem;
         }
-        .page-btn:hover, .page-btn.active { background: var(--primary); color: #000; border-color: var(--primary); }
-        .page-btn.disabled { opacity: 0.3; pointer-events: none; }
+        .page-btn.active { background: var(--primary); color: #000; }
 
-        /* --- MOBILE --- */
+        /* --- MOBILE TWEAKS --- */
         @media(max-width: 768px) {
-            .hero-section { height: 400px; margin: 0 0 25px 0; width: 100%; }
-            .hero-overlay { background: linear-gradient(to top, rgba(0,0,0,0.95) 15%, transparent 100%); padding: 20px; justify-content: flex-end; }
-            .hero-title { font-size: 2rem; }
-            .hero-desc { font-size: 0.9rem; -webkit-line-clamp: 2; }
-            .hero-nav { display: none; } /* Hide arrows on mobile */
-            .hero-dots { left: 50%; transform: translateX(-50%); bottom: 15px; }
-            .container { padding: 15px 10px; }
+            .hero-section { height: 420px; }
+            .hero-title { font-size: 1.8rem; }
+            .hero-nav { display: none; } /* Hide arrows on phones */
+            .hero-dots { left: 50%; transform: translateX(-50%); }
+            .hero-content { align-items: center; text-align: center; max-width: 100%; padding-bottom: 50px; }
+            .hero-badges { justify-content: center; }
+            
+            .container { padding: 15px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- CONTAINER -->
     <div class="container">
         
-        <!-- 1. HERO SLIDER -->
         <div class="hero-section" id="hero-slider"></div>
 
-        <!-- 2. DYNAMIC FILTER BAR -->
         <div class="genre-scroll" id="dynamic-filters"></div>
 
-        <!-- 3. GRID HEADER -->
-        <div class="section-header" id="grid-header">
-            Latest Releases
-        </div>
-
-        <!-- 4. MAIN GRID -->
-        <div class="grid" id="movie-grid">
-            <div style="grid-column:1/-1; text-align:center; padding:50px; color:#666;">
-                Loading...
+        <div id="featured-rows">
+            <div class="h-section">
+                <div class="h-header">Latest Movies <span style="font-size:0.8rem; opacity:0.7; font-weight:400; cursor:pointer;" onclick="applyFilter('Movie')">View All</span></div>
+                <div class="h-scroll" id="row-movies"></div>
+            </div>
+            
+            <div class="h-section">
+                <div class="h-header">TV Series <span style="font-size:0.8rem; opacity:0.7; font-weight:400; cursor:pointer;" onclick="applyFilter('TV Series')">View All</span></div>
+                <div class="h-scroll" id="row-series"></div>
             </div>
         </div>
 
-        <!-- 5. PAGINATION -->
+        <div class="section-header" id="grid-header">All Releases</div>
+        <div class="grid" id="movie-grid">
+            <div style="grid-column:1/-1; text-align:center; padding:50px; color:#666;">Loading Library...</div>
+        </div>
+
         <div class="pagination" id="pagination-controls"></div>
 
     </div>
 
-    <!-- SCRIPTS -->
     <script src="config.js"></script>
     <script src="app.js"></script>
     
     <script>
-        // --- GLOBAL VARIABLES ---
+        // GLOBAL STATE
         let db = []; 
         let filteredDB = []; 
         let currentPage = 1;
         const ITEMS_PER_PAGE = 24; 
         
-        // Slider State
         let currentSlide = 0;
         let slideInterval;
         let touchStartX = 0;
-        let touchEndX = 0;
 
         document.addEventListener('DOMContentLoaded', () => {
             fetch('movies.json?t=' + Date.now())
                 .then(r => r.json())
                 .then(data => {
-                    if(data.length === 0) {
-                        document.getElementById('movie-grid').innerHTML = "No content.";
-                        return;
-                    }
+                    if(data.length === 0) { document.getElementById('movie-grid').innerHTML = "No content."; return; }
 
-                    // 1. Prepare Data
                     db = data.reverse(); // Newest first
                     filteredDB = [...db];
 
-                    // 2. Init UI
-                    initHero(db.slice(0, 5)); // Featured: Top 5
-                    initFilters(); // Generate Pills from DB
+                    // Init Components
+                    initHero(db.slice(0, 5));
+                    initFilters();
                     
-                    // 3. Handle URL Params (e.g. ?genre=Action)
+                    // Render Horizontal Rows
+                    renderHorizontalRow('row-movies', db.filter(m => m.type === 'Movie').slice(0, 8));
+                    renderHorizontalRow('row-series', db.filter(m => m.type === 'TV Series' || m.type === 'tv').slice(0, 8));
+
+                    // Check URL Params
                     const params = new URLSearchParams(window.location.search);
-                    if(params.has('genre')) applyFilter(params.get('genre'), null);
-                    else if(params.has('year')) applyFilter(params.get('year'), null);
-                    else if(params.has('type')) applyFilter(params.get('type'), null);
+                    if(params.has('genre')) applyFilter(params.get('genre'));
+                    else if(params.has('year')) applyFilter(params.get('year'));
+                    else if(params.has('type')) applyFilter(params.get('type'));
                     else if(params.has('search')) applySearch(params.get('search'));
-                    else renderPage(1); // Default Load
+                    else renderPage(1);
                 })
                 .catch(err => console.error(err));
         });
 
-        // --- 1. HERO LOGIC (Swipe + Auto) ---
+        // --- URL FIXER ---
+        function getPageLink(m) {
+            const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
+            // Correctly uses resolveLink from app.js without double slashes
+            const base = resolveLink(folder); 
+            // Handle trailing slash issues safely
+            return base.endsWith('/') ? `${base}?id=${m.id}` : `${base}/?id=${m.id}`;
+        }
+
+        // --- 1. HERO SYSTEM ---
         function initHero(featured) {
             const container = document.getElementById('hero-slider');
             if(!featured.length) return;
@@ -203,8 +216,7 @@
             let dotsHTML = '';
 
             featured.forEach((m, idx) => {
-                const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
-                const link = resolveLink(`${folder}/?id=${m.id}`);
+                const link = getPageLink(m);
                 const bg = m.backdrop || m.poster;
                 const active = idx === 0 ? 'active' : '';
 
@@ -220,7 +232,7 @@
                                 <h2 class="hero-title">${m.title}</h2>
                                 <p class="hero-desc">${m.description || ''}</p>
                                 <a href="${link}" class="hero-btn">
-                                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
                                     Watch Now
                                 </a>
                             </div>
@@ -239,71 +251,56 @@
             `;
             container.style.display = 'block';
 
-            // Swipe Listeners
             container.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
             container.addEventListener('touchend', e => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipe();
+                if (e.changedTouches[0].screenX < touchStartX - 50) changeSlide(1);
+                if (e.changedTouches[0].screenX > touchStartX + 50) changeSlide(-1);
             });
-
             startSlideTimer();
-        }
-
-        function handleSwipe() {
-            if (touchEndX < touchStartX - 50) changeSlide(1); // Swipe Left (Next)
-            if (touchEndX > touchStartX + 50) changeSlide(-1); // Swipe Right (Prev)
         }
 
         function startSlideTimer() {
             clearInterval(slideInterval);
             slideInterval = setInterval(() => changeSlide(1), 6000);
         }
-
         function changeSlide(dir) {
             const slides = document.querySelectorAll('.hero-slide');
             const dots = document.querySelectorAll('.dot');
-            if(slides.length === 0) return;
-
+            if(!slides.length) return;
             slides[currentSlide].classList.remove('active');
             dots[currentSlide].classList.remove('active');
-
             currentSlide = (currentSlide + dir + slides.length) % slides.length;
-
             slides[currentSlide].classList.add('active');
             dots[currentSlide].classList.add('active');
             startSlideTimer();
         }
+        function goToSlide(idx) { currentSlide = idx; changeSlide(0); }
 
-        function goToSlide(idx) {
-            currentSlide = idx;
-            changeSlide(0); // Refresh view
+        // --- 2. HORIZONTAL ROWS ---
+        function renderHorizontalRow(elementId, items) {
+            const container = document.getElementById(elementId);
+            if(!items.length) { container.parentElement.style.display = 'none'; return; }
+            
+            container.innerHTML = items.map(m => `
+                <div class="card" onclick="window.location.href='${getPageLink(m)}'" style="min-width:140px;">
+                    <img src="${m.poster}" class="poster" loading="lazy" alt="${m.title}">
+                    <div class="card-info">
+                        <div class="card-title">${m.title}</div>
+                        <div class="card-meta"><span>${m.year}</span><span class="badge">${m.type}</span></div>
+                    </div>
+                </div>`).join('');
         }
 
-        // --- 2. DYNAMIC FILTERS (Auto-Generated) ---
+        // --- 3. FILTERS ---
         function initFilters() {
             const container = document.getElementById('dynamic-filters');
-            
-            // Extract Unique Values
             const genres = new Set();
-            const years = new Set();
-            db.forEach(m => {
-                if(m.genre) m.genre.split(',').forEach(g => genres.add(g.trim()));
-                if(m.year) years.add(m.year);
-            });
-
-            let html = `<div class="filter-pill active" onclick="applyFilter('all', this)">All</div>`;
-            html += `<div class="filter-pill" onclick="applyFilter('Movie', this)">Movies</div>`;
-            html += `<div class="filter-pill" onclick="applyFilter('TV Series', this)">TV Series</div>`;
+            db.forEach(m => { if(m.genre) m.genre.split(',').forEach(g => genres.add(g.trim())); });
             
-            // Sort & Add Genres
+            let html = `<div class="filter-pill active" onclick="applyFilter('all', this)">All</div>`;
             Array.from(genres).sort().forEach(g => {
                 html += `<div class="filter-pill" onclick="applyFilter('${g}', this)">${g}</div>`;
             });
-            // Sort & Add Recent Years
-            Array.from(years).sort().reverse().slice(0, 5).forEach(y => {
-                html += `<div class="filter-pill" onclick="applyFilter('${y}', this)">${y}</div>`;
-            });
-
             container.innerHTML = html;
         }
 
@@ -313,62 +310,57 @@
                 btn.classList.add('active');
             }
 
-            if(criteria === 'all') {
+            if(criteria === 'all' || !criteria) {
                 filteredDB = [...db];
-                document.getElementById('grid-header').innerText = "Latest Releases";
                 document.getElementById('hero-slider').style.display = 'block';
+                document.getElementById('featured-rows').style.display = 'block';
+                document.getElementById('grid-header').innerText = "All Releases";
             } else {
                 filteredDB = db.filter(m => {
-                    const isType = m.type === criteria || (criteria === 'TV Series' && m.type === 'tv');
-                    const isGenre = m.genre && m.genre.includes(criteria);
-                    const isYear = m.year == criteria;
-                    return isType || isGenre || isYear;
+                    return (m.type === criteria) || 
+                           (criteria === 'TV Series' && m.type === 'tv') ||
+                           (m.genre && m.genre.includes(criteria)) || 
+                           (m.year == criteria);
                 });
-                document.getElementById('grid-header').innerText = `${criteria}`;
                 document.getElementById('hero-slider').style.display = 'none';
+                document.getElementById('featured-rows').style.display = 'none';
+                document.getElementById('grid-header').innerText = criteria;
             }
             renderPage(1);
         }
 
         function applySearch(q) {
-            const query = q.toLowerCase();
-            filteredDB = db.filter(m => m.title.toLowerCase().includes(query));
-            document.getElementById('grid-header').innerText = `Search: "${q}"`;
+            filteredDB = db.filter(m => m.title.toLowerCase().includes(q.toLowerCase()));
             document.getElementById('hero-slider').style.display = 'none';
+            document.getElementById('featured-rows').style.display = 'none';
+            document.getElementById('grid-header').innerText = `Search: "${q}"`;
             renderPage(1);
         }
 
-        // --- 3. PAGINATION RENDERER ---
+        // --- 4. GRID & PAGINATION ---
         function renderPage(page) {
             currentPage = page;
             const grid = document.getElementById('movie-grid');
             grid.innerHTML = '';
             
             const start = (page - 1) * ITEMS_PER_PAGE;
-            const end = start + ITEMS_PER_PAGE;
-            const pageItems = filteredDB.slice(start, end);
+            const pageItems = filteredDB.slice(start, start + ITEMS_PER_PAGE);
 
             if(pageItems.length === 0) {
-                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px;">No results found.</div>`;
+                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px;">No results.</div>`;
             } else {
                 pageItems.forEach(m => {
-                    const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
-                    const link = resolveLink(`${folder}/?id=${m.id}`);
-                    
                     grid.innerHTML += `
-                        <div class="card reveal" onclick="window.location.href='${link}'">
-                            <img src="${m.poster}" class="poster" loading="lazy" alt="${m.title}">
+                        <div class="card reveal" onclick="window.location.href='${getPageLink(m)}'">
+                            <img src="${m.poster}" class="poster" loading="lazy">
                             <div class="card-info">
                                 <div class="card-title">${m.title}</div>
-                                <div class="card-meta">
-                                    <span>${m.year}</span>
-                                    <span class="badge">${m.type}</span>
-                                </div>
+                                <div class="card-meta"><span>${m.year}</span><span class="badge">${m.type}</span></div>
                             </div>
                         </div>`;
                 });
             }
-
+            
             setTimeout(() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('active')), 50);
             renderControls();
             if(page > 1) document.getElementById('grid-header').scrollIntoView({ behavior: 'smooth' });
@@ -377,21 +369,16 @@
         function renderControls() {
             const container = document.getElementById('pagination-controls');
             const totalPages = Math.ceil(filteredDB.length / ITEMS_PER_PAGE);
-            
             if(totalPages <= 1) { container.innerHTML = ''; return; }
 
-            let html = `<div class="page-btn ${currentPage === 1 ? 'disabled' : ''}" onclick="renderPage(${currentPage - 1})">Prev</div>`;
-
-            // Logic to show "1 ... 4 5 6 ... 10"
-            for (let i = 1; i <= totalPages; i++) {
-                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+            let html = `<div class="page-btn" onclick="renderPage(${currentPage - 1})" ${currentPage === 1 ? 'style="opacity:0.3;pointer-events:none"' : ''}>Prev</div>`;
+            
+            for(let i = 1; i <= totalPages; i++) {
+                if(i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
                     html += `<div class="page-btn ${i === currentPage ? 'active' : ''}" onclick="renderPage(${i})">${i}</div>`;
-                } else if (i === currentPage - 2 || i === currentPage + 2) {
-                    html += `<span style="color:#666; align-self:center;">...</span>`;
-                }
+                } else if(i === currentPage - 2 || i === currentPage + 2) html += `<span>...</span>`;
             }
-
-            html += `<div class="page-btn ${currentPage === totalPages ? 'disabled' : ''}" onclick="renderPage(${currentPage + 1})">Next</div>`;
+            html += `<div class="page-btn" onclick="renderPage(${currentPage + 1})" ${currentPage === totalPages ? 'style="opacity:0.3;pointer-events:none"' : ''}>Next</div>`;
             container.innerHTML = html;
         }
     </script>
