@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamHub</title>
+    <title>${CONFIG.siteName</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -64,7 +64,7 @@
                 
                 grid.innerHTML += `
                     <div class="card" onclick="window.location.href='${link}'">
-                        <img src="${m.poster}" class="poster" loading="lazy" alt="${m.title} Poster">
+                        <img src="${m.poster}" class="poster" loading="lazy" alt="${m.title} | ${CONFIG.siteName">
                         <div class="card-info">
                             <div class="card-title">${m.title}</div>
                             <div class="card-meta"><span>${m.year}</span><span class="badge">${m.type}</span></div>
