@@ -5,73 +5,289 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>FLIXᐃR | Bring the Theatre to Your Home</title>
-    <meta name="description" content="Stream and download high-quality movies and TV series.">
-    
+    <meta name="description" content="Stream and download high-quality movies and TV series in 1080p and 4K.">
     <meta property="og:site_name" content="StreamHub">
     <meta property="og:title" content="StreamHub - Watch Movies & Series">
-    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/2503/2503508.png"> <meta property="og:type" content="website">
+    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/2503/2503508.png">
+    <meta property="og:type" content="website">
 
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* HERO CAROUSEL */
+        .hero-section {
+            position: relative;
+            width: 100%;
+            height: 550px; /* Tall, cinematic height */
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            border: 1px solid var(--border);
+        }
+
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center top;
+            opacity: 0;
+            transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+        }
+        .hero-slide.active { opacity: 1; z-index: 2; }
+
+        /* Gradient Overlay for Text Readability */
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, #050505 5%, rgba(5,5,5,0.8) 25%, transparent 60%);
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 40px;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 4;
+            max-width: 800px;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: 0.8s;
+        }
+        .hero-slide.active .hero-content { transform: translateY(0); opacity: 1; }
+
+        .hero-badges { display: flex; gap: 10px; margin-bottom: 15px; }
+        .hero-tag { 
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); 
+            padding: 5px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; 
+            border: 1px solid rgba(255,255,255,0.1); color: #ddd;
+        }
+        .hero-rating { background: #eab308; color: #000; font-weight: 800; border:none; }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin: 0 0 15px 0;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+            font-family: 'Raleway', sans-serif;
+        }
+
+        .hero-desc {
+            font-size: 1.1rem;
+            color: #ccc;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Limit to 2 lines */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            max-width: 600px;
+            text-shadow: 0 1px 5px rgba(0,0,0,0.8);
+        }
+
+        .hero-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 35px;
+            background: var(--primary);
+            color: #000;
+            font-weight: 800;
+            font-size: 1rem;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 20px var(--shadow-color);
+            transition: 0.3s;
+        }
+        .hero-btn:hover { transform: scale(1.05); box-shadow: 0 0 40px var(--shadow-color); background: #fff; }
+
+        /* GENRE PILLS SCROLL */
+        .genre-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            scrollbar-width: none; /* Firefox */
+        }
+        .genre-scroll::-webkit-scrollbar { display: none; } /* Chrome */
+        
+        .genre-pill {
+            white-space: nowrap;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 99px;
+            color: var(--text-dim);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .genre-pill:hover, .genre-pill.active {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--primary);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* MOBILE ADJUSTMENTS */
+        @media(max-width: 768px) {
+            .hero-section { height: 450px; border-radius: 0; margin: -20px -4% 30px -4%; width: 108%; }
+            .hero-overlay { padding: 20px; }
+            .hero-title { font-size: 2rem; }
+            .hero-desc { font-size: 0.9rem; -webkit-line-clamp: 3; }
+            .hero-btn { padding: 10px 25px; font-size: 0.9rem; }
+        }
+    </style>
 </head>
 <body>
 
     <div class="container">
-        <div id="featured-content"></div>
+        
+        <div class="hero-section" id="hero-slider">
+            <div style="display:flex; height:100%; align-items:center; justify-content:center; color:#555;">
+                Loading Featured Content...
+            </div>
+        </div>
+
+        <div class="genre-scroll" id="genre-filters">
+            <div class="genre-pill active" onclick="filterGrid('All', this)">All</div>
+            <div class="genre-pill" onclick="filterGrid('Action', this)">Action</div>
+            <div class="genre-pill" onclick="filterGrid('Adventure', this)">Adventure</div>
+            <div class="genre-pill" onclick="filterGrid('Sci-Fi', this)">Sci-Fi</div>
+            <div class="genre-pill" onclick="filterGrid('Drama', this)">Drama</div>
+            <div class="genre-pill" onclick="filterGrid('Comedy', this)">Comedy</div>
+            <div class="genre-pill" onclick="filterGrid('Thriller', this)">Thriller</div>
+            <div class="genre-pill" onclick="filterGrid('Horror', this)">Horror</div>
+            <div class="genre-pill" onclick="filterGrid('Animation', this)">Animation</div>
+        </div>
 
         <div class="section-header">
             Latest Releases
         </div>
-
+        
         <div class="grid" id="movie-grid">
             </div>
+
     </div>
 
     <script src="config.js"></script>
     <script src="app.js"></script>
     
     <script>
-        // Wait for global scripts to load
+        let allMovies = []; // Store data globally for filtering
+
         document.addEventListener('DOMContentLoaded', () => {
             fetch('movies.json?t=' + Date.now())
                 .then(r => r.json())
                 .then(data => {
-                    const grid = document.getElementById('movie-grid');
-                    if(!grid) return;
+                    if(data.length === 0) return;
+                    allMovies = data.reverse(); // Newest first
                     
-                    grid.innerHTML = ''; // Clear loading state
-                    
-                    // Show latest first
-                    data.reverse().forEach(m => {
-                        // Determine folder path
-                        const folder = m.type === 'TV Series' ? 'series' : 'movie';
-                        
-                        grid.innerHTML += `
-                            <div class="card reveal" onclick="window.location.href='${folder}/index.html?id=${m.id}'">
-                                <img src="${m.poster}" class="poster" loading="lazy" alt="${m.title}">
-                                <div class="card-info">
-                                    <div class="card-title">${m.title}</div>
-                                    <div class="card-meta">
-                                        <span>${m.year}</span>
-                                        <span class="badge">${m.type}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-
-                    // Trigger Animations
-                    const observer = new IntersectionObserver((entries) => {
-                        entries.forEach(entry => {
-                            if(entry.isIntersecting) entry.target.classList.add('active');
-                        });
-                    });
-                    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+                    initHero(allMovies.slice(0, 5)); // Use top 5 for Hero
+                    initGrid(allMovies); // Show all in grid
                 })
-                .catch(err => {
-                    console.error(err);
-                    document.getElementById('movie-grid').innerHTML = '<h3 style="text-align:center; width:100%;">Error loading content. Check Console.</h3>';
-                });
+                .catch(err => console.error("Error:", err));
         });
+
+        // --- 1. HERO LOGIC (Cinematic Slider) ---
+        function initHero(featured) {
+            const container = document.getElementById('hero-slider');
+            if(!featured || featured.length === 0) return;
+
+            let html = '';
+            featured.forEach((m, idx) => {
+                const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
+                const link = `${folder}/index.html?id=${m.id}`;
+                const bg = m.backdrop || m.poster; // Fallback to poster if no backdrop
+                const activeClass = idx === 0 ? 'active' : '';
+
+                html += `
+                    <div class="hero-slide ${activeClass}" style="background-image: url('${bg}')" data-index="${idx}">
+                        <div class="hero-overlay">
+                            <div class="hero-content">
+                                <div class="hero-badges">
+                                    <span class="hero-tag hero-rating">IMDb ${m.rating}</span>
+                                    <span class="hero-tag">${m.year}</span>
+                                    <span class="hero-tag">${m.type}</span>
+                                </div>
+                                <h2 class="hero-title">${m.title}</h2>
+                                <p class="hero-desc">${m.description || 'No description available.'}</p>
+                                <a href="${link}" class="hero-btn">
+                                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                                    Watch Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            container.innerHTML = html;
+
+            // Auto Rotation
+            let currentSlide = 0;
+            const slides = document.querySelectorAll('.hero-slide');
+            
+            setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }, 6000); // Change every 6 seconds
+        }
+
+        // --- 2. GRID LOGIC ---
+        function initGrid(data) {
+            const grid = document.getElementById('movie-grid');
+            grid.innerHTML = '';
+            
+            data.forEach(m => {
+                const isSeries = (m.type === 'TV Series' || m.type === 'tv');
+                const folder = isSeries ? 'series' : 'movie';
+                
+                grid.innerHTML += `
+                    <div class="card reveal" onclick="window.location.href='${folder}/index.html?id=${m.id}'">
+                        <img src="${m.poster}" class="poster" loading="lazy" alt="${m.title}">
+                        <div class="card-info">
+                            <div class="card-title">${m.title}</div>
+                            <div class="card-meta">
+                                <span>${m.year}</span>
+                                <span class="badge">${m.type}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Trigger Reveal Animation
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        // --- 3. FILTER LOGIC ---
+        function filterGrid(genre, btn) {
+            // Update Active Pill
+            document.querySelectorAll('.genre-pill').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+
+            if (genre === 'All') {
+                initGrid(allMovies);
+            } else {
+                const filtered = allMovies.filter(m => m.genre && m.genre.includes(genre));
+                initGrid(filtered);
+            }
+        }
     </script>
 </body>
 </html>
