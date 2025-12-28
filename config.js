@@ -15,6 +15,6 @@ const CONFIG = {
         border: "rgba(255,255,255,0.08)" // Subtle Borders
     },
 
-    footerText: "FLIXᐃR © 2025. All Rights Reserved.\nDeveloped & Maintained by UNIQX Family.",
+    footerText: "FLIXᐃR © 2025. All Rights Reserved.</br>Developed & Maintained by UNIQX Family.",
     latestCount: 12
 };
