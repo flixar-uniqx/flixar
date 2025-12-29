@@ -4,140 +4,204 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <title>StreamHub - Watch Movies & Series</title>
+    <title>FLIXᐃR | Bring the Theatre to Your Home</title>
     <meta name="description" content="Stream and download high-quality movies and TV series.">
+    
     <meta property="og:site_name" content="StreamHub">
     <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/2503/2503508.png">
 
     <link rel="stylesheet" href="style.css">
 
     <style>
-        /* --- 1. HERO SLIDER (UI/UX Optimized) --- */
+        /* --- GLOBAL & TILE FIXES --- */
+        :root { --radius-xl: 24px; }
+
+        /* Unified Card Styling for Grid & Rows */
+        .card {
+            border-radius: var(--radius);
+            /* Fixed Aspect Ratio issues */
+            aspect-ratio: 2/3; 
+            width: 100%;
+            background: var(--card);
+            position: relative; overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s;
+            border: 1px solid transparent;
+        }
+        
+        /* The Hover Lift */
+        .card:hover { 
+            transform: translateY(-8px) scale(1.02); 
+            z-index: 10; 
+            border-color: var(--border);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+        }
+
+        .poster { width: 100%; height: 100%; object-fit: cover; }
+        
+        .card-info {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(to top, #000 10%, rgba(0,0,0,0.8) 80%, transparent 100%);
+            padding: 15px 10px 10px 10px;
+        }
+        
+        .card-title { font-size: 0.85rem; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; color: #fff; }
+        .card-meta { display: flex; justify-content: space-between; font-size: 0.7rem; color: #ccc; font-weight: 600; }
+
+        /* --- 1. HERO SLIDER (Google Material Style) --- */
         .hero-section {
-            position: relative; width: 100%; 
-            height: 480px; /* Reduced height for better view */
-            border-radius: var(--radius); overflow: hidden; margin-bottom: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid var(--border);
-            display: none; 
+            position: relative; width: 100%; height: 550px;
+            border-radius: var(--radius-xl); overflow: hidden; margin-bottom: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5); border: 1px solid var(--border);
+            display: none;
         }
         .hero-slide {
             position: absolute; inset: 0; background-size: cover; background-position: center top;
-            opacity: 0; transition: opacity 0.6s ease; z-index: 1;
+            opacity: 0; transition: opacity 0.8s ease; z-index: 1;
         }
         .hero-slide.active { opacity: 1; z-index: 2; }
         
-        /* Gradient: Clear text reading area */
         .hero-overlay {
             position: absolute; inset: 0;
-            background: linear-gradient(to right, #000 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
-            z-index: 3; display: flex; align-items: center; padding-left: 60px;
+            background: linear-gradient(to right, #000 0%, rgba(0,0,0,0.5) 60%, transparent 100%);
+            z-index: 3; display: flex; flex-direction: column; justify-content: center; 
+            padding-left: 60px; padding-right: 60px;
         }
 
         .hero-content { 
             position: relative; z-index: 4; max-width: 600px; 
-            transform: translateY(20px); opacity: 0; transition: 0.5s 0.2s;
+            transform: translateY(30px); opacity: 0; transition: 0.6s 0.2s;
         }
         .hero-slide.active .hero-content { transform: translateY(0); opacity: 1; }
 
-        .hero-badges { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
+        .hero-badges { display: flex; gap: 8px; margin-bottom: 15px; }
+        /* Google Pill Shape */
         .hero-pill { 
-            background: rgba(255,255,255,0.15); backdrop-filter: blur(5px); 
-            padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; color: #fff;
+            background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); 
+            padding: 6px 16px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; color: #fff;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .hero-rating { background: #eab308; color: #000; }
+        .hero-rating { background: #eab308; color: #000; border: none; }
 
         .hero-title {
-            font-size: 3.2rem; font-weight: 800; line-height: 1.1; margin: 0 0 15px 0;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.9); font-family: 'Raleway', sans-serif; color: #fff;
+            font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin: 0 0 15px 0;
+            text-shadow: 0 4px 30px rgba(0,0,0,0.9); font-family: 'Raleway', sans-serif; color: #fff;
         }
         .hero-desc {
-            font-size: 1rem; color: #ccc; margin-bottom: 25px; line-height: 1.5;
+            font-size: 1rem; color: #ddd; margin-bottom: 30px; line-height: 1.6;
             display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
-            overflow: hidden; max-width: 500px; text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+            overflow: hidden; max-width: 550px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);
         }
 
         .hero-btn {
-            display: inline-flex; align-items: center; gap: 8px; padding: 12px 30px;
-            background: var(--primary); color: #000; font-weight: 800; font-size: 0.9rem;
+            display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px;
+            background: var(--primary); color: #000; font-weight: 800; font-size: 0.95rem;
             border-radius: 99px; text-transform: uppercase; letter-spacing: 0.5px;
-            box-shadow: 0 0 25px var(--shadow-color); transition: 0.3s; cursor: pointer;
+            box-shadow: 0 5px 25px var(--shadow-color); transition: 0.3s; cursor: pointer;
         }
-        .hero-btn:hover { transform: scale(1.05); background: #fff; }
+        .hero-btn:hover { transform: scale(1.05) translateY(-2px); background: #fff; }
 
-        /* NAVIGATION (Sides & Bottom) */
+        /* NAVIGATION CONTROLS (Bottom Right) */
+        .hero-controls {
+            position: absolute; bottom: 30px; right: 40px; z-index: 20; /* High Z-index */
+            display: flex; flex-direction: column; align-items: flex-end; gap: 15px;
+        }
+        
+        .hero-arrows { display: flex; gap: 10px; }
         .hero-arrow {
-            position: absolute; top: 50%; transform: translateY(-50%); z-index: 10;
-            width: 45px; height: 45px; border-radius: 50%;
-            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: #fff;
+            width: 48px; height: 48px; border-radius: 50%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2); color: #fff;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: 0.2s; font-size: 1.2rem;
         }
-        .hero-arrow:hover { background: var(--primary); color: #000; }
-        .prev-slide { left: 20px; }
-        .next-slide { right: 20px; }
-        
-        .hero-dots { 
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); 
-            z-index: 10; display: flex; gap: 8px; 
-        }
-        .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.3); border-radius: 50%; transition: 0.3s; cursor: pointer; }
-        .dot.active { width: 25px; border-radius: 10px; background: var(--primary); }
+        .hero-arrow:hover { background: var(--primary); color: #000; border-color: var(--primary); transform: scale(1.1); }
 
-        /* --- 2. HORIZONTAL SCROLL (Optimized Size) --- */
-        .h-section { margin-bottom: 40px; position: relative; }
+        .hero-dots { display: flex; gap: 8px; }
+        .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.4); border-radius: 50%; transition: 0.3s; cursor: pointer; }
+        .dot.active { width: 24px; border-radius: 10px; background: var(--primary); }
+
+        /* --- 2. HORIZONTAL SECTIONS (Fixes Hover Cutoff) --- */
+        .h-section { margin-bottom: 50px; }
         .h-header { 
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; 
-            color:#fff; font-weight:800; font-size:1.1rem; border-left: 4px solid var(--primary); padding-left: 12px; 
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; 
+            color:#fff; font-weight:800; font-size:1.4rem; font-family: 'Raleway', sans-serif;
+            border-left: 5px solid var(--primary); padding-left: 15px; 
         }
-        .view-all { font-size: 0.75rem; color: var(--text-dim); cursor: pointer; font-weight: 600; text-transform: uppercase; }
-        .view-all:hover { color: var(--primary); }
-
+        
         .h-scroll {
-            display: flex; gap: 12px; overflow-x: auto; padding: 5px 5px 20px 5px;
-            scroll-behavior: smooth; scrollbar-width: none;
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            /* PADDING FIX: Enough space for translateY(-8px) and Shadow */
+            padding: 20px 10px 40px 10px; 
+            scroll-behavior: smooth;
+            scrollbar-width: none;
         }
         .h-scroll::-webkit-scrollbar { display: none; }
         
-        /* Smaller Cards for Horizontal List */
+        /* Uniform Tile Sizes */
         .h-scroll .card {
-            min-width: 140px; width: 140px; flex-shrink: 0;
+            min-width: 150px; width: 150px; flex-shrink: 0;
         }
-        .h-scroll .card-title { font-size: 0.8rem; }
-        .h-scroll .card-info { padding: 8px; }
 
-        /* --- 3. PAGINATION --- */
-        .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 60px; margin-bottom: 20px; flex-wrap: wrap; }
-        .page-btn {
-            min-width: 36px; height: 36px; padding: 0 10px; display: flex; align-items: center; justify-content: center;
-            background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px;
-            color: var(--text-dim); cursor: pointer; transition: 0.2s; font-weight: 700; font-size: 0.85rem;
+        /* --- 3. MAIN GRID (Consistent Size) --- */
+        .grid {
+            display: grid;
+            /* Matches approx 150px width of horizontal cards */
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+            gap: 15px;
+            padding-bottom: 20px;
         }
-        .page-btn:hover, .page-btn.active { background: var(--primary); color: #000; border-color: var(--primary); }
-        .page-btn.disabled { opacity: 0.3; pointer-events: none; }
 
         /* --- 4. FILTERS --- */
         .genre-scroll {
-            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; scrollbar-width: none;
+            display: flex; gap: 8px; overflow-x: auto; 
+            padding: 5px 5px 20px 5px; margin-bottom: 20px;
+            scrollbar-width: none;
         }
         .filter-pill {
-            white-space: nowrap; padding: 8px 16px; background: rgba(255,255,255,0.05);
+            white-space: nowrap; padding: 10px 24px; background: rgba(255,255,255,0.05);
             border: 1px solid var(--border); border-radius: 99px; color: var(--text-dim);
-            font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.2s;
+            font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s; user-select: none;
         }
-        .filter-pill.active { background: var(--primary); color: #000; border-color: var(--primary); }
+        .filter-pill:hover, .filter-pill.active {
+            background: var(--primary); color: #000; border-color: var(--primary); 
+            transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 210, 255, 0.2);
+        }
 
-        /* --- MOBILE OPTIMIZATION --- */
+        /* --- 5. PAGINATION (Animated) --- */
+        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 40px; margin-bottom: 60px; flex-wrap: wrap; }
+        .page-btn {
+            min-width: 40px; height: 40px; padding: 0 12px; display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px;
+            color: var(--text-dim); cursor: pointer; transition: all 0.3s ease; font-weight: 700; font-size: 0.9rem;
+        }
+        .page-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-3px); }
+        .page-btn.active { background: var(--primary); color: #000; border-color: var(--primary); transform: scale(1.1); box-shadow: 0 0 15px var(--shadow-color); }
+        .page-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+        /* --- MOBILE OPTIMIZATION (Optimistic UI) --- */
         @media(max-width: 768px) {
-            .hero-section { height: 420px; margin-bottom: 25px; }
-            .hero-overlay { background: linear-gradient(to top, rgba(0,0,0,0.95) 15%, transparent 100%); padding: 20px; align-items: flex-end; }
-            .hero-content { text-align: center; max-width: 100%; padding-bottom: 40px; margin-bottom: 0; }
-            .hero-title { font-size: 2rem; margin-bottom: 10px; }
-            .hero-desc { display: none; /* Hide desc on mobile for cleaner look */ }
-            .hero-badges { justify-content: center; }
-            .hero-arrow { display: none; } /* Use swipe instead */
+            .hero-section { height: 480px; margin-bottom: 30px; border-radius: 0 0 24px 24px; width: 100vw; margin-left: -4%; }
             
-            .h-scroll .card { min-width: 120px; width: 120px; }
-            .container { padding: 15px 12px; }
+            .hero-overlay { 
+                background: linear-gradient(to top, #000 10%, rgba(0,0,0,0.8) 50%, transparent 100%); 
+                padding: 20px; justify-content: flex-end; align-items: flex-start;
+            }
+            
+            .hero-content { transform: translateY(0); padding-bottom: 10px; text-align: left; }
+            .hero-title { font-size: 2rem; margin-bottom: 8px; }
+            /* Show description but limit it */
+            .hero-desc { font-size: 0.9rem; -webkit-line-clamp: 3; margin-bottom: 20px; }
+            
+            /* Mobile Nav: Arrows hidden, Dots center bottom */
+            .hero-controls { bottom: 15px; right: 50%; transform: translateX(50%); align-items: center; }
+            .hero-arrows { display: none; } /* Swipe is enough */
+            
+            .h-scroll .card, .grid .card { min-width: 120px; width: 100%; }
+            .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            
+            .container { padding: 15px 4%; }
         }
     </style>
 </head>
@@ -156,19 +220,19 @@
             </div>
 
             <div class="h-section">
-                <div class="h-header">Latest Movies <span class="view-all" onclick="applyFilter('Movie')">View All</span></div>
+                <div class="h-header">Movies <span style="font-size:0.8rem; font-weight:400; opacity:0.7; cursor:pointer;" onclick="applyFilter('Movie')">VIEW ALL</span></div>
                 <div class="h-scroll" id="row-movies"></div>
             </div>
             
             <div class="h-section">
-                <div class="h-header">TV Series <span class="view-all" onclick="applyFilter('TV Series')">View All</span></div>
+                <div class="h-header">TV Series <span style="font-size:0.8rem; font-weight:400; opacity:0.7; cursor:pointer;" onclick="applyFilter('TV Series')">VIEW ALL</span></div>
                 <div class="h-scroll" id="row-series"></div>
             </div>
         </div>
 
-        <div class="section-header" id="grid-header">All Releases</div>
+        <div class="section-header" id="grid-header" style="margin-top:60px;">All Releases</div>
         <div class="grid" id="movie-grid">
-            <div style="grid-column:1/-1; text-align:center; padding:50px; color:#666;">Loading Library...</div>
+            <div style="grid-column:1/-1; text-align:center; padding:50px; color:#666;">Loading...</div>
         </div>
 
         <div class="pagination" id="pagination-controls"></div>
@@ -179,13 +243,12 @@
     <script src="app.js"></script>
     
     <script>
-        // GLOBAL VARIABLES
+        // GLOBAL STATE
         let db = []; 
         let filteredDB = []; 
         let currentPage = 1;
         const ITEMS_PER_PAGE = 24; 
         
-        // Slider State
         let currentSlide = 0;
         let slideInterval;
         let touchStartX = 0;
@@ -196,21 +259,22 @@
                 .then(data => {
                     if(data.length === 0) { document.getElementById('movie-grid').innerHTML = "No content."; return; }
 
-                    db = data.reverse(); // Newest first
+                    // 1. SORT: Latest Uploads First
+                    db = data.reverse(); 
                     filteredDB = [...db];
 
-                    // 1. Init Hero (Top 5)
+                    // 2. HERO: Top 5 Latest
                     initHero(db.slice(0, 5));
                     
-                    // 2. Init Filters
+                    // 3. FILTERS
                     initFilters();
                     
-                    // 3. Render Horizontal Rows (Top 10 of each)
+                    // 4. HORIZONTAL ROWS (Top 10 of each category)
                     renderHorizontalRow('row-latest', db.slice(0, 10)); 
                     renderHorizontalRow('row-movies', db.filter(m => m.type === 'Movie').slice(0, 10));
                     renderHorizontalRow('row-series', db.filter(m => m.type === 'TV Series' || m.type === 'tv').slice(0, 10));
 
-                    // 4. Handle URL & Initial Grid
+                    // 5. MAIN GRID (Handle URL Params)
                     const params = new URLSearchParams(window.location.search);
                     if(params.has('genre')) applyFilter(params.get('genre'));
                     else if(params.has('year')) applyFilter(params.get('year'));
@@ -221,19 +285,11 @@
                 .catch(err => console.error(err));
         });
 
-        // --- URL GENERATOR (Fixed) ---
-        function getPageLink(m) {
-            const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
-            // Use resolveLink from app.js to handle local/root paths correctly
-            const basePath = resolveLink(folder); 
-            // Append index.html explicitly to avoid server redirect errors
-            if(basePath.endsWith('/')) return `${basePath}index.html?id=${m.id}`;
-            return `${basePath}/index.html?id=${m.id}`;
-        }
-
-        // --- UNIFIED CARD GENERATOR ---
+        // --- SHARED CARD GENERATOR (Ensures All Tiles Look Identical) ---
         function createCardHTML(m, customClass = "") {
-            const link = getPageLink(m);
+            const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
+            const link = resolveLink(`${folder}/?id=${m.id}`); // Using resolveLink for safety
+            
             return `
                 <div class="card reveal ${customClass}" onclick="window.location.href='${link}'">
                     <img src="${m.poster}" class="poster" loading="lazy" alt="${m.title}">
@@ -241,7 +297,7 @@
                         <div class="card-title">${m.title}</div>
                         <div class="card-meta">
                             <span>${m.year}</span>
-                            <span class="badge">${m.type}</span>
+                            <span class="badge" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:4px; padding:1px 4px;">${m.type}</span>
                         </div>
                     </div>
                 </div>`;
@@ -256,7 +312,8 @@
             let dotsHTML = '';
 
             featured.forEach((m, idx) => {
-                const link = getPageLink(m);
+                const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
+                const link = resolveLink(`${folder}/?id=${m.id}`);
                 const bg = m.backdrop || m.poster;
                 const active = idx === 0 ? 'active' : '';
 
@@ -283,13 +340,17 @@
 
             container.innerHTML = `
                 ${slidesHTML}
-                <div class="hero-arrow prev-slide" onclick="changeSlide(-1)">❮</div>
-                <div class="hero-arrow next-slide" onclick="changeSlide(1)">❯</div>
-                <div class="hero-dots">${dotsHTML}</div>
+                <div class="hero-controls">
+                    <div class="hero-arrows">
+                        <div class="hero-arrow" onclick="changeSlide(-1)">❮</div>
+                        <div class="hero-arrow" onclick="changeSlide(1)">❯</div>
+                    </div>
+                    <div class="hero-dots">${dotsHTML}</div>
+                </div>
             `;
             container.style.display = 'block';
 
-            // Touch Swipe
+            // Swipe logic
             container.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
             container.addEventListener('touchend', e => {
                 if (e.changedTouches[0].screenX < touchStartX - 50) changeSlide(1);
@@ -319,8 +380,14 @@
         function renderHorizontalRow(elementId, items) {
             const container = document.getElementById(elementId);
             if(!items.length) { container.parentElement.style.display = 'none'; return; }
+            
+            // USE createCardHTML to ensure identical styling
             container.innerHTML = items.map(m => createCardHTML(m)).join('');
-            setTimeout(() => container.querySelectorAll('.reveal').forEach(el => el.classList.add('active')), 100);
+            
+            // Animation
+            setTimeout(() => {
+                container.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
+            }, 100);
         }
 
         // --- 3. FILTERS ---
@@ -328,6 +395,7 @@
             const container = document.getElementById('dynamic-filters');
             const genres = new Set();
             db.forEach(m => { if(m.genre) m.genre.split(',').forEach(g => genres.add(g.trim())); });
+            
             let html = `<div class="filter-pill active" onclick="applyFilter('all', this)">All</div>`;
             Array.from(genres).sort().forEach(g => {
                 html += `<div class="filter-pill" onclick="applyFilter('${g}', this)">${g}</div>`;
@@ -381,11 +449,14 @@
                 grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px;">No results found.</div>`;
             } else {
                 pageItems.forEach(m => {
+                    // USE createCardHTML to ensure identical styling
                     grid.innerHTML += createCardHTML(m);
                 });
             }
+            
             setTimeout(() => document.querySelectorAll('#movie-grid .reveal').forEach(el => el.classList.add('active')), 50);
             renderControls();
+            
             if(page > 1) document.getElementById('grid-header').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -394,13 +465,14 @@
             const totalPages = Math.ceil(filteredDB.length / ITEMS_PER_PAGE);
             if(totalPages <= 1) { container.innerHTML = ''; return; }
 
-            let html = `<div class="page-btn ${currentPage === 1 ? 'disabled' : ''}" onclick="renderPage(${currentPage - 1})">Prev</div>`;
+            let html = `<div class="page-btn" onclick="renderPage(${currentPage - 1})" ${currentPage === 1 ? 'style="opacity:0.3;pointer-events:none"' : ''}>Prev</div>`;
+            
             for(let i = 1; i <= totalPages; i++) {
                 if(i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
                     html += `<div class="page-btn ${i === currentPage ? 'active' : ''}" onclick="renderPage(${i})">${i}</div>`;
-                } else if(i === currentPage - 2 || i === currentPage + 2) html += `<span style="align-self:center;color:#666;">...</span>`;
+                } else if(i === currentPage - 2 || i === currentPage + 2) html += `<span>...</span>`;
             }
-            html += `<div class="page-btn ${currentPage === totalPages ? 'disabled' : ''}" onclick="renderPage(${currentPage + 1})">Next</div>`;
+            html += `<div class="page-btn" onclick="renderPage(${currentPage + 1})" ${currentPage === totalPages ? 'style="opacity:0.3;pointer-events:none"' : ''}>Next</div>`;
             container.innerHTML = html;
         }
     </script>
