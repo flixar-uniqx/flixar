@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>StreamHub - Watch Movies & Series</title>
-    <meta property="og:site_name" content="StreamHub">
-    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/2503/2503508.png">
+    <title>StreamHub</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -41,14 +39,12 @@
             </div>
         </div>
 
-        <div class="section-header" id="grid-header" style="margin-top: 40px;">
-            <span>🚀 All Releases</span>
+        <div class="section-header" id="grid-header" style="margin-top: 40px; font-size: 1.5rem; font-weight: 800; color: #fff; border-left: 4px solid var(--primary); padding-left: 15px;">
+            🚀 All Releases
         </div>
         
-        <div class="grid" id="movie-grid">
-            <div style="grid-column:1/-1; text-align:center; padding:50px; color:#666;">Loading Library...</div>
-        </div>
-
+        <div class="grid" id="movie-grid"></div>
+        
         <div class="pagination" id="pagination-controls"></div>
 
     </div>
@@ -57,60 +53,54 @@
     <script src="app.js"></script>
     
     <script>
-        // GLOBAL STATE
-        let db = []; 
-        let filteredDB = []; 
-        let currentPage = 1;
+        let db = [], filteredDB = [], currentPage = 1;
         const ITEMS_PER_PAGE = 24; 
-        
-        let currentSlide = 0;
-        let slideInterval;
-        let touchStartX = 0;
+        let currentSlide = 0, slideInterval, touchStartX = 0;
 
         document.addEventListener('DOMContentLoaded', () => {
             fetch('movies.json?t=' + Date.now())
                 .then(r => r.json())
                 .then(data => {
-                    if(data.length === 0) { document.getElementById('movie-grid').innerHTML = "No content."; return; }
-
-                    // 1. SORTING: User said "Latest is top of JSON". So NO REVERSE.
+                    // 1. DATA (User says latest is at top, so no reverse needed)
                     db = data; 
                     filteredDB = [...db];
 
-                    // 2. HERO: Take top 5
-                    initHero(db.slice(0, 5));
-                    
-                    // 3. FILTERS
-                    initFilters();
-                    
-                    // 4. ROWS (Top 10 of each)
-                    renderHorizontalRow('row-latest', db.slice(0, 10)); 
-                    renderHorizontalRow('row-movies', db.filter(m => m.type === 'Movie').slice(0, 10));
-                    renderHorizontalRow('row-series', db.filter(m => m.type === 'TV Series' || m.type === 'tv').slice(0, 10));
-
-                    // 5. GRID
-                    const params = new URLSearchParams(window.location.search);
-                    if(params.has('genre')) applyFilter(params.get('genre'));
-                    else if(params.has('year')) applyFilter(params.get('year'));
-                    else if(params.has('type')) applyFilter(params.get('type'));
-                    else if(params.has('search')) applySearch(params.get('search'));
-                    else renderPage(1);
-                })
-                .catch(err => console.error(err));
+                    // 2. INIT
+                    if(db.length > 0) {
+                        initHero(db.slice(0, 5));
+                        initFilters();
+                        renderHorizontalRow('row-latest', db.slice(0, 10)); 
+                        renderHorizontalRow('row-movies', db.filter(m => m.type === 'Movie').slice(0, 10));
+                        renderHorizontalRow('row-series', db.filter(m => m.type === 'TV Series' || m.type === 'tv').slice(0, 10));
+                        
+                        // URL Params
+                        const params = new URLSearchParams(window.location.search);
+                        if(params.has('genre')) applyFilter(params.get('genre'));
+                        else if(params.has('year')) applyFilter(params.get('year'));
+                        else if(params.has('type')) applyFilter(params.get('type'));
+                        else if(params.has('search')) applySearch(params.get('search'));
+                        else renderPage(1);
+                    } else {
+                        document.getElementById('movie-grid').innerHTML = '<div style="color:#666; text-align:center;">No content found.</div>';
+                    }
+                });
         });
 
-        // --- NEW CARD DESIGN (Text Below Poster) ---
-        function createCardHTML(m, customClass = "") {
+        // --- COMPONENTS ---
+        function getPageLink(m) {
             const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
-            const link = resolveLink(`${folder}/index.html?id=${m.id}`);
-            
-            // Badge Logic
+            const base = resolveLink(folder); 
+            return base.endsWith('/') ? `${base}index.html?id=${m.id}` : `${base}/index.html?id=${m.id}`;
+        }
+
+        function createCardHTML(m) {
+            const link = getPageLink(m);
             const isSeries = (m.type === 'TV Series' || m.type === 'tv');
             const badgeClass = isSeries ? 'badge series' : 'badge movie';
             const badgeText = isSeries ? 'SERIES' : 'MOVIE';
 
             return `
-                <div class="card reveal ${customClass}" onclick="window.location.href='${link}'">
+                <div class="card reveal" onclick="window.location.href='${link}'">
                     <div class="poster-wrapper">
                         <img src="${m.poster}" class="poster" loading="lazy" alt="${m.title}">
                     </div>
@@ -124,22 +114,17 @@
                 </div>`;
         }
 
-        // --- HERO SYSTEM ---
         function initHero(featured) {
             const container = document.getElementById('hero-slider');
             if(!featured.length) return;
-
-            let slidesHTML = '';
-            let dotsHTML = '';
-
+            
+            let slidesHTML = '', dotsHTML = '';
             featured.forEach((m, idx) => {
-                const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
-                const link = resolveLink(`${folder}/index.html?id=${m.id}`);
-                const bg = m.backdrop || m.poster;
+                const link = getPageLink(m);
                 const active = idx === 0 ? 'active' : '';
-
+                
                 slidesHTML += `
-                    <div class="hero-slide ${active}" style="background-image: url('${bg}')">
+                    <div class="hero-slide ${active}" style="background-image: url('${m.backdrop || m.poster}')">
                         <div class="hero-overlay">
                             <div class="hero-content">
                                 <div class="hero-badges">
@@ -150,13 +135,12 @@
                                 <h2 class="hero-title">${m.title}</h2>
                                 <p class="hero-desc">${m.description || ''}</p>
                                 <a href="${link}" class="hero-btn">
-                                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg> 
                                     Watch Now
                                 </a>
                             </div>
                         </div>
                     </div>`;
-                // Dots logic
                 dotsHTML += `<div class="dot ${active}" onclick="goToSlide(${idx})"></div>`;
             });
 
@@ -170,8 +154,8 @@
                     <div class="hero-dots">${dotsHTML}</div>
                 </div>`;
             container.style.display = 'block';
-
-            // Swipe Logic
+            
+            // Swipe
             container.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
             container.addEventListener('touchend', e => {
                 if (e.changedTouches[0].screenX < touchStartX - 50) changeSlide(1);
@@ -182,35 +166,25 @@
 
         function startSlideTimer() { clearInterval(slideInterval); slideInterval = setInterval(() => changeSlide(1), 6000); }
         function changeSlide(dir) {
-            const slides = document.querySelectorAll('.hero-slide');
-            const dots = document.querySelectorAll('.dot');
+            const slides = document.querySelectorAll('.hero-slide'), dots = document.querySelectorAll('.dot');
             if(!slides.length) return;
-            slides[currentSlide].classList.remove('active');
-            dots[currentSlide].classList.remove('active');
+            slides[currentSlide].classList.remove('active'); dots[currentSlide].classList.remove('active');
             currentSlide = (currentSlide + dir + slides.length) % slides.length;
-            slides[currentSlide].classList.add('active');
-            dots[currentSlide].classList.add('active');
+            slides[currentSlide].classList.add('active'); dots[currentSlide].classList.add('active');
             startSlideTimer();
         }
-        
-        // Exposed global function for onclick="goToSlide(x)"
         window.goToSlide = function(idx) { 
-            const slides = document.querySelectorAll('.hero-slide');
-            const dots = document.querySelectorAll('.dot');
-            slides[currentSlide].classList.remove('active');
-            dots[currentSlide].classList.remove('active');
+            const slides = document.querySelectorAll('.hero-slide'), dots = document.querySelectorAll('.dot');
+            slides[currentSlide].classList.remove('active'); dots[currentSlide].classList.remove('active');
             currentSlide = idx; 
-            slides[currentSlide].classList.add('active');
-            dots[currentSlide].classList.add('active');
+            slides[currentSlide].classList.add('active'); dots[currentSlide].classList.add('active');
             startSlideTimer();
         }
 
-        // --- RENDERERS ---
-        function renderHorizontalRow(elementId, items) {
-            const container = document.getElementById(elementId);
-            if(!items.length) { container.parentElement.style.display = 'none'; return; }
-            container.innerHTML = items.map(m => createCardHTML(m)).join('');
-            setTimeout(() => container.querySelectorAll('.reveal').forEach(el => el.classList.add('active')), 100);
+        function renderHorizontalRow(id, items) {
+            const el = document.getElementById(id);
+            if(items.length === 0) el.parentElement.style.display = 'none';
+            else el.innerHTML = items.map(m => createCardHTML(m)).join('');
         }
 
         function initFilters() {
@@ -224,12 +198,11 @@
 
         function applyFilter(criteria, btn) {
             if(btn) { document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
-            
-            if(criteria === 'all' || !criteria) {
+            if(criteria === 'all') {
                 filteredDB = [...db];
                 document.getElementById('hero-slider').style.display = 'block';
                 document.getElementById('featured-rows').style.display = 'block';
-                document.getElementById('grid-header').innerHTML = "🚀 All Releases";
+                document.getElementById('grid-header').innerText = "🚀 All Releases";
             } else {
                 filteredDB = db.filter(m => (m.type === criteria) || (criteria === 'TV Series' && m.type === 'tv') || (m.genre && m.genre.includes(criteria)) || (m.year == criteria));
                 document.getElementById('hero-slider').style.display = 'none';
@@ -251,16 +224,14 @@
             currentPage = page;
             const grid = document.getElementById('movie-grid');
             grid.innerHTML = '';
-            
             const start = (page - 1) * ITEMS_PER_PAGE;
             const pageItems = filteredDB.slice(start, start + ITEMS_PER_PAGE);
-
+            
             if(pageItems.length === 0) grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px;">No results found.</div>`;
             else pageItems.forEach(m => grid.innerHTML += createCardHTML(m));
             
             setTimeout(() => document.querySelectorAll('#movie-grid .reveal').forEach(el => el.classList.add('active')), 50);
             renderControls();
-            
             if(page > 1) document.getElementById('grid-header').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -268,7 +239,6 @@
             const container = document.getElementById('pagination-controls');
             const totalPages = Math.ceil(filteredDB.length / ITEMS_PER_PAGE);
             if(totalPages <= 1) { container.innerHTML = ''; return; }
-
             let html = `<div class="page-btn" onclick="renderPage(${currentPage - 1})" ${currentPage === 1 ? 'style="opacity:0.3;pointer-events:none"' : ''}>Prev</div>`;
             for(let i = 1; i <= totalPages; i++) {
                 if(i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
