@@ -39,7 +39,7 @@
             </div>
         </div>
 
-        <div class="h-header" id="grid-header" style="margin-top: 40px;">
+        <div class="h-header" id="grid-header" style="margin-top: 40px; margin-bottom: 20px;">
             <span>🚀 All Releases</span>
         </div>
         
@@ -63,9 +63,8 @@
             fetch('movies.json?t=' + Date.now())
                 .then(r => r.json())
                 .then(data => {
-                    // 1. DATA: FORCE SORT BY YEAR DESCENDING (Latest first)
-                    // If year is same, fallback to array order (Latest Added)
-                    db = data.sort((a,b) => b.year - a.year); 
+                    // 1. DATA: Respect JSON order (Latest at top)
+                    db = data; 
                     filteredDB = [...db];
 
                     // 2. HERO: Top 5
@@ -89,12 +88,11 @@
                 });
         });
 
-        // --- GOOGLE STYLE CARD GENERATOR ---
+        // --- NEW CARD DESIGN ---
         function createCardHTML(m) {
             const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
-            const link = resolveLink(`${folder}/index.html?id=${m.id}`);
+            const link = resolveLink(`${folder}/?id=${m.id}`);
             const isSeries = (m.type === 'TV Series' || m.type === 'tv');
-            // Logic for Colored Dots
             const dotClass = isSeries ? 'dot-icon series' : 'dot-icon movie';
             const catName = isSeries ? 'Series' : 'Movie';
 
@@ -120,7 +118,7 @@
             
             let slidesHTML = '', dotsHTML = '';
             featured.forEach((m, idx) => {
-                const link = resolveLink(`${(m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie'}/index.html?id=${m.id}`);
+                const link = resolveLink(`${(m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie'}/?id=${m.id}`);
                 const active = idx === 0 ? 'active' : '';
                 
                 slidesHTML += `
@@ -200,7 +198,7 @@
                 filteredDB = [...db];
                 document.getElementById('hero-slider').style.display = 'block';
                 document.getElementById('featured-rows').style.display = 'block';
-                document.getElementById('grid-header').innerHTML = "🚀 All Releases";
+                document.getElementById('grid-header').innerText = "🚀 All Releases";
             } else {
                 filteredDB = db.filter(m => (m.type === criteria) || (criteria === 'TV Series' && m.type === 'tv') || (m.genre && m.genre.includes(criteria)) || (m.year == criteria));
                 document.getElementById('hero-slider').style.display = 'none';
