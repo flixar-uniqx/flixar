@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>StreamHub</title>
+    <title>StreamHub - Watch Movies & Series</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,31 +16,43 @@
 
         <div id="featured-rows">
             <div class="h-section">
-                <div class="h-header">
-                    <span>🔥 Latest Uploads</span>
+                <div class="section-header">
+                    <div style="display:flex; align-items:center;">
+                        <svg width="24" height="24" fill="none" stroke="#eab308" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path></svg>
+                        Latest Uploads
+                    </div>
                 </div>
                 <div class="h-scroll" id="row-latest"></div>
             </div>
 
             <div class="h-section">
-                <div class="h-header">
-                    <span>🎬 Movies</span>
+                <div class="section-header">
+                    <div style="display:flex; align-items:center;">
+                        <svg width="24" height="24" fill="none" stroke="#00d2ff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>
+                        Movies
+                    </div>
                     <span class="view-all" onclick="applyFilter('Movie')">View All</span>
                 </div>
                 <div class="h-scroll" id="row-movies"></div>
             </div>
             
             <div class="h-section">
-                <div class="h-header">
-                    <span>📺 TV Series</span>
+                <div class="section-header">
+                    <div style="display:flex; align-items:center;">
+                        <svg width="24" height="24" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        TV Series
+                    </div>
                     <span class="view-all" onclick="applyFilter('TV Series')">View All</span>
                 </div>
                 <div class="h-scroll" id="row-series"></div>
             </div>
         </div>
 
-        <div class="h-header" id="grid-header" style="margin-top: 40px; margin-bottom: 20px;">
-            <span>🚀 All Releases</span>
+        <div class="section-header" id="grid-header" style="margin-top: 40px;">
+            <div style="display:flex; align-items:center;">
+                <svg width="24" height="24" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                All Releases
+            </div>
         </div>
         
         <div class="grid" id="movie-grid">
@@ -63,28 +75,26 @@
             fetch('movies.json?t=' + Date.now())
                 .then(r => r.json())
                 .then(data => {
-                    // 1. DATA: Respect JSON order (Latest at top)
+                    // Use Raw JSON Order (Latest First)
                     db = data; 
                     filteredDB = [...db];
 
-                    // 2. HERO: Top 5
-                    initHero(db.slice(0, 5));
-                    
-                    // 3. FILTERS
-                    initFilters();
-                    
-                    // 4. ROWS
-                    renderHorizontalRow('row-latest', db.slice(0, 10)); 
-                    renderHorizontalRow('row-movies', db.filter(m => m.type === 'Movie').slice(0, 10));
-                    renderHorizontalRow('row-series', db.filter(m => m.type === 'TV Series' || m.type === 'tv').slice(0, 10));
-
-                    // 5. GRID
-                    const params = new URLSearchParams(window.location.search);
-                    if(params.has('genre')) applyFilter(params.get('genre'));
-                    else if(params.has('year')) applyFilter(params.get('year'));
-                    else if(params.has('type')) applyFilter(params.get('type'));
-                    else if(params.has('search')) applySearch(params.get('search'));
-                    else renderPage(1);
+                    if(db.length > 0) {
+                        initHero(db.slice(0, 5));
+                        initFilters();
+                        renderHorizontalRow('row-latest', db.slice(0, 10)); 
+                        renderHorizontalRow('row-movies', db.filter(m => m.type === 'Movie').slice(0, 10));
+                        renderHorizontalRow('row-series', db.filter(m => m.type === 'TV Series' || m.type === 'tv').slice(0, 10));
+                        
+                        const params = new URLSearchParams(window.location.search);
+                        if(params.has('genre')) applyFilter(params.get('genre'));
+                        else if(params.has('year')) applyFilter(params.get('year'));
+                        else if(params.has('type')) applyFilter(params.get('type'));
+                        else if(params.has('search')) applySearch(params.get('search'));
+                        else renderPage(1);
+                    } else {
+                        document.getElementById('movie-grid').innerHTML = '<div style="color:#666; text-align:center;">No content found.</div>';
+                    }
                 });
         });
 
