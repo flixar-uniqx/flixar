@@ -6,179 +6,10 @@
     
     <title>StreamHub - Watch Movies & Series</title>
     <meta name="description" content="Stream and download high-quality movies and TV series.">
-    
     <meta property="og:site_name" content="StreamHub">
     <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/2503/2503508.png">
 
     <link rel="stylesheet" href="style.css">
-
-    <style>
-        /* --- 1. HERO SLIDER (Desktop Default) --- */
-        .hero-section {
-            position: relative; width: 100%; height: 550px;
-            border-radius: var(--radius); overflow: hidden; margin-bottom: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6); border: 1px solid var(--border);
-            display: none;
-        }
-        .hero-slide {
-            position: absolute; inset: 0; background-size: cover; background-position: center top;
-            opacity: 0; transition: opacity 0.8s ease; z-index: 1;
-        }
-        .hero-slide.active { opacity: 1; z-index: 2; }
-        
-        .hero-overlay {
-            position: absolute; inset: 0;
-            /* Desktop Gradient: Horizontal fade */
-            background: linear-gradient(to right, #000 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
-            z-index: 3; display: flex; flex-direction: column; justify-content: center; 
-            padding-left: 60px; padding-right: 60px;
-        }
-
-        .hero-content { 
-            position: relative; z-index: 4; max-width: 650px; 
-            transform: translateY(30px); opacity: 0; transition: 0.6s 0.2s;
-        }
-        .hero-slide.active .hero-content { transform: translateY(0); opacity: 1; }
-
-        .hero-badges { display: flex; gap: 8px; margin-bottom: 15px; }
-        .hero-pill { 
-            background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); 
-            padding: 5px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; color: #fff;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .hero-rating { background: #eab308; color: #000; border: none; }
-
-        .hero-title {
-            font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin: 0 0 15px 0;
-            text-shadow: 0 4px 30px rgba(0,0,0,0.9); font-family: 'Raleway', sans-serif; color: #fff;
-        }
-        .hero-desc {
-            font-size: 1rem; color: #ddd; margin-bottom: 30px; line-height: 1.6;
-            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
-            overflow: hidden; max-width: 550px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-        }
-
-        .hero-btn {
-            display: inline-flex; align-items: center; gap: 8px; padding: 12px 32px;
-            background: var(--primary); color: #000; font-weight: 800; font-size: 0.9rem;
-            border-radius: var(--radius-pill); text-transform: uppercase; letter-spacing: 0.5px;
-            box-shadow: 0 5px 25px var(--shadow-color); transition: 0.3s; cursor: pointer;
-            text-decoration: none;
-        }
-        .hero-btn:hover { transform: scale(1.05) translateY(-2px); background: #fff; }
-
-        /* NAVIGATION CONTROLS (Z-Index Fixed) */
-        .hero-controls {
-            position: absolute; bottom: 30px; right: 40px; 
-            z-index: 20; /* Higher than overlay */
-            display: flex; flex-direction: column; align-items: flex-end; gap: 15px;
-            pointer-events: none; /* Let clicks pass through area */
-        }
-        .hero-arrows { display: flex; gap: 10px; pointer-events: auto; /* Enable clicks on buttons */ }
-        
-        .hero-arrow {
-            width: 45px; height: 45px; border-radius: 50%;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2); color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.2s; font-size: 1.2rem;
-        }
-        .hero-arrow:hover { background: var(--primary); color: #000; border-color: var(--primary); }
-        
-        .hero-dots { display: flex; gap: 8px; pointer-events: auto; }
-        .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.4); border-radius: 50%; transition: 0.3s; cursor: pointer; }
-        .dot.active { width: 24px; border-radius: 10px; background: var(--primary); }
-
-        /* --- 2. HORIZONTAL SCROLL (Identical Tiles) --- */
-        .h-section { margin-bottom: 50px; }
-        .h-header { 
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; 
-            color: #fff; font-weight: 800; font-size: 1.3rem; 
-            border-left: 4px solid var(--primary); padding-left: 12px; font-family: 'Raleway', sans-serif;
-        }
-        .view-all { font-size: 0.75rem; color: var(--text-dim); cursor: pointer; text-transform: uppercase; font-weight: 600; }
-        
-        .h-scroll {
-            display: flex; gap: 15px; overflow-x: auto;
-            padding: 15px 5px 30px 5px; /* Space for hover lift */
-            scroll-behavior: smooth; scrollbar-width: none;
-        }
-        .h-scroll::-webkit-scrollbar { display: none; }
-        .h-scroll .card { min-width: 150px; width: 150px; flex-shrink: 0; }
-
-        /* --- 3. FILTERS --- */
-        .genre-scroll {
-            display: flex; gap: 8px; overflow-x: auto; 
-            padding: 5px 5px 20px 5px; margin-bottom: 20px;
-            scrollbar-width: none;
-        }
-        .filter-pill {
-            white-space: nowrap; padding: 10px 24px; background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border); border-radius: 99px; color: var(--text-dim);
-            font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s; user-select: none;
-        }
-        .filter-pill:hover, .filter-pill.active {
-            background: var(--primary); color: #000; border-color: var(--primary); 
-            transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 210, 255, 0.2);
-        }
-
-        /* --- 4. PAGINATION --- */
-        .pagination { display: flex; justify-content: center; gap: 8px; margin: 40px 0 60px 0; flex-wrap: wrap; }
-        .page-btn {
-            min-width: 40px; height: 40px; padding: 0 12px; display: flex; align-items: center; justify-content: center;
-            background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-            color: var(--text-dim); cursor: pointer; transition: 0.2s; font-weight: 700; font-size: 0.9rem;
-        }
-        .page-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
-        .page-btn.active { background: var(--primary); color: #000; border-color: var(--primary); box-shadow: 0 0 15px var(--shadow-color); }
-        .page-btn.disabled { opacity: 0.3; pointer-events: none; }
-
-        /* --- MOBILE OPTIMIZATION (App-Like Feel) --- */
-        @media(max-width: 768px) {
-            /* Hero: Full Bleed Edge-to-Edge */
-            .hero-section { 
-                height: auto; 
-                aspect-ratio: 2/3; /* Vertical Poster Style for Mobile */
-                width: 100vw; 
-                margin-left: -4%; /* Pull out of container padding */
-                margin-right: -4%; 
-                border-radius: 0; 
-                border: none;
-                margin-bottom: 20px;
-            }
-            
-            .hero-overlay { 
-                /* Gradient from bottom up for vertical layout */
-                background: linear-gradient(to top, #000 15%, rgba(0,0,0,0.8) 50%, transparent 100%); 
-                padding: 20px; 
-                justify-content: flex-end; 
-                align-items: flex-start;
-            }
-            
-            .hero-content { 
-                transform: translateY(0); 
-                padding-bottom: 30px; 
-                text-align: left; 
-                max-width: 100%;
-            }
-            
-            .hero-title { font-size: 2.2rem; margin-bottom: 8px; line-height: 1.1; }
-            .hero-desc { font-size: 0.9rem; -webkit-line-clamp: 3; margin-bottom: 15px; display: -webkit-box; }
-            
-            /* Mobile Nav: Hide Arrows, Center Dots */
-            .hero-controls { 
-                bottom: 10px; right: 50%; transform: translateX(50%); 
-                align-items: center; width: auto;
-            }
-            .hero-arrows { display: none; } /* Native swipe is better on mobile */
-            
-            /* Horizontal Cards Mobile Size */
-            .h-scroll .card { min-width: 125px; width: 125px; }
-            
-            /* Tighter Mobile Grid (3 Columns) */
-            .container { padding: 15px 4%; }
-        }
-    </style>
 </head>
 <body>
 
@@ -190,22 +21,45 @@
 
         <div id="featured-rows">
             <div class="h-section">
-                <div class="h-header">Latest Uploads</div>
+                <div class="h-header">
+                    <span>
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right:8px; vertical-align:middle; color:#eab308;"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path></svg>
+                        Latest Uploads
+                    </span>
+                </div>
                 <div class="h-scroll" id="row-latest"></div>
             </div>
 
             <div class="h-section">
-                <div class="h-header">Movies <span class="view-all" onclick="applyFilter('Movie')">View All</span></div>
+                <div class="h-header">
+                    <span>
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right:8px; vertical-align:middle; color:#00d2ff;"><path stroke-linecap="round" stroke-linejoin="round" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>
+                        Movies
+                    </span>
+                    <span class="view-all" onclick="applyFilter('Movie')">VIEW ALL</span>
+                </div>
                 <div class="h-scroll" id="row-movies"></div>
             </div>
             
             <div class="h-section">
-                <div class="h-header">TV Series <span class="view-all" onclick="applyFilter('TV Series')">View All</span></div>
+                <div class="h-header">
+                    <span>
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right:8px; vertical-align:middle; color:#10b981;"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        TV Series
+                    </span>
+                    <span class="view-all" onclick="applyFilter('TV Series')">VIEW ALL</span>
+                </div>
                 <div class="h-scroll" id="row-series"></div>
             </div>
         </div>
 
-        <div class="section-header" id="grid-header" style="margin-top: 40px;">All Releases</div>
+        <div class="section-header" id="grid-header" style="margin-top: 40px;">
+            <span>
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right:10px;"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                All Releases
+            </span>
+        </div>
+        
         <div class="grid" id="movie-grid">
             <div style="grid-column:1/-1; text-align:center; padding:50px; color:#666;">Loading Library...</div>
         </div>
@@ -218,7 +72,7 @@
     <script src="app.js"></script>
     
     <script>
-        // --- GLOBAL STATE ---
+        // GLOBAL STATE
         let db = []; 
         let filteredDB = []; 
         let currentPage = 1;
@@ -234,20 +88,22 @@
                 .then(data => {
                     if(data.length === 0) { document.getElementById('movie-grid').innerHTML = "No content."; return; }
 
-                    // 1. SORT LATEST FIRST
+                    // 1. SORT BY LATEST
                     db = data.reverse(); 
                     filteredDB = [...db];
 
-                    // 2. INIT UI
+                    // 2. HERO: Top 5 Latest
                     initHero(db.slice(0, 5));
+                    
+                    // 3. FILTERS
                     initFilters();
                     
-                    // 3. RENDER ROWS (Using unified card generator)
+                    // 4. HORIZONTAL ROWS (Top 10 of each)
                     renderHorizontalRow('row-latest', db.slice(0, 10)); 
                     renderHorizontalRow('row-movies', db.filter(m => m.type === 'Movie').slice(0, 10));
                     renderHorizontalRow('row-series', db.filter(m => m.type === 'TV Series' || m.type === 'tv').slice(0, 10));
 
-                    // 4. PARAMS & GRID
+                    // 5. GRID / URL HANDLING
                     const params = new URLSearchParams(window.location.search);
                     if(params.has('genre')) applyFilter(params.get('genre'));
                     else if(params.has('year')) applyFilter(params.get('year'));
@@ -261,7 +117,8 @@
         // --- SHARED HELPERS ---
         function getPageLink(m) {
             const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
-            const base = resolveLink(folder);
+            const base = resolveLink(folder); 
+            // Fix double slash issues
             return base.endsWith('/') ? `${base}index.html?id=${m.id}` : `${base}/index.html?id=${m.id}`;
         }
 
@@ -274,7 +131,7 @@
                         <div class="card-title">${m.title}</div>
                         <div class="card-meta">
                             <span>${m.year}</span>
-                            <span class="badge" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:4px; padding:1px 4px;">${m.type}</span>
+                            <span class="badge">${m.type}</span>
                         </div>
                     </div>
                 </div>`;
@@ -304,10 +161,10 @@
                                 </div>
                                 <h2 class="hero-title">${m.title}</h2>
                                 <p class="hero-desc">${m.description || ''}</p>
-                                <a href="${link}" class="hero-btn">
+                                <div onclick="window.location.href='${link}'" class="hero-btn">
                                     <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
                                     Watch Now
-                                </a>
+                                </div>
                             </div>
                         </div>
                     </div>`;
@@ -326,7 +183,6 @@
             `;
             container.style.display = 'block';
 
-            // Swipe Logic
             container.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
             container.addEventListener('touchend', e => {
                 if (e.changedTouches[0].screenX < touchStartX - 50) changeSlide(1);
@@ -343,12 +199,9 @@
             const slides = document.querySelectorAll('.hero-slide');
             const dots = document.querySelectorAll('.dot');
             if(!slides.length) return;
-            
             slides[currentSlide].classList.remove('active');
             dots[currentSlide].classList.remove('active');
-            
             currentSlide = (currentSlide + dir + slides.length) % slides.length;
-            
             slides[currentSlide].classList.add('active');
             dots[currentSlide].classList.add('active');
             startSlideTimer();
@@ -381,7 +234,7 @@
                 btn.classList.add('active');
             }
 
-            if(criteria === 'all') {
+            if(criteria === 'all' || !criteria) {
                 filteredDB = [...db];
                 document.getElementById('hero-slider').style.display = 'block';
                 document.getElementById('featured-rows').style.display = 'block';
