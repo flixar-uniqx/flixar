@@ -1,5 +1,3 @@
-/* SAVE THIS AS app.js */
-
 const isLocal = window.location.protocol === 'file:' || window.location.href.includes('.html');
 function getRoot() {
     if (window.location.pathname.match(/\/(movie|series|contact|disclaimer|terms|admin)\//)) return '../';
@@ -9,7 +7,6 @@ const ROOT = getRoot();
 
 function resolveLink(folder) {
     if (folder === '') return isLocal ? `${ROOT}index.html` : ROOT;
-    // CLEAN LINKING: If local, use index.html. If server, use directory.
     return isLocal ? `${ROOT}${folder}/index.html` : `${ROOT}${folder}/`;
 }
 
@@ -21,21 +18,19 @@ document.addEventListener("DOMContentLoaded", () => {
     injectFooter();
     setupScroll();
     
-    // Preload Search Data
     fetch(ROOT + 'movies.json?t=' + Date.now())
         .then(r => r.json()).then(data => window.movieData = data).catch(()=>{});
 });
 
 function applyConfig() { document.documentElement.style.setProperty('--primary', CONFIG.colors.primary); }
 
-// NAVBAR
 function injectNavbar() {
     const homeLink = resolveLink('');
     const nav = document.createElement('nav');
     nav.className = 'nav';
     nav.innerHTML = `
         <a href="${homeLink}" class="logo">
-            <img src="${CONFIG.logoUrl}" alt="${CONFIG.siteName} Logo">
+            <img src="${CONFIG.logoUrl}" alt="Logo">
             <span>${CONFIG.siteName}</span>
         </a>
         <div class="nav-right">
@@ -44,7 +39,7 @@ function injectNavbar() {
                 <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path></svg>
                 <div class="search-results" id="search-dropdown"></div>
             </div>
-            <div class="menu-btn" onclick="toggleMenu()" aria-label="Open Menu">
+            <div class="menu-btn" onclick="toggleMenu()">
                 <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </div>
         </div>`;
@@ -72,10 +67,10 @@ function showSuggestions(query) {
             const link = resolveLink(`${folder}/?id=${m.id}`);
             html += `
                 <div class="search-item" onclick="window.location.href='${link}'">
-                    <img src="${m.poster}" class="s-poster" alt="${m.title} thumbnail">
+                    <img src="${m.poster}" class="s-poster" alt="${m.title}">
                     <div class="s-info">
                         <span class="s-title">${m.title}</span>
-                        <span class="s-meta" style="font-size:0.7rem; color:#888;">${m.year}</span>
+                        <span class="s-meta">${m.year} • ${m.type}</span>
                     </div>
                 </div>`;
         });
@@ -84,7 +79,6 @@ function showSuggestions(query) {
     dropdown.classList.add('active');
 }
 
-// SIDEBAR
 function injectSidebar() {
     const homeLink = resolveLink('');
     const sidebar = document.createElement('div');
@@ -112,7 +106,17 @@ function toggleMenu() { document.querySelector('.sidebar').classList.toggle('act
 function injectFooter() {
     const footer = document.createElement('div');
     footer.className = 'footer';
-    footer.innerHTML = `<div class="footer-copy">${CONFIG.footerText}</div><div id="go-up" onclick="window.scrollTo({top:0, behavior:'smooth'})"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"></path></svg></div>`;
+    footer.innerHTML = `
+        <div class="footer-links">
+            <a href="${resolveLink('')}">Home</a>
+            <a href="${resolveLink('contact')}">Contact</a>
+            <a href="${resolveLink('terms')}">Terms</a>
+            <a href="${resolveLink('disclaimer')}">Disclaimer</a>
+        </div>
+        <div class="footer-copy">${CONFIG.footerText}</div>
+        <div id="go-up" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"></path></svg>
+        </div>`;
     document.body.appendChild(footer);
 }
 
