@@ -9,7 +9,8 @@ const ROOT = getRoot();
 
 function resolveLink(folder) {
     if (folder === '') return isLocal ? `${ROOT}index.html` : ROOT;
-    return isLocal ? `${ROOT}${folder}` : `${ROOT}${folder}/`;
+    // CLEAN LINKING: If local, use index.html. If server, use directory.
+    return isLocal ? `${ROOT}${folder}/index.html` : `${ROOT}${folder}/`;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -68,7 +69,7 @@ function showSuggestions(query) {
         let html = '';
         results.forEach(m => {
             const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
-            const link = resolveLink(`${folder}/index.html?id=${m.id}`);
+            const link = resolveLink(`${folder}/?id=${m.id}`);
             html += `
                 <div class="search-item" onclick="window.location.href='${link}'">
                     <img src="${m.poster}" class="s-poster" alt="${m.title} thumbnail">
@@ -121,7 +122,7 @@ function populateSidebarFilters(data) {
     const c = document.getElementById('side-filters');
     const homeLink = resolveLink('');
     const chip = (k, v) => `<a href="${homeLink}?${k}=${encodeURIComponent(v)}" class="filter-pill" style="display:inline-block; margin:2px;">${v}</a>`;
-    c.innerHTML = `<h3>Browse</h3><div style="display:flex; flex-wrap:wrap;">${chip('type','Movie')}${chip('type','TV Series')}</div>`;
+    c.innerHTML = `<h3>Browse</h3><div style="display:flex; flex-wrap:wrap; gap:5px;">${chip('type','Movie')}${chip('type','TV Series')}</div>`;
 }
 
 function resolveDL(link) {
