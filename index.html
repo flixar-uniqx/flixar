@@ -11,32 +11,30 @@
 <body>
 
     <div class="container">
+        
         <div class="hero-section" id="hero-slider"></div>
 
         <div class="genre-scroll" id="dynamic-filters"></div>
 
         <div id="featured-rows">
             <div class="h-section">
-                <div class="section-header">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    Latest Uploads
+                <div class="h-header">
+                    <span>🔥 Latest Uploads</span>
                 </div>
                 <div class="h-scroll" id="row-latest"></div>
             </div>
 
             <div class="h-section">
-                <div class="section-header">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>
-                    Movies
+                <div class="h-header">
+                    <span>🎬 Movies</span>
                     <span class="view-all" onclick="applyFilter('Movie')">View All</span>
                 </div>
                 <div class="h-scroll" id="row-movies"></div>
             </div>
             
             <div class="h-section">
-                <div class="section-header">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                    TV Series
+                <div class="h-header">
+                    <span>📺 TV Series</span>
                     <span class="view-all" onclick="applyFilter('TV Series')">View All</span>
                 </div>
                 <div class="h-scroll" id="row-series"></div>
@@ -44,24 +42,30 @@
         </div>
 
         <div class="section-header" id="grid-header" style="margin-top: 40px;">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-            All Releases
+            <span>🚀 All Releases</span>
         </div>
         
         <div class="grid" id="movie-grid">
-            <div style="grid-column:1/-1; text-align:center; padding:50px; color:#666;">Loading...</div>
+            <div style="grid-column:1/-1; text-align:center; padding:50px; color:#666;">Loading Library...</div>
         </div>
 
         <div class="pagination" id="pagination-controls"></div>
+
     </div>
 
     <script src="config.js"></script>
     <script src="app.js"></script>
     
     <script>
-        let db = [], filteredDB = [], currentPage = 1;
+        // GLOBAL STATE
+        let db = []; 
+        let filteredDB = []; 
+        let currentPage = 1;
         const ITEMS_PER_PAGE = 24; 
-        let currentSlide = 0, slideInterval, touchStartX = 0;
+        
+        let currentSlide = 0;
+        let slideInterval;
+        let touchStartX = 0;
 
         document.addEventListener('DOMContentLoaded', () => {
             fetch('movies.json?t=' + Date.now())
@@ -69,19 +73,22 @@
                 .then(data => {
                     if(data.length === 0) { document.getElementById('movie-grid').innerHTML = "No content."; return; }
 
-                    // 1. SORT LATEST FIRST (Reverses JSON array)
-                    db = data.reverse(); 
+                    // 1. SORTING: User said "Latest is top of JSON". So NO REVERSE.
+                    db = data; 
                     filteredDB = [...db];
 
-                    // 2. INIT UI
+                    // 2. HERO: Take top 5
                     initHero(db.slice(0, 5));
+                    
+                    // 3. FILTERS
                     initFilters();
                     
+                    // 4. ROWS (Top 10 of each)
                     renderHorizontalRow('row-latest', db.slice(0, 10)); 
                     renderHorizontalRow('row-movies', db.filter(m => m.type === 'Movie').slice(0, 10));
                     renderHorizontalRow('row-series', db.filter(m => m.type === 'TV Series' || m.type === 'tv').slice(0, 10));
 
-                    // 3. PAGE LOAD
+                    // 5. GRID
                     const params = new URLSearchParams(window.location.search);
                     if(params.has('genre')) applyFilter(params.get('genre'));
                     else if(params.has('year')) applyFilter(params.get('year'));
@@ -92,23 +99,26 @@
                 .catch(err => console.error(err));
         });
 
-        // --- HELPERS ---
-        function getPageLink(m) {
-            const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
-            const base = resolveLink(folder); 
-            return base.endsWith('/') ? `${base}index.html?id=${m.id}` : `${base}/index.html?id=${m.id}`;
-        }
-
+        // --- NEW CARD DESIGN (Text Below Poster) ---
         function createCardHTML(m, customClass = "") {
-            const link = getPageLink(m);
+            const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
+            const link = resolveLink(`${folder}/index.html?id=${m.id}`);
+            
+            // Badge Logic
+            const isSeries = (m.type === 'TV Series' || m.type === 'tv');
+            const badgeClass = isSeries ? 'badge series' : 'badge movie';
+            const badgeText = isSeries ? 'SERIES' : 'MOVIE';
+
             return `
                 <div class="card reveal ${customClass}" onclick="window.location.href='${link}'">
-                    <img src="${m.poster}" class="poster" loading="lazy" alt="${m.title}">
-                    <div class="card-info">
+                    <div class="poster-wrapper">
+                        <img src="${m.poster}" class="poster" loading="lazy" alt="${m.title}">
+                    </div>
+                    <div class="card-details">
                         <div class="card-title">${m.title}</div>
                         <div class="card-meta">
                             <span>${m.year}</span>
-                            <span class="badge" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2); border-radius:4px; padding:1px 4px;">${m.type}</span>
+                            <span class="${badgeClass}">${badgeText}</span>
                         </div>
                     </div>
                 </div>`;
@@ -119,10 +129,12 @@
             const container = document.getElementById('hero-slider');
             if(!featured.length) return;
 
-            let slidesHTML = '', dotsHTML = '';
+            let slidesHTML = '';
+            let dotsHTML = '';
 
             featured.forEach((m, idx) => {
-                const link = getPageLink(m);
+                const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
+                const link = resolveLink(`${folder}/index.html?id=${m.id}`);
                 const bg = m.backdrop || m.poster;
                 const active = idx === 0 ? 'active' : '';
 
@@ -144,6 +156,7 @@
                             </div>
                         </div>
                     </div>`;
+                // Dots logic
                 dotsHTML += `<div class="dot ${active}" onclick="goToSlide(${idx})"></div>`;
             });
 
@@ -158,6 +171,7 @@
                 </div>`;
             container.style.display = 'block';
 
+            // Swipe Logic
             container.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
             container.addEventListener('touchend', e => {
                 if (e.changedTouches[0].screenX < touchStartX - 50) changeSlide(1);
@@ -168,16 +182,30 @@
 
         function startSlideTimer() { clearInterval(slideInterval); slideInterval = setInterval(() => changeSlide(1), 6000); }
         function changeSlide(dir) {
-            const slides = document.querySelectorAll('.hero-slide'), dots = document.querySelectorAll('.dot');
+            const slides = document.querySelectorAll('.hero-slide');
+            const dots = document.querySelectorAll('.dot');
             if(!slides.length) return;
-            slides[currentSlide].classList.remove('active'); dots[currentSlide].classList.remove('active');
+            slides[currentSlide].classList.remove('active');
+            dots[currentSlide].classList.remove('active');
             currentSlide = (currentSlide + dir + slides.length) % slides.length;
-            slides[currentSlide].classList.add('active'); dots[currentSlide].classList.add('active');
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
             startSlideTimer();
         }
-        function goToSlide(idx) { currentSlide = idx; changeSlide(0); }
+        
+        // Exposed global function for onclick="goToSlide(x)"
+        window.goToSlide = function(idx) { 
+            const slides = document.querySelectorAll('.hero-slide');
+            const dots = document.querySelectorAll('.dot');
+            slides[currentSlide].classList.remove('active');
+            dots[currentSlide].classList.remove('active');
+            currentSlide = idx; 
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+            startSlideTimer();
+        }
 
-        // --- UI RENDERERS ---
+        // --- RENDERERS ---
         function renderHorizontalRow(elementId, items) {
             const container = document.getElementById(elementId);
             if(!items.length) { container.parentElement.style.display = 'none'; return; }
@@ -201,12 +229,12 @@
                 filteredDB = [...db];
                 document.getElementById('hero-slider').style.display = 'block';
                 document.getElementById('featured-rows').style.display = 'block';
-                document.getElementById('grid-header').innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:28px;height:28px;margin-right:10px;"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg> All Releases`;
+                document.getElementById('grid-header').innerHTML = "🚀 All Releases";
             } else {
                 filteredDB = db.filter(m => (m.type === criteria) || (criteria === 'TV Series' && m.type === 'tv') || (m.genre && m.genre.includes(criteria)) || (m.year == criteria));
                 document.getElementById('hero-slider').style.display = 'none';
                 document.getElementById('featured-rows').style.display = 'none';
-                document.getElementById('grid-header').innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:28px;height:28px;margin-right:10px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg> Results: ${criteria}`;
+                document.getElementById('grid-header').innerText = `Results: ${criteria}`;
             }
             renderPage(1);
         }
@@ -232,6 +260,7 @@
             
             setTimeout(() => document.querySelectorAll('#movie-grid .reveal').forEach(el => el.classList.add('active')), 50);
             renderControls();
+            
             if(page > 1) document.getElementById('grid-header').scrollIntoView({ behavior: 'smooth' });
         }
 
