@@ -39,12 +39,14 @@
             </div>
         </div>
 
-        <div class="section-header" id="grid-header" style="margin-top: 40px; font-size: 1.5rem; font-weight: 800; color: #fff; border-left: 4px solid var(--primary); padding-left: 15px;">
+        <div class="section-header" id="grid-header" style="margin-top: 40px; border-left:4px solid var(--primary); padding-left:15px; font-size:1.5rem; font-weight:800; color:#fff;">
             🚀 All Releases
         </div>
         
-        <div class="grid" id="movie-grid"></div>
-        
+        <div class="grid" id="movie-grid">
+            <div style="text-align:center; padding:50px; color:#666;">Loading...</div>
+        </div>
+
         <div class="pagination" id="pagination-controls"></div>
 
     </div>
@@ -61,43 +63,38 @@
             fetch('movies.json?t=' + Date.now())
                 .then(r => r.json())
                 .then(data => {
-                    // 1. DATA (User says latest is at top, so no reverse needed)
+                    // 1. DATA: Use raw order (Latest at top)
                     db = data; 
                     filteredDB = [...db];
 
-                    // 2. INIT
-                    if(db.length > 0) {
-                        initHero(db.slice(0, 5));
-                        initFilters();
-                        renderHorizontalRow('row-latest', db.slice(0, 10)); 
-                        renderHorizontalRow('row-movies', db.filter(m => m.type === 'Movie').slice(0, 10));
-                        renderHorizontalRow('row-series', db.filter(m => m.type === 'TV Series' || m.type === 'tv').slice(0, 10));
-                        
-                        // URL Params
-                        const params = new URLSearchParams(window.location.search);
-                        if(params.has('genre')) applyFilter(params.get('genre'));
-                        else if(params.has('year')) applyFilter(params.get('year'));
-                        else if(params.has('type')) applyFilter(params.get('type'));
-                        else if(params.has('search')) applySearch(params.get('search'));
-                        else renderPage(1);
-                    } else {
-                        document.getElementById('movie-grid').innerHTML = '<div style="color:#666; text-align:center;">No content found.</div>';
-                    }
+                    // 2. HERO: Top 5
+                    initHero(db.slice(0, 5));
+                    
+                    // 3. FILTERS
+                    initFilters();
+                    
+                    // 4. ROWS
+                    renderHorizontalRow('row-latest', db.slice(0, 10)); 
+                    renderHorizontalRow('row-movies', db.filter(m => m.type === 'Movie').slice(0, 10));
+                    renderHorizontalRow('row-series', db.filter(m => m.type === 'TV Series' || m.type === 'tv').slice(0, 10));
+
+                    // 5. GRID
+                    const params = new URLSearchParams(window.location.search);
+                    if(params.has('genre')) applyFilter(params.get('genre'));
+                    else if(params.has('year')) applyFilter(params.get('year'));
+                    else if(params.has('type')) applyFilter(params.get('type'));
+                    else if(params.has('search')) applySearch(params.get('search'));
+                    else renderPage(1);
                 });
         });
 
-        // --- COMPONENTS ---
-        function getPageLink(m) {
-            const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
-            const base = resolveLink(folder); 
-            return base.endsWith('/') ? `${base}index.html?id=${m.id}` : `${base}/index.html?id=${m.id}`;
-        }
-
+        // --- NEW CARD DESIGN ---
         function createCardHTML(m) {
-            const link = getPageLink(m);
+            const folder = (m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie';
+            const link = resolveLink(`${folder}/index.html?id=${m.id}`);
             const isSeries = (m.type === 'TV Series' || m.type === 'tv');
-            const badgeClass = isSeries ? 'badge series' : 'badge movie';
-            const badgeText = isSeries ? 'SERIES' : 'MOVIE';
+            const dotClass = isSeries ? 'dot-icon series' : 'dot-icon movie';
+            const catName = isSeries ? 'Series' : 'Movie';
 
             return `
                 <div class="card reveal" onclick="window.location.href='${link}'">
@@ -108,19 +105,20 @@
                         <div class="card-title">${m.title}</div>
                         <div class="card-meta">
                             <span>${m.year}</span>
-                            <span class="${badgeClass}">${badgeText}</span>
+                            <div class="badge-dot"><span class="${dotClass}"></span> ${catName}</div>
                         </div>
                     </div>
                 </div>`;
         }
 
+        // --- HERO SLIDER ---
         function initHero(featured) {
             const container = document.getElementById('hero-slider');
             if(!featured.length) return;
             
             let slidesHTML = '', dotsHTML = '';
             featured.forEach((m, idx) => {
-                const link = getPageLink(m);
+                const link = resolveLink(`${(m.type === 'TV Series' || m.type === 'tv') ? 'series' : 'movie'}/index.html?id=${m.id}`);
                 const active = idx === 0 ? 'active' : '';
                 
                 slidesHTML += `
@@ -155,7 +153,6 @@
                 </div>`;
             container.style.display = 'block';
             
-            // Swipe
             container.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
             container.addEventListener('touchend', e => {
                 if (e.changedTouches[0].screenX < touchStartX - 50) changeSlide(1);
@@ -167,7 +164,6 @@
         function startSlideTimer() { clearInterval(slideInterval); slideInterval = setInterval(() => changeSlide(1), 6000); }
         function changeSlide(dir) {
             const slides = document.querySelectorAll('.hero-slide'), dots = document.querySelectorAll('.dot');
-            if(!slides.length) return;
             slides[currentSlide].classList.remove('active'); dots[currentSlide].classList.remove('active');
             currentSlide = (currentSlide + dir + slides.length) % slides.length;
             slides[currentSlide].classList.add('active'); dots[currentSlide].classList.add('active');
@@ -232,7 +228,6 @@
             
             setTimeout(() => document.querySelectorAll('#movie-grid .reveal').forEach(el => el.classList.add('active')), 50);
             renderControls();
-            if(page > 1) document.getElementById('grid-header').scrollIntoView({ behavior: 'smooth' });
         }
 
         function renderControls() {
